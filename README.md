@@ -73,6 +73,7 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
    | `AWS_BEARER_TOKEN_BEDROCK` | Your Bedrock API key (bearer token). |
    | `AWS_REGION` | e.g. `eu-west-1`. |
    | `ANTHROPIC_MODEL` (or `CLAUDE_MODEL`) | Bedrock model / inference-profile id, e.g. `eu.anthropic.claude-opus-4-8` (the default in Bedrock mode). |
+   | `BEDROCK_ENDPOINT` | Optional: `runtime` (default — classic InvokeModel endpoint, works with plain Bedrock API keys) or `mantle` (newer Messages endpoint; the key additionally needs the `bedrock-mantle:CreateInference` IAM action). |
 
    The provider is auto-detected from which credentials are present
    (`ANTHROPIC_API_KEY` wins if both are set; override with `CLAUDE_PROVIDER=anthropic|bedrock`).

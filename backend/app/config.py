@@ -12,7 +12,7 @@ AWS_BEARER_TOKEN_BEDROCK = os.environ.get("AWS_BEARER_TOKEN_BEDROCK", "")
 
 # Provider selection:
 #   CLAUDE_PROVIDER=anthropic  -> first-party Claude API (needs ANTHROPIC_API_KEY)
-#   CLAUDE_PROVIDER=bedrock    -> Claude on Amazon Bedrock via the Mantle client
+#   CLAUDE_PROVIDER=bedrock    -> Claude on Amazon Bedrock
 #                                 (needs AWS_BEARER_TOKEN_BEDROCK + AWS_REGION,
 #                                  or standard AWS SigV4 credentials)
 # If unset, the provider is inferred from which credentials are present.
@@ -38,6 +38,9 @@ CLAUDE_MODEL = (
     or os.environ.get("ANTHROPIC_MODEL")
     or _DEFAULT_MODELS.get(CLAUDE_PROVIDER, "claude-opus-4-8")
 )
+
+# Bedrock API surface: "runtime" (classic InvokeModel, default) or "mantle".
+BEDROCK_ENDPOINT = os.environ.get("BEDROCK_ENDPOINT", "runtime").strip().lower()
 
 # Max tokens per agent response. Findings are structured JSON so this is generous.
 AGENT_MAX_TOKENS = int(os.environ.get("AGENT_MAX_TOKENS", "8000"))
@@ -68,9 +71,19 @@ def make_async_client():
         from anthropic import AsyncAnthropic
         return AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
     if CLAUDE_PROVIDER == "bedrock":
-        from anthropic import AsyncAnthropicBedrockMantle
-        # Credentials and region resolve from the environment:
+        # Credentials and region resolve from the environment in both cases:
         # AWS_BEARER_TOKEN_BEDROCK (Bedrock API key) or SigV4 credentials,
         # plus AWS_REGION / AWS_DEFAULT_REGION.
-        return AsyncAnthropicBedrockMantle()
+        #
+        # BEDROCK_ENDPOINT selects the API surface:
+        #   runtime (default) -> classic bedrock-runtime InvokeModel endpoint.
+        #     Bedrock API keys carry bedrock:InvokeModel permission out of the
+        #     box, so this is the path that works without extra IAM policies.
+        #   mantle -> the newer Messages-API endpoint; requires the
+        #     bedrock-mantle:CreateInference IAM action.
+        if BEDROCK_ENDPOINT == "mantle":
+            from anthropic import AsyncAnthropicBedrockMantle
+            return AsyncAnthropicBedrockMantle()
+        from anthropic import AsyncAnthropicBedrock
+        return AsyncAnthropicBedrock()
     return None
