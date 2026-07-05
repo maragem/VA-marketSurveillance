@@ -3,6 +3,19 @@
   margin: 0 0 1rem;
 }
 
+.examples {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  &__label {
+    font-size: 0.85rem;
+    color: #5b6873;
+  }
+}
+
 .form {
   display: flex;
   flex-direction: column;

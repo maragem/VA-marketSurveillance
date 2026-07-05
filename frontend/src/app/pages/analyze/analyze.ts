@@ -5,6 +5,7 @@ import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EuiButtonComponent } from '@eui/components/eui-button';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { ApiService } from '../../core/api.service';
+import { EXAMPLE_CAMPAIGNS, ExampleCampaign } from '../../core/examples';
 import {
   AnalysisReport,
   CampaignSubmission,
@@ -32,6 +33,7 @@ export class AnalyzePage {
   private readonly api = inject(ApiService);
 
   protected readonly regulationLabels = REGULATION_LABELS;
+  protected readonly examples = EXAMPLE_CAMPAIGNS;
 
   // form model
   protected title = '';
@@ -53,6 +55,18 @@ export class AnalyzePage {
       regulation: regulation as Regulation,
       state: state as AgentState,
     }));
+  }
+
+  protected loadExample(example: ExampleCampaign): void {
+    const c = example.campaign;
+    this.title = c.title;
+    this.text = c.text;
+    this.channels = c.channels.join(', ');
+    this.audience = c.target_audience ?? '';
+    this.markets = c.markets.join(', ');
+    this.usesAi = !!c.uses_ai_generation;
+    this.usesPersonalisation = !!c.uses_personalisation;
+    this.errorMessage.set(null);
   }
 
   protected canSubmit(): boolean {

@@ -8,6 +8,17 @@
     </eui-alert>
   }
 
+  <div class="examples">
+    <span class="examples__label">Try an example campaign:</span>
+    @for (example of examples; track example.label) {
+      <button euiButton euiSecondary euiSizeS type="button"
+              [title]="example.description"
+              (buttonClick)="loadExample(example)">
+        {{ example.label }}
+      </button>
+    }
+  </div>
+
   <eui-card>
     <eui-card-content>
       <form class="form" (ngSubmit)="submit()">
