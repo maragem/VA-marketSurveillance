@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Data (SQLite reports — attach a Railway volume at /app/data instead)
+data/
+
+# Node / Angular
+node_modules/
+frontend/dist/
+frontend/.angular/
+npm-debug.log*
+
+# Env & IDE
+.env
+.env.*
+.idea/
+.vscode/

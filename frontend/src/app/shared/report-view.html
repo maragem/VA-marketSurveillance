@@ -1,0 +1,112 @@
+@let r = report();
+
+<div class="report">
+  <div class="report__overview" [class.report__overview--danger]="isDanger(r.overall_risk)"
+       [class.report__overview--warning]="isWarning(r.overall_risk)"
+       [class.report__overview--ok]="r.overall_risk === 'compliant' || isInfo(r.overall_risk)">
+    <div class="report__risk">
+      <span class="report__risk-label">Overall assessment</span>
+      <span class="report__risk-value">{{ riskLabel(r.overall_risk) }}</span>
+      <span class="report__risk-meta">
+        {{ totalFindings(r) }} finding(s) · {{ r.created_at | date: 'medium' }} ·
+        engine: {{ r.engine === 'agentic' ? 'agentic (GraphRAG + Claude agents)' : 'heuristic (GraphRAG retrieval only)' }}
+      </span>
+    </div>
+    <p class="report__summary">{{ r.executive_summary }}</p>
+  </div>
+
+  @if (r.engine === 'heuristic') {
+    <eui-alert euiWarning>
+      <eui-alert-title>Heuristic screening only</eui-alert-title>
+      This analysis was produced without LLM reasoning (no API key configured). Provisions listed
+      were retrieved as potentially relevant and require manual verification.
+    </eui-alert>
+  }
+
+  @if (r.triage; as triage) {
+    <eui-card>
+      <eui-card-header>
+        <eui-card-header-title>Triage</eui-card-header-title>
+        <eui-card-header-subtitle>{{ triage.summary }}</eui-card-header-subtitle>
+      </eui-card-header>
+      <eui-card-content>
+        <div class="report__chips">
+          @for (practice of triage.detected_practices; track practice) {
+            <eui-chip euiSizeS>{{ practice }}</eui-chip>
+          }
+          @if (triage.ai_involved) { <eui-chip euiSizeS euiInfo>AI involved</eui-chip> }
+          @if (triage.personal_data_involved) { <eui-chip euiSizeS euiInfo>personal data</eui-chip> }
+          @if (triage.minors_potentially_reached) { <eui-chip euiSizeS euiWarning>minors reached</eui-chip> }
+        </div>
+      </eui-card-content>
+    </eui-card>
+  }
+
+  @for (verdict of r.verdicts; track verdict.regulation) {
+    <eui-card class="report__verdict">
+      <eui-card-header>
+        <eui-card-header-title>
+          <span class="report__reg-title">
+            {{ regulationLabel(verdict.regulation) }}
+            <span euiBadge
+                  [euiDanger]="statusIsBad(verdict.status)"
+                  [euiWarning]="statusIsWarn(verdict.status)"
+                  [euiSuccess]="statusIsOk(verdict.status)">
+              {{ statusLabel(verdict.status) }}
+            </span>
+          </span>
+        </eui-card-header-title>
+        @if (verdict.notes) {
+          <eui-card-header-subtitle>{{ verdict.notes }}</eui-card-header-subtitle>
+        }
+      </eui-card-header>
+      @if (verdict.findings.length > 0) {
+        <eui-card-content>
+          <div class="findings">
+            @for (finding of sortedFindings(verdict); track finding.provision_id + finding.rationale) {
+              <div class="finding"
+                   [class.finding--danger]="isDanger(finding.severity)"
+                   [class.finding--warning]="isWarning(finding.severity)"
+                   [class.finding--info]="isInfo(finding.severity)">
+                <div class="finding__head">
+                  <span euiBadge euiSizeS
+                        [euiDanger]="isDanger(finding.severity)"
+                        [euiWarning]="isWarning(finding.severity)"
+                        [euiInfo]="isInfo(finding.severity)">
+                    {{ finding.severity }}
+                  </span>
+                  <span class="finding__ref">{{ finding.provision_ref }}</span>
+                  <span class="finding__title">{{ finding.title }}</span>
+                </div>
+                <p class="finding__rationale">{{ finding.rationale }}</p>
+                @if (finding.evidence_quote) {
+                  <blockquote class="finding__quote">“{{ finding.evidence_quote }}”</blockquote>
+                }
+                <p class="finding__reco"><strong>Recommendation:</strong> {{ finding.recommendation }}</p>
+                @if (finding.graph_path.length > 1) {
+                  <p class="finding__path">Graph evidence: <code>{{ finding.graph_path.join(' ') }}</code></p>
+                }
+              </div>
+            }
+          </div>
+        </eui-card-content>
+      }
+    </eui-card>
+  }
+
+  @if (r.recommendations.length > 0) {
+    <eui-card>
+      <eui-card-header>
+        <eui-card-header-title>Remediation plan</eui-card-header-title>
+        <eui-card-header-subtitle>Prioritised actions, most important first</eui-card-header-subtitle>
+      </eui-card-header>
+      <eui-card-content>
+        <ol class="report__recos">
+          @for (reco of r.recommendations; track $index) {
+            <li>{{ reco }}</li>
+          }
+        </ol>
+      </eui-card-content>
+    </eui-card>
+  }
+</div>

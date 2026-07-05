@@ -1,0 +1,12 @@
+/* Global styles — eUI base stylesheet is loaded via angular.json */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: #232c36;
+}
+
+* {
+  box-sizing: border-box;
+}

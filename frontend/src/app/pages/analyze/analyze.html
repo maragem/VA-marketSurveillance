@@ -1,0 +1,106 @@
+@if (phase() === 'form' || phase() === 'failed') {
+  <h1 class="page-title">New campaign analysis</h1>
+
+  @if (errorMessage()) {
+    <eui-alert euiDanger>
+      <eui-alert-title>Analysis failed</eui-alert-title>
+      {{ errorMessage() }}
+    </eui-alert>
+  }
+
+  <eui-card>
+    <eui-card-content>
+      <form class="form" (ngSubmit)="submit()">
+        <label class="form__field">
+          <span class="form__label">Campaign title *</span>
+          <input class="form__input" type="text" name="title" [(ngModel)]="title"
+                 placeholder="e.g. Summer flash sale 2026" maxlength="300" required />
+        </label>
+
+        <label class="form__field">
+          <span class="form__label">Campaign description *</span>
+          <textarea class="form__input form__textarea" name="text" [(ngModel)]="text" rows="10" required
+                    placeholder="Paste the full campaign brief: messaging, claims, creative concept, targeting strategy, channels, mechanics (timers, discounts, chatbots, influencers, data collection)…"></textarea>
+          <span class="form__hint">The more concrete the description (claims, targeting, mechanics), the sharper the findings. Minimum 20 characters.</span>
+        </label>
+
+        <div class="form__row">
+          <label class="form__field">
+            <span class="form__label">Channels</span>
+            <input class="form__input" type="text" name="channels" [(ngModel)]="channels"
+                   placeholder="instagram, tiktok, email (comma-separated)" />
+          </label>
+          <label class="form__field">
+            <span class="form__label">Target audience</span>
+            <input class="form__input" type="text" name="audience" [(ngModel)]="audience"
+                   placeholder="e.g. adults 25-45 interested in fitness" />
+          </label>
+          <label class="form__field">
+            <span class="form__label">Markets</span>
+            <input class="form__input" type="text" name="markets" [(ngModel)]="markets"
+                   placeholder="EU, DE, FR (comma-separated)" />
+          </label>
+        </div>
+
+        <div class="form__row form__row--checks">
+          <label class="form__check">
+            <input type="checkbox" name="usesAi" [(ngModel)]="usesAi" />
+            Uses generative AI (content, chatbots, deep fakes…)
+          </label>
+          <label class="form__check">
+            <input type="checkbox" name="usesPersonalisation" [(ngModel)]="usesPersonalisation" />
+            Uses personalisation / targeted advertising
+          </label>
+        </div>
+
+        <div class="form__actions">
+          <button euiButton euiPrimary euiCTAButton type="submit" [euiDisabled]="!canSubmit()">
+            Run compliance analysis
+          </button>
+        </div>
+      </form>
+    </eui-card-content>
+  </eui-card>
+}
+
+@if (phase() === 'running') {
+  <h1 class="page-title">Analysing “{{ title }}”…</h1>
+
+  <eui-card>
+    <eui-card-header>
+      <eui-card-header-title>Specialist agents</eui-card-header-title>
+      <eui-card-header-subtitle>Each regulation is reviewed by a dedicated agent querying the legal knowledge graph</eui-card-header-subtitle>
+    </eui-card-header>
+    <eui-card-content>
+      <div class="agents">
+        @for (agent of agentEntries(); track agent.regulation) {
+          <div class="agents__item" [class.agents__item--running]="agent.state === 'running'"
+               [class.agents__item--done]="agent.state === 'done'">
+            <span class="agents__dot"></span>
+            <span class="agents__name">{{ regulationLabels[agent.regulation] }}</span>
+            <span euiBadge euiSizeS
+                  [euiInfo]="agent.state === 'running'"
+                  [euiSuccess]="agent.state === 'done'">{{ agent.state }}</span>
+          </div>
+        } @empty {
+          <span class="muted">Waiting for triage…</span>
+        }
+      </div>
+
+      <div class="console" aria-live="polite">
+        @for (line of progress(); track $index) {
+          <div class="console__line console__line--{{ line.kind }}">{{ line.text }}</div>
+        }
+        <div class="console__line console__line--pulse">▌</div>
+      </div>
+    </eui-card-content>
+  </eui-card>
+}
+
+@if (phase() === 'done' && report(); as done) {
+  <div class="done-bar">
+    <h1 class="page-title">Compliance report — {{ done.campaign.title }}</h1>
+    <button euiButton euiSecondary (buttonClick)="reset()">Analyse another campaign</button>
+  </div>
+  <app-report-view [report]="done" />
+}

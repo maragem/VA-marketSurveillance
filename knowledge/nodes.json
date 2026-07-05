@@ -1,0 +1,563 @@
+[
+  {
+    "id": "reg-ai-act",
+    "type": "regulation",
+    "regulation": "AI_ACT",
+    "ref": "Regulation (EU) 2024/1689",
+    "title": "Artificial Intelligence Act",
+    "text": "Horizontal EU regulation on artificial intelligence. For marketing, the most relevant parts are the prohibited AI practices (Article 5) and the transparency obligations for AI systems and AI-generated content (Article 50).",
+    "keywords": ["ai act", "artificial intelligence", "2024/1689"]
+  },
+  {
+    "id": "reg-gdpr",
+    "type": "regulation",
+    "regulation": "GDPR",
+    "ref": "Regulation (EU) 2016/679",
+    "title": "General Data Protection Regulation",
+    "text": "EU regulation on the protection of personal data. For marketing, the key areas are lawful basis for processing, consent quality, profiling and automated decision-making, special categories of data, children's data, transparency, and the right to object to direct marketing.",
+    "keywords": ["gdpr", "data protection", "personal data", "2016/679"]
+  },
+  {
+    "id": "reg-dsa",
+    "type": "regulation",
+    "regulation": "DSA",
+    "ref": "Regulation (EU) 2022/2065",
+    "title": "Digital Services Act",
+    "text": "EU regulation on intermediary services and online platforms. For marketing, the key provisions concern dark patterns, advertising transparency, profiling-based advertising restrictions (special-category data and minors), and recommender system transparency.",
+    "keywords": ["dsa", "digital services act", "online platform", "2022/2065"]
+  },
+  {
+    "id": "reg-ucpd",
+    "type": "regulation",
+    "regulation": "UCPD",
+    "ref": "Directive 2005/29/EC",
+    "title": "Unfair Commercial Practices Directive",
+    "text": "EU directive prohibiting unfair business-to-consumer commercial practices, including misleading actions and omissions, aggressive practices, and the Annex I blacklist of practices that are unfair in all circumstances. Amended by the Omnibus Directive (EU) 2019/2161 (fake reviews, search ranking transparency).",
+    "keywords": ["ucpd", "unfair commercial practices", "2005/29", "omnibus", "misleading"]
+  },
+
+  {
+    "id": "aia-art5-1a",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 5(1)(a)",
+    "title": "Prohibition of subliminal, manipulative or deceptive AI techniques",
+    "severity_hint": "prohibition",
+    "text": "Prohibits placing on the market or using an AI system that deploys subliminal techniques beyond a person's consciousness, or purposefully manipulative or deceptive techniques, with the objective or effect of materially distorting a person's behaviour by appreciably impairing their ability to make an informed decision, causing them to take a decision they would not otherwise have taken, in a manner that causes or is reasonably likely to cause significant harm. Marketing relevance: AI-driven persuasion techniques, emotionally manipulative AI targeting, covert AI nudging in campaigns.",
+    "keywords": ["subliminal", "manipulative", "deceptive", "ai manipulation", "behavioural distortion", "nudging", "persuasion", "significant harm"]
+  },
+  {
+    "id": "aia-art5-1b",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 5(1)(b)",
+    "title": "Prohibition of AI exploiting vulnerabilities",
+    "severity_hint": "prohibition",
+    "text": "Prohibits AI systems that exploit vulnerabilities of a person or group due to their age, disability, or a specific social or economic situation, with the objective or effect of materially distorting their behaviour in a manner that causes or is reasonably likely to cause significant harm. Marketing relevance: AI-targeted campaigns aimed at children, elderly people, people in financial distress, or people with disabilities.",
+    "keywords": ["vulnerability", "children", "elderly", "disability", "financial distress", "exploitation", "targeting vulnerable groups"]
+  },
+  {
+    "id": "aia-art5-1c",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 5(1)(c)",
+    "title": "Prohibition of social scoring",
+    "severity_hint": "prohibition",
+    "text": "Prohibits AI systems evaluating or classifying persons based on social behaviour or personal characteristics, where the social score leads to detrimental or unfavourable treatment in unrelated contexts or treatment that is unjustified or disproportionate. Marketing relevance: loyalty/eligibility schemes that score customers on unrelated social behaviour and disadvantage them.",
+    "keywords": ["social scoring", "social score", "classification of persons", "detrimental treatment"]
+  },
+  {
+    "id": "aia-art5-1f",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 5(1)(f)",
+    "title": "Prohibition of emotion recognition in workplace and education",
+    "severity_hint": "prohibition",
+    "text": "Prohibits AI systems that infer emotions of a natural person in the areas of workplace and education institutions (except for medical or safety reasons). Marketing relevance: campaigns or activations that deploy emotion-recognition AI on employees or students; emotion inference used elsewhere for ad targeting also triggers GDPR concerns.",
+    "keywords": ["emotion recognition", "emotion inference", "workplace", "education", "affective computing"]
+  },
+  {
+    "id": "aia-art50-1",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 50(1)",
+    "title": "Transparency: disclosure of AI interaction (chatbots)",
+    "severity_hint": "transparency",
+    "text": "Providers must ensure that AI systems intended to interact directly with natural persons are designed so that the persons are informed they are interacting with an AI system, unless this is obvious from the circumstances. Marketing relevance: chatbots, conversational assistants, AI voice agents used in campaigns or customer engagement must disclose their AI nature.",
+    "keywords": ["chatbot", "conversational ai", "voice assistant", "disclosure", "interacting with ai", "virtual assistant"]
+  },
+  {
+    "id": "aia-art50-2",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 50(2)",
+    "title": "Transparency: marking of synthetic (AI-generated) content",
+    "severity_hint": "transparency",
+    "text": "Providers of AI systems generating synthetic audio, image, video or text content must ensure outputs are marked in a machine-readable format and detectable as artificially generated or manipulated. Marketing relevance: AI-generated visuals, audio, video or copy used in campaign assets should carry machine-readable provenance marking.",
+    "keywords": ["synthetic content", "ai-generated", "machine-readable marking", "provenance", "watermark", "generated image", "generated video"]
+  },
+  {
+    "id": "aia-art50-4",
+    "type": "provision",
+    "regulation": "AI_ACT",
+    "ref": "AI Act, Art. 50(4)",
+    "title": "Transparency: disclosure of deep fakes and AI-generated text",
+    "severity_hint": "transparency",
+    "text": "Deployers of AI systems generating or manipulating image, audio or video content constituting a deep fake must disclose that the content has been artificially generated or manipulated. Deployers generating or manipulating text published to inform the public on matters of public interest must also disclose AI generation. Marketing relevance: campaigns using deep fakes of real persons (including deceased celebrities), synthetic influencers presented as real, or AI-manipulated realistic footage must clearly disclose this.",
+    "keywords": ["deepfake", "deep fake", "synthetic influencer", "manipulated video", "artificially generated", "disclosure", "likeness"]
+  },
+
+  {
+    "id": "gdpr-art4-4",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 4(4)",
+    "title": "Definition of profiling",
+    "severity_hint": "definition",
+    "text": "Profiling means any form of automated processing of personal data to evaluate personal aspects of a natural person, in particular to analyse or predict aspects concerning performance at work, economic situation, health, personal preferences, interests, reliability, behaviour, location or movements. Marketing relevance: audience segmentation, lookalike audiences, behavioural targeting and personalisation typically constitute profiling.",
+    "keywords": ["profiling", "automated processing", "segmentation", "behavioural targeting", "prediction", "lookalike"]
+  },
+  {
+    "id": "gdpr-art4-11",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 4(11)",
+    "title": "Definition of consent",
+    "severity_hint": "definition",
+    "text": "Consent means any freely given, specific, informed and unambiguous indication of the data subject's wishes by a statement or clear affirmative action. Pre-ticked boxes, inactivity or bundled consent do not qualify. Marketing relevance: opt-ins for newsletters, tracking, personalised ads must meet this standard.",
+    "keywords": ["consent", "freely given", "specific", "informed", "unambiguous", "opt-in", "pre-ticked"]
+  },
+  {
+    "id": "gdpr-art5-1a",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 5(1)(a)",
+    "title": "Lawfulness, fairness and transparency principle",
+    "severity_hint": "principle",
+    "text": "Personal data must be processed lawfully, fairly and in a transparent manner. Covert data collection, misleading privacy information, or hidden tracking in campaigns violate this principle.",
+    "keywords": ["lawfulness", "fairness", "transparency", "covert tracking", "hidden data collection"]
+  },
+  {
+    "id": "gdpr-art6-1",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 6(1)",
+    "title": "Lawful basis for processing",
+    "severity_hint": "obligation",
+    "text": "Processing is lawful only with a valid legal basis: consent, contract, legal obligation, vital interests, public task, or legitimate interests. Marketing relevance: personalised advertising and profiling generally require consent or a carefully balanced legitimate-interest assessment; e-mail/SMS direct marketing generally requires prior consent (see also ePrivacy Directive Art. 13).",
+    "keywords": ["lawful basis", "legal basis", "legitimate interest", "consent", "email marketing", "sms marketing"]
+  },
+  {
+    "id": "gdpr-art7",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 7",
+    "title": "Conditions for consent",
+    "severity_hint": "obligation",
+    "text": "The controller must be able to demonstrate consent; consent requests must be clearly distinguishable, in clear and plain language; consent must be as easy to withdraw as to give; and performance of a contract must not be made conditional on unnecessary consent. Marketing relevance: consent flows in campaign landing pages, sweepstakes requiring marketing consent to participate, and difficult unsubscribe processes.",
+    "keywords": ["consent conditions", "withdraw consent", "bundled consent", "conditional", "sweepstake", "unsubscribe"]
+  },
+  {
+    "id": "gdpr-art8",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 8",
+    "title": "Child's consent for information society services",
+    "severity_hint": "obligation",
+    "text": "Where consent is the legal basis for information society services offered directly to a child, processing is lawful only where the child is at least 16 years old (Member States may lower to 13); below that age, parental consent is required and the controller must make reasonable verification efforts. Marketing relevance: campaigns collecting data from minors, gaming/social campaigns aimed at young audiences.",
+    "keywords": ["child consent", "parental consent", "minors", "age verification", "children data"]
+  },
+  {
+    "id": "gdpr-art9",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 9",
+    "title": "Special categories of personal data",
+    "severity_hint": "prohibition",
+    "text": "Processing of data revealing racial or ethnic origin, political opinions, religious beliefs, trade union membership, genetic or biometric data, health data, or data concerning sex life or sexual orientation is prohibited unless a specific exception applies (e.g., explicit consent). Marketing relevance: targeting based on health conditions, sexual orientation, religion, political views or ethnicity — including inferred attributes — engages Art. 9 and is also banned for platform ad targeting under DSA Art. 26(3).",
+    "keywords": ["special categories", "sensitive data", "health data", "sexual orientation", "religion", "political opinions", "ethnicity", "biometric", "explicit consent", "inferred attributes"]
+  },
+  {
+    "id": "gdpr-art12",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 12",
+    "title": "Transparent information and communication",
+    "severity_hint": "transparency",
+    "text": "Information provided to data subjects must be concise, transparent, intelligible and easily accessible, using clear and plain language, in particular for information addressed to a child. Marketing relevance: privacy notices in campaign sign-up flows, data collection disclosures in promotions.",
+    "keywords": ["privacy notice", "transparent information", "plain language", "data collection disclosure"]
+  },
+  {
+    "id": "gdpr-art13",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 13",
+    "title": "Information to be provided when collecting personal data",
+    "severity_hint": "transparency",
+    "text": "When collecting personal data, the controller must provide its identity, purposes and legal basis of processing, recipients, retention, data subject rights, and information about automated decision-making including profiling. Marketing relevance: lead-generation forms, competition entries, and sign-ups in campaigns must include this information at the point of collection.",
+    "keywords": ["information obligation", "lead generation", "sign-up form", "data collection", "purpose", "retention"]
+  },
+  {
+    "id": "gdpr-art21",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 21(2)-(3)",
+    "title": "Right to object to direct marketing",
+    "severity_hint": "obligation",
+    "text": "Data subjects have the right to object at any time to processing of their personal data for direct marketing, including profiling related to such marketing. Where they object, the data must no longer be processed for that purpose — this right is absolute. Marketing relevance: every direct marketing communication and profiling operation must respect and facilitate opt-out.",
+    "keywords": ["right to object", "opt-out", "direct marketing", "suppression list", "unsubscribe"]
+  },
+  {
+    "id": "gdpr-art22",
+    "type": "provision",
+    "regulation": "GDPR",
+    "ref": "GDPR, Art. 22",
+    "title": "Automated individual decision-making, including profiling",
+    "severity_hint": "obligation",
+    "text": "Data subjects have the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects or similarly significantly affects them, unless an exception applies (explicit consent, contract, law) with safeguards. Marketing relevance: automated eligibility decisions, dynamic pricing that significantly affects individuals, automated exclusion from offers.",
+    "keywords": ["automated decision", "solely automated", "significant effect", "dynamic pricing", "eligibility", "algorithmic decision"]
+  },
+
+  {
+    "id": "dsa-art25",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 25",
+    "title": "Prohibition of dark patterns in online interface design",
+    "severity_hint": "prohibition",
+    "text": "Providers of online platforms shall not design, organise or operate their online interfaces in a way that deceives or manipulates recipients or otherwise materially distorts or impairs their ability to make free and informed decisions. Includes giving more prominence to certain choices, repeatedly requesting a choice already made, and making cancellation harder than subscription. Marketing relevance: campaign landing pages and platform experiences using confirm-shaming, disguised ads, forced continuity, obstruction of cancellation.",
+    "keywords": ["dark patterns", "deceptive design", "manipulation", "confirmshaming", "nagging", "obstruction", "interface design", "forced continuity"]
+  },
+  {
+    "id": "dsa-art26-1",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 26(1)",
+    "title": "Advertising transparency on online platforms",
+    "severity_hint": "transparency",
+    "text": "Online platforms presenting advertisements must ensure recipients can identify, for each ad, in a clear, concise, unambiguous manner and in real time: that it is an advertisement; on whose behalf it is presented; who paid for it; and meaningful information about the main parameters used to determine the recipient it is presented to, and how to change them. Marketing relevance: platform ad campaigns must be clearly labelled as ads with advertiser identity and targeting parameters available.",
+    "keywords": ["ad transparency", "advertisement label", "sponsored", "who paid", "targeting parameters", "ad disclosure"]
+  },
+  {
+    "id": "dsa-art26-3",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 26(3)",
+    "title": "Ban on ads targeted using special categories of data",
+    "severity_hint": "prohibition",
+    "text": "Providers of online platforms shall not present advertisements based on profiling using special categories of personal data referred to in GDPR Art. 9 (health, religion, sexual orientation, political opinions, ethnicity, etc.). Marketing relevance: any platform ad targeting that uses — directly or by inference — sensitive attributes is prohibited regardless of consent.",
+    "keywords": ["targeted advertising", "sensitive targeting", "profiling ads", "health targeting", "political targeting", "religion targeting"]
+  },
+  {
+    "id": "dsa-art27",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 27",
+    "title": "Recommender system transparency",
+    "severity_hint": "transparency",
+    "text": "Online platforms using recommender systems must set out in plain language the main parameters used, and any options for recipients to modify or influence them. Marketing relevance: campaigns relying on platform recommendation/feed placement should be aware of parameter transparency obligations; owned platforms with recommenders must disclose parameters.",
+    "keywords": ["recommender system", "feed ranking", "main parameters", "algorithmic recommendation"]
+  },
+  {
+    "id": "dsa-art28",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 28",
+    "title": "Online protection of minors; ban on profiling-based ads to minors",
+    "severity_hint": "prohibition",
+    "text": "Online platforms accessible to minors must put in place appropriate measures to ensure a high level of privacy, safety and security of minors. Providers shall not present advertisements based on profiling using personal data of recipients they are aware with reasonable certainty are minors. Marketing relevance: no behaviourally targeted / profiled advertising to minors; age-appropriate design for campaigns reaching minors.",
+    "keywords": ["minors", "children", "profiling ads to minors", "age assurance", "protection of minors", "teen targeting"]
+  },
+  {
+    "id": "dsa-art39",
+    "type": "provision",
+    "regulation": "DSA",
+    "ref": "DSA, Art. 39",
+    "title": "Ad repositories for very large online platforms",
+    "severity_hint": "obligation",
+    "text": "Very large online platforms (VLOPs) must maintain a public repository of advertisements presented on their interfaces, including ad content, advertiser, payer, targeting parameters and reach. Marketing relevance: campaigns on VLOPs will be publicly archived with targeting details — claims and targeting must withstand public scrutiny.",
+    "keywords": ["ad repository", "vlop", "ad archive", "public transparency"]
+  },
+
+  {
+    "id": "ucpd-art5",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Art. 5",
+    "title": "General prohibition of unfair commercial practices",
+    "severity_hint": "prohibition",
+    "text": "A commercial practice is unfair if it is contrary to professional diligence and materially distorts or is likely to materially distort the economic behaviour of the average consumer. Practices likely to distort the behaviour of a clearly identifiable vulnerable group (due to mental or physical infirmity, age or credulity) are assessed from the perspective of the average member of that group (Art. 5(3)). Marketing relevance: general fairness safety-net for practices not caught by specific rules.",
+    "keywords": ["unfair practice", "professional diligence", "material distortion", "vulnerable consumers", "average consumer"]
+  },
+  {
+    "id": "ucpd-art6",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Art. 6",
+    "title": "Misleading actions",
+    "severity_hint": "prohibition",
+    "text": "A practice is misleading if it contains false information or deceives the average consumer regarding the existence or nature of the product, its main characteristics (benefits, results, composition, origin), the price or manner of price calculation, the existence of a specific price advantage, or the trader's qualifications and awards — and causes them to take a transactional decision they would not otherwise have taken. Marketing relevance: exaggerated or unsubstantiated product claims, fake discounts, false award/certification claims, misleading environmental ('greenwashing') claims.",
+    "keywords": ["misleading", "false claims", "exaggerated claims", "fake discount", "price advantage", "greenwashing", "unsubstantiated", "deception", "awards"]
+  },
+  {
+    "id": "ucpd-art7",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Art. 7",
+    "title": "Misleading omissions; hidden commercial intent",
+    "severity_hint": "prohibition",
+    "text": "A practice is misleading if it omits material information the average consumer needs to make an informed decision, hides such information, or provides it in an unclear, unintelligible, ambiguous or untimely manner — including failing to identify the commercial intent of the practice if not apparent from context. Marketing relevance: influencer posts without ad disclosure, native advertising not identified as such, hidden costs and conditions, undisclosed material connections.",
+    "keywords": ["misleading omission", "hidden costs", "commercial intent", "influencer disclosure", "native advertising", "material information", "undisclosed partnership", "#ad"]
+  },
+  {
+    "id": "ucpd-art8-9",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Arts. 8-9",
+    "title": "Aggressive commercial practices",
+    "severity_hint": "prohibition",
+    "text": "A practice is aggressive if, by harassment, coercion or undue influence, it significantly impairs the average consumer's freedom of choice and causes them to take a transactional decision they would not otherwise have taken. Factors include timing, persistence, exploitation of misfortune, and onerous barriers to exercising contractual rights. Marketing relevance: high-pressure sales tactics, relentless retargeting, exploiting grief or emergencies, making cancellation burdensome.",
+    "keywords": ["aggressive practice", "harassment", "coercion", "undue influence", "pressure tactics", "persistent retargeting", "exploiting misfortune"]
+  },
+  {
+    "id": "ucpd-annex1-7",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 7",
+    "title": "Blacklist: false urgency and scarcity claims",
+    "severity_hint": "prohibition",
+    "text": "Falsely stating that a product will only be available for a very limited time, or on particular terms for a very limited time, to elicit an immediate decision and deprive consumers of sufficient opportunity to make an informed choice, is prohibited in all circumstances. Marketing relevance: fake countdown timers, false 'only 2 left' stock claims, artificial flash-sale deadlines.",
+    "keywords": ["false urgency", "countdown timer", "limited time", "scarcity", "only x left", "flash sale", "fomo"]
+  },
+  {
+    "id": "ucpd-annex1-11",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 11",
+    "title": "Blacklist: advertorials without disclosure",
+    "severity_hint": "prohibition",
+    "text": "Using editorial content in the media to promote a product where a trader has paid for the promotion, without making that clear in the content or by clearly identifiable images or sounds ('advertorial'), is prohibited in all circumstances. Marketing relevance: paid articles, sponsored editorial content, and paid influencer content presented as independent editorial.",
+    "keywords": ["advertorial", "paid editorial", "sponsored content", "media promotion", "undisclosed paid promotion"]
+  },
+  {
+    "id": "ucpd-annex1-17",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 17",
+    "title": "Blacklist: false cure claims",
+    "severity_hint": "prohibition",
+    "text": "Falsely claiming that a product is able to cure illnesses, dysfunction or malformations is prohibited in all circumstances. Marketing relevance: health, wellness and supplement campaigns claiming curative effects; also engages the Health Claims Regulation (EC) 1924/2006 for food claims.",
+    "keywords": ["cure claims", "health claims", "illness", "medical claims", "supplement", "wellness", "treats", "heals"]
+  },
+  {
+    "id": "ucpd-annex1-20",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 20",
+    "title": "Blacklist: misuse of 'free'",
+    "severity_hint": "prohibition",
+    "text": "Describing a product as 'gratis', 'free', 'without charge' or similar if the consumer has to pay anything other than the unavoidable cost of responding and collecting or paying for delivery, is prohibited in all circumstances. Marketing relevance: 'free' offers with hidden charges, free trials converting to paid subscriptions without clarity, 'free gift' conditional on purchases beyond delivery cost.",
+    "keywords": ["free", "gratis", "without charge", "free trial", "hidden charges", "free gift"]
+  },
+  {
+    "id": "ucpd-annex1-28",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 28",
+    "title": "Blacklist: direct exhortation to children",
+    "severity_hint": "prohibition",
+    "text": "Including in an advertisement a direct exhortation to children to buy advertised products or persuade their parents or other adults to buy advertised products for them is prohibited in all circumstances. Marketing relevance: 'Buy it now!', 'Ask your mum to get it!' phrasing in child-directed campaigns, in-game purchase prompts aimed at children.",
+    "keywords": ["direct exhortation", "children advertising", "pester power", "buy now kids", "in-game purchases", "kids marketing"]
+  },
+  {
+    "id": "ucpd-annex1-23b",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 23b",
+    "title": "Blacklist: unverified consumer reviews",
+    "severity_hint": "prohibition",
+    "text": "Stating that reviews of a product are submitted by consumers who have actually used or purchased the product without taking reasonable and proportionate steps to check that they originate from such consumers is prohibited in all circumstances (added by Omnibus Directive). Marketing relevance: campaigns showcasing 'verified customer reviews' without a verification process.",
+    "keywords": ["consumer reviews", "verified reviews", "review verification", "testimonials"]
+  },
+  {
+    "id": "ucpd-annex1-23c",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 23c",
+    "title": "Blacklist: fake reviews and endorsements",
+    "severity_hint": "prohibition",
+    "text": "Submitting or commissioning another legal or natural person to submit false consumer reviews or endorsements, or misrepresenting consumer reviews or social endorsements, in order to promote products, is prohibited in all circumstances (added by Omnibus Directive). Marketing relevance: purchased reviews, bot-generated testimonials, AI-generated fake reviews, cherry-picking or suppressing negative reviews.",
+    "keywords": ["fake reviews", "purchased reviews", "bot reviews", "false endorsement", "misrepresenting reviews", "ai-generated reviews"]
+  },
+  {
+    "id": "ucpd-annex1-31",
+    "type": "provision",
+    "regulation": "UCPD",
+    "ref": "UCPD, Annex I, point 31",
+    "title": "Blacklist: false prize claims",
+    "severity_hint": "prohibition",
+    "text": "Creating the false impression that the consumer has already won, will win, or will on doing a particular act win a prize or other equivalent benefit, when in fact there is no prize or claiming it is subject to paying money or incurring a cost, is prohibited in all circumstances. Marketing relevance: 'You have won!' pop-ups and mailers, prize promotions with hidden costs.",
+    "keywords": ["prize", "you have won", "sweepstake", "lottery", "false winning claim", "competition"]
+  },
+
+  {
+    "id": "c-dark-patterns",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Dark patterns / deceptive design",
+    "severity_hint": "concept",
+    "text": "Interface and communication design that steers, deceives or manipulates consumers: confirm-shaming, false hierarchy of buttons, nagging, obstruction of cancellation, disguised advertisements, sneaking items into baskets. Regulated by DSA Art. 25 (platforms), UCPD Arts. 5-9 (all traders), GDPR Arts. 4(11)/7 (consent dark patterns), and AI Act Art. 5(1)(a) when AI-driven.",
+    "keywords": ["dark patterns", "deceptive design", "confirmshaming", "sneaking", "nagging", "manipulation", "cancel"]
+  },
+  {
+    "id": "c-profiling-personalisation",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Profiling and personalised targeting",
+    "severity_hint": "concept",
+    "text": "Use of personal data to segment, score and target individuals with tailored ads, offers or prices. Engages GDPR (profiling definition, lawful basis, Art. 22 automated decisions, Art. 21 objection) and DSA (ad transparency, bans on sensitive-data and minor-targeted profiling ads).",
+    "keywords": ["personalisation", "targeting", "segmentation", "behavioural ads", "retargeting", "custom audience", "lookalike", "dynamic pricing"]
+  },
+  {
+    "id": "c-ai-generated-content",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "AI-generated and synthetic content",
+    "severity_hint": "concept",
+    "text": "Campaign assets produced or manipulated by generative AI: images, video, audio, text, virtual influencers. Engages AI Act Art. 50(2) (machine-readable marking) and 50(4) (deep fake disclosure), and UCPD Arts. 6-7 if the synthetic nature deceives consumers about material facts.",
+    "keywords": ["generative ai", "ai-generated", "synthetic media", "ai image", "ai video", "ai copy", "virtual influencer", "genai"]
+  },
+  {
+    "id": "c-chatbots",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Chatbots and conversational agents",
+    "severity_hint": "concept",
+    "text": "AI systems that converse with consumers in campaigns or customer journeys. Must disclose AI nature (AI Act Art. 50(1)); hidden commercial intent in conversations engages UCPD Art. 7; data collected in conversations engages GDPR.",
+    "keywords": ["chatbot", "conversational agent", "ai assistant", "voice bot", "dm automation"]
+  },
+  {
+    "id": "c-influencer-marketing",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Influencer and native advertising",
+    "severity_hint": "concept",
+    "text": "Paid or incentivised promotion through influencers, creators or editorial-style placements. Commercial intent must be disclosed (UCPD Art. 7(2), Annex I point 11); platform ads must be labelled (DSA Art. 26); synthetic influencers additionally engage AI Act Art. 50(4).",
+    "keywords": ["influencer", "creator", "sponsored post", "brand deal", "native ads", "ugc campaign", "ambassador"]
+  },
+  {
+    "id": "c-minors",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Marketing to children and minors",
+    "severity_hint": "concept",
+    "text": "Campaigns reaching or targeting persons under 18. Direct exhortations are blacklisted (UCPD Annex I point 28); profiling-based ads to minors are banned (DSA Art. 28(2)); children's data needs parental consent for information society services (GDPR Art. 8); AI exploiting age-related vulnerability is prohibited (AI Act Art. 5(1)(b)).",
+    "keywords": ["children", "minors", "kids", "teens", "under 18", "young audience", "school", "toys"]
+  },
+  {
+    "id": "c-sensitive-data-targeting",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Targeting based on sensitive attributes",
+    "severity_hint": "concept",
+    "text": "Segmenting or targeting audiences using — directly or via proxies/inference — health status, sexual orientation, religion, political views, ethnicity or other GDPR Art. 9 categories. Requires explicit consent under GDPR at minimum and is flatly prohibited for platform advertising under DSA Art. 26(3).",
+    "keywords": ["health targeting", "pregnancy", "sexual orientation", "religion", "political", "ethnicity", "sensitive attributes", "medical condition", "proxy targeting"]
+  },
+  {
+    "id": "c-urgency-scarcity",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Urgency, scarcity and FOMO tactics",
+    "severity_hint": "concept",
+    "text": "Countdown timers, limited-stock messages and flash deadlines. Lawful only if genuinely true; false urgency is blacklisted (UCPD Annex I point 7) and may constitute a dark pattern (DSA Art. 25) or aggressive practice (UCPD Arts. 8-9).",
+    "keywords": ["urgency", "scarcity", "countdown", "limited stock", "flash sale", "act now", "last chance", "fomo"]
+  },
+  {
+    "id": "c-free-claims",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "'Free' offers and trials",
+    "severity_hint": "concept",
+    "text": "Use of 'free', 'gratis' or equivalent in offers. Misuse is blacklisted (UCPD Annex I point 20); auto-converting free trials with obscured terms also engage UCPD Art. 7 (misleading omission) and DSA Art. 25 (dark patterns).",
+    "keywords": ["free", "free trial", "gratis", "no cost", "subscription trap", "auto-renewal"]
+  },
+  {
+    "id": "c-health-claims",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Health, cure and wellness claims",
+    "severity_hint": "concept",
+    "text": "Claims that products cure, treat or prevent illness. False cure claims are blacklisted (UCPD Annex I point 17); general misleading rules apply (UCPD Art. 6); health-based targeting engages GDPR Art. 9 and DSA Art. 26(3). Food claims additionally fall under Regulation (EC) 1924/2006.",
+    "keywords": ["cure", "treatment", "health benefit", "immune", "weight loss", "supplement", "clinically proven", "detox"]
+  },
+  {
+    "id": "c-fake-reviews",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Reviews, testimonials and social proof",
+    "severity_hint": "concept",
+    "text": "Use of consumer reviews, ratings, testimonials and endorsements as campaign evidence. Fake or commissioned reviews and misrepresented social proof are blacklisted (UCPD Annex I points 23b-23c); 'verified' claims need actual verification; AI-generated testimonials presented as real consumers are both fake reviews and undisclosed synthetic content.",
+    "keywords": ["reviews", "testimonials", "ratings", "social proof", "endorsement", "5 stars", "customer stories"]
+  },
+  {
+    "id": "c-deepfakes",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Deep fakes and synthetic likenesses",
+    "severity_hint": "concept",
+    "text": "AI-generated or manipulated content depicting real persons, places or events that would falsely appear authentic. Disclosure is mandatory (AI Act Art. 50(4)); undisclosed use of a synthetic celebrity endorsement is also a misleading practice (UCPD Art. 6-7) and may be blacklisted false endorsement.",
+    "keywords": ["deepfake", "celebrity likeness", "voice clone", "face swap", "synthetic endorsement", "resurrection ads"]
+  },
+  {
+    "id": "c-greenwashing",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Environmental claims (greenwashing)",
+    "severity_hint": "concept",
+    "text": "Vague, unsubstantiated or false environmental claims ('eco-friendly', 'carbon neutral', 'sustainable'). Assessed under UCPD Arts. 6-7 (misleading actions/omissions); generic environmental claims without recognised excellent performance are being blacklisted under the Empowering Consumers Directive (EU) 2024/825 amendments.",
+    "keywords": ["greenwashing", "eco-friendly", "sustainable", "carbon neutral", "green", "climate", "recyclable", "biodegradable", "environment"]
+  },
+  {
+    "id": "c-pricing-practices",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Price claims, discounts and personalised pricing",
+    "severity_hint": "concept",
+    "text": "Discount and price-advantage claims must be true (UCPD Art. 6(1)(d)); price reduction announcements must reference the lowest prior price within 30 days (Price Indication Directive 98/6/EC Art. 6a); personalised pricing based on automated profiling must be disclosed (Consumer Rights Directive as amended) and engages GDPR Art. 22.",
+    "keywords": ["discount", "was/now pricing", "price reduction", "personalised pricing", "dynamic pricing", "sale", "% off", "strikethrough price"]
+  },
+  {
+    "id": "c-consent-flows",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Consent collection and cookie/tracking flows",
+    "severity_hint": "concept",
+    "text": "Mechanisms in campaigns for obtaining consent to data processing, tracking or communications. Must satisfy GDPR Arts. 4(11) and 7; manipulative consent interfaces are dark patterns (DSA Art. 25); tracking technologies additionally require ePrivacy Directive consent.",
+    "keywords": ["cookie banner", "consent flow", "opt-in", "tracking", "pixels", "newsletter signup", "marketing consent"]
+  },
+  {
+    "id": "c-emotion-targeting",
+    "type": "concept",
+    "regulation": null,
+    "ref": "Concept",
+    "title": "Emotion-based AI targeting",
+    "severity_hint": "concept",
+    "text": "Using AI to infer emotional states and time or tailor marketing to exploit them (e.g., targeting people when sad or anxious). Risks AI Act Art. 5(1)(a)-(b) prohibitions, involves biometric/inferred data under GDPR Art. 9, and can be an aggressive practice under UCPD Arts. 8-9.",
+    "keywords": ["emotion targeting", "mood targeting", "emotional state", "sentiment", "anxiety", "emotion ai"]
+  }
+]

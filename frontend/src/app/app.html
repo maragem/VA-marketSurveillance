@@ -1,0 +1,33 @@
+<header class="app-header">
+  <div class="app-header__inner">
+    <div class="app-header__brand">
+      <span class="app-header__emblem" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none">
+          <rect x="1" y="1" width="22" height="22" rx="3" fill="#FFD617"/>
+          <path d="M12 5l1.4 2.9 3.2.4-2.3 2.2.6 3.1L12 12.1l-2.9 1.5.6-3.1-2.3-2.2 3.2-.4L12 5z" fill="#004494"/>
+        </svg>
+      </span>
+      <div>
+        <div class="app-header__title">Marketing Compliance Checker</div>
+        <div class="app-header__subtitle">AI Act · GDPR · DSA · UCPD — GraphRAG agentic screening</div>
+      </div>
+    </div>
+    <nav class="app-header__nav">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+      <a routerLink="/analyze" routerLinkActive="is-active">New analysis</a>
+      @if (llmConfigured() === false) {
+        <span class="app-header__mode" title="ANTHROPIC_API_KEY not configured — retrieval-only screening">heuristic mode</span>
+      } @else if (model()) {
+        <span class="app-header__mode app-header__mode--ok">{{ model() }}</span>
+      }
+    </nav>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
+
+<footer class="app-footer">
+  <span>© {{ year }} — Decision-support tool. Results are indicative screening, not legal advice.</span>
+</footer>

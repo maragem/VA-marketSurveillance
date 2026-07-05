@@ -1,0 +1,38 @@
+<section class="hero">
+  <h1>Check your campaign against EU marketing rules</h1>
+  <p>
+    Submit your campaign as text and a supervisor agent will triage it, dispatch specialist agents
+    for the <strong>AI Act</strong>, <strong>GDPR</strong>, <strong>DSA</strong> and
+    <strong>UCPD</strong> in parallel, and ground every finding in a legal knowledge graph.
+  </p>
+  <a euiButton euiPrimary euiCTAButton routerLink="/analyze">Analyse a campaign</a>
+</section>
+
+<h2 class="section-title">Previous analyses</h2>
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else if (error()) {
+  <p class="muted">{{ error() }}</p>
+} @else if (analyses().length === 0) {
+  <eui-card>
+    <eui-card-content>
+      No analyses yet — run your first one from <a routerLink="/analyze">New analysis</a>.
+    </eui-card-content>
+  </eui-card>
+} @else {
+  <div class="history">
+    @for (item of analyses(); track item.id) {
+      <a class="history__item" [routerLink]="['/reports', item.id]">
+        <span class="history__title">{{ item.title }}</span>
+        <span class="history__meta">{{ item.created_at | date: 'medium' }}</span>
+        <span euiBadge euiSizeS
+              [euiDanger]="riskIsDanger(item.overall_risk)"
+              [euiWarning]="riskIsWarning(item.overall_risk)"
+              [euiSuccess]="riskIsOk(item.overall_risk)">
+          {{ item.overall_risk }}
+        </span>
+      </a>
+    }
+  </div>
+}
