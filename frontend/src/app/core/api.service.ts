@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   AnalysisListItem,
   AnalysisReport,
+  AnalyticsData,
   CampaignSubmission,
   CellarMetadata,
   StreamEvent,
@@ -30,6 +31,10 @@ export class ApiService {
 
   cellarMetadata(celex: string): Observable<CellarMetadata> {
     return this.http.get<CellarMetadata>(`${this.base}/cellar/${celex}`);
+  }
+
+  analytics(): Observable<AnalyticsData> {
+    return this.http.get<AnalyticsData>(`${this.base}/analytics`);
   }
 
   /**

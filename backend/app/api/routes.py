@@ -57,6 +57,13 @@ async def cellar_metadata(celex: str, request: Request):
     return await request.app.state.cellar.metadata(celex)
 
 
+@router.get("/analytics")
+async def analytics(request: Request):
+    from ..analytics import build_analytics
+    reports = await request.app.state.store.payloads()
+    return build_analytics(reports)
+
+
 @router.get("/analyses")
 async def list_analyses(request: Request):
     return await request.app.state.store.list()

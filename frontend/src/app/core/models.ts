@@ -79,6 +79,25 @@ export interface CellarMetadata {
   date_document?: string | null;
 }
 
+export interface AnalyticsData {
+  totals: {
+    reports: number;
+    findings: number;
+    high_or_critical_pct: number;
+    agentic_pct: number;
+  };
+  risk_distribution: { risk: string; count: number }[];
+  findings_by_regulation: {
+    regulation: string;
+    label: string;
+    count: number;
+    severities: Record<string, number>;
+  }[];
+  top_provisions: { ref: string; title: string; count: number }[];
+  timeline: { date: string; count: number; high: number }[];
+  channels: { channel: string; count: number; high: number }[];
+}
+
 export interface StreamEvent {
   type: string;
   [key: string]: unknown;

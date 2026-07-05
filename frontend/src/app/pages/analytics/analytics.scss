@@ -1,0 +1,139 @@
+.page-title {
+  font-size: 1.35rem;
+  margin: 0 0 1rem;
+}
+
+.muted {
+  color: #5b6873;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tile {
+  background: #fff;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  &__value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #232c36;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: #5b6873;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  > * {
+    min-width: 0;
+  }
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr 2.5rem;
+    align-items: center;
+    gap: 0.6rem;
+
+    &:hover .bars__fill {
+      filter: brightness(1.15);
+    }
+  }
+
+  &--wide .bars__row {
+    grid-template-columns: 12rem 1fr 2.5rem;
+  }
+
+  &__label {
+    font-size: 0.82rem;
+    color: #232c36;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+
+    &--wide {
+      text-transform: none;
+    }
+  }
+
+  &__track {
+    background: #f0f2f5;
+    border-radius: 4px;
+    height: 14px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: 0 4px 4px 0;
+    min-width: 3px;
+    transition: width 0.4s ease;
+  }
+
+  &__value {
+    font-size: 0.82rem;
+    color: #44535f;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+}
+
+.columns {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 150px;
+
+  &__item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 0.25rem;
+
+    &:hover .columns__bar {
+      filter: brightness(1.15);
+    }
+  }
+
+  &__bar {
+    width: 100%;
+    max-width: 34px;
+    border-radius: 4px 4px 0 0;
+    min-height: 3px;
+  }
+
+  &__label {
+    font-size: 0.68rem;
+    color: #5b6873;
+    white-space: nowrap;
+  }
+}

@@ -54,6 +54,15 @@ class ReportStore:
         payload = await asyncio.to_thread(_read)
         return AnalysisReport(**json.loads(payload)) if payload else None
 
+    async def payloads(self, limit: int = 5000) -> list[dict]:
+        """All stored reports as dicts, newest first (for analytics)."""
+        def _read():
+            with self._connect() as conn:
+                rows = conn.execute(
+                    "SELECT payload FROM reports ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+                return [json.loads(r[0]) for r in rows]
+        return await asyncio.to_thread(_read)
+
     async def list(self, limit: int = 50) -> list[dict]:
         def _read():
             with self._connect() as conn:

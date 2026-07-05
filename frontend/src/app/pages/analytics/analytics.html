@@ -1,0 +1,145 @@
+<h1 class="page-title">Compliance analytics</h1>
+
+@if (error()) {
+  <p class="muted">{{ error() }}</p>
+} @else if (!data()) {
+  <p class="muted">Loading…</p>
+} @else {
+  @let d = data()!;
+
+  @if (d.totals.reports === 0) {
+    <eui-card>
+      <eui-card-content>No completed analyses yet — run a few from “New analysis” and come back.</eui-card-content>
+    </eui-card>
+  } @else {
+    <div class="tiles">
+      <div class="tile">
+        <span class="tile__value">{{ d.totals.reports }}</span>
+        <span class="tile__label">campaigns analysed</span>
+      </div>
+      <div class="tile">
+        <span class="tile__value">{{ d.totals.findings }}</span>
+        <span class="tile__label">findings raised</span>
+      </div>
+      <div class="tile">
+        <span class="tile__value">{{ d.totals.high_or_critical_pct }}%</span>
+        <span class="tile__label">high or critical risk</span>
+      </div>
+      <div class="tile">
+        <span class="tile__value">{{ d.totals.agentic_pct }}%</span>
+        <span class="tile__label">full agentic analyses</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <eui-card>
+        <eui-card-header>
+          <eui-card-header-title>Risk distribution</eui-card-header-title>
+          <eui-card-header-subtitle>Overall assessment of analysed campaigns</eui-card-header-subtitle>
+        </eui-card-header>
+        <eui-card-content>
+          <div class="bars" role="table" aria-label="Risk distribution">
+            @for (row of d.risk_distribution; track row.risk) {
+              <div class="bars__row" role="row" [title]="row.count + ' campaign(s) assessed ' + riskLabel(row.risk)">
+                <span class="bars__label" role="rowheader">{{ riskLabel(row.risk) }}</span>
+                <span class="bars__track">
+                  <span class="bars__fill" [style.width]="pct(row.count, maxRisk())"
+                        [style.background]="riskColors[row.risk]"></span>
+                </span>
+                <span class="bars__value" role="cell">{{ row.count }}</span>
+              </div>
+            }
+          </div>
+        </eui-card-content>
+      </eui-card>
+
+      <eui-card>
+        <eui-card-header>
+          <eui-card-header-title>Findings by regulation</eui-card-header-title>
+          <eui-card-header-subtitle>Where campaigns run into trouble</eui-card-header-subtitle>
+        </eui-card-header>
+        <eui-card-content>
+          <div class="bars" role="table" aria-label="Findings by regulation">
+            @for (row of d.findings_by_regulation; track row.regulation) {
+              <div class="bars__row" role="row"
+                   [title]="row.count + ' finding(s) — critical: ' + row.severities['critical'] + ', high: ' + row.severities['high'] + ', medium: ' + row.severities['medium'] + ', low: ' + row.severities['low'] + ', info: ' + row.severities['info']">
+                <span class="bars__label" role="rowheader">{{ row.label }}</span>
+                <span class="bars__track">
+                  <span class="bars__fill" [style.width]="pct(row.count, maxRegulation())"
+                        [style.background]="barHue"></span>
+                </span>
+                <span class="bars__value" role="cell">{{ row.count }}</span>
+              </div>
+            }
+          </div>
+        </eui-card-content>
+      </eui-card>
+    </div>
+
+    <eui-card>
+      <eui-card-header>
+        <eui-card-header-title>Most-cited provisions</eui-card-header-title>
+        <eui-card-header-subtitle>The rules campaigns break most often</eui-card-header-subtitle>
+      </eui-card-header>
+      <eui-card-content>
+        <div class="bars bars--wide" role="table" aria-label="Most cited provisions">
+          @for (row of d.top_provisions; track row.ref) {
+            <div class="bars__row" role="row" [title]="row.title">
+              <span class="bars__label bars__label--wide" role="rowheader">{{ row.ref }}</span>
+              <span class="bars__track">
+                <span class="bars__fill" [style.width]="pct(row.count, maxProvision())"
+                      [style.background]="barHue"></span>
+              </span>
+              <span class="bars__value" role="cell">{{ row.count }}</span>
+            </div>
+          }
+        </div>
+      </eui-card-content>
+    </eui-card>
+
+    <div class="grid">
+      <eui-card>
+        <eui-card-header>
+          <eui-card-header-title>Analyses over time</eui-card-header-title>
+          <eui-card-header-subtitle>Last {{ d.timeline.length }} active day(s)</eui-card-header-subtitle>
+        </eui-card-header>
+        <eui-card-content>
+          <div class="columns" role="img" aria-label="Analyses per day">
+            @for (day of d.timeline; track day.date) {
+              <div class="columns__item"
+                   [title]="(day.date | date: 'mediumDate') + ': ' + day.count + ' analyses, ' + day.high + ' high/critical'">
+                <span class="columns__bar" [style.height]="pct(day.count, maxDay())"
+                      [style.background]="barHue"></span>
+                <span class="columns__label">{{ day.date | date: 'd/M' }}</span>
+              </div>
+            }
+          </div>
+        </eui-card-content>
+      </eui-card>
+
+      <eui-card>
+        <eui-card-header>
+          <eui-card-header-title>Channels</eui-card-header-title>
+          <eui-card-header-subtitle>Declared campaign channels</eui-card-header-subtitle>
+        </eui-card-header>
+        <eui-card-content>
+          <div class="bars" role="table" aria-label="Campaigns per channel">
+            @for (row of d.channels; track row.channel) {
+              <div class="bars__row" role="row"
+                   [title]="row.count + ' campaign(s), of which ' + row.high + ' high/critical risk'">
+                <span class="bars__label" role="rowheader">{{ row.channel }}</span>
+                <span class="bars__track">
+                  <span class="bars__fill" [style.width]="pct(row.count, maxChannel())"
+                        [style.background]="barHue"></span>
+                </span>
+                <span class="bars__value" role="cell">{{ row.count }}</span>
+              </div>
+            } @empty {
+              <span class="muted">No channel metadata declared yet.</span>
+            }
+          </div>
+        </eui-card-content>
+      </eui-card>
+    </div>
+  }
+}
