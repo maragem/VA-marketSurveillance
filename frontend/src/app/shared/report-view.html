@@ -116,6 +116,48 @@
     </eui-card>
   }
 
+  @if (sources().length > 0) {
+    <eui-card>
+      <eui-card-header>
+        <eui-card-header-title>Legal sources</eui-card-header-title>
+        <eui-card-header-subtitle>
+          Acts cited in this report, resolved against the Publications Office CELLAR repository
+        </eui-card-header-subtitle>
+      </eui-card-header>
+      <eui-card-content>
+        <div class="sources">
+          @for (src of sources(); track src.celex) {
+            <div class="sources__row">
+              <div class="sources__main">
+                <span class="sources__celex">CELEX {{ src.celex }}</span>
+                <span class="sources__title">
+                  {{ src.cellar?.title || src.regulations.join(', ') }}
+                </span>
+                @if (src.cellar?.date_document) {
+                  <span class="sources__date">{{ src.cellar?.date_document }}</span>
+                }
+              </div>
+              <div class="sources__side">
+                @if (src.cellar === null) {
+                  <span euiBadge euiSizeS>querying CELLAR…</span>
+                } @else if (src.cellar?.available) {
+                  <span euiBadge euiSizeS euiSuccess title="Metadata retrieved live from the CELLAR SPARQL endpoint">
+                    verified in CELLAR
+                  </span>
+                } @else {
+                  <span euiBadge euiSizeS euiWarning title="CELLAR unreachable — static CELEX/ELI reference shown">
+                    static reference
+                  </span>
+                }
+                <a [href]="src.eurLexUrl" target="_blank" rel="noopener">EUR-Lex ↗</a>
+              </div>
+            </div>
+          }
+        </div>
+      </eui-card-content>
+    </eui-card>
+  }
+
   <p class="report__sources">
     Legal references are anchored to the authoritative EU corpus via the Publications Office
     <strong>CELLAR</strong> repository (CELEX / ELI identifiers); "Official text" links open the

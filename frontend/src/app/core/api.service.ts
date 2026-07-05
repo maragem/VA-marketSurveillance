@@ -5,6 +5,7 @@ import {
   AnalysisListItem,
   AnalysisReport,
   CampaignSubmission,
+  CellarMetadata,
   StreamEvent,
 } from './models';
 
@@ -25,6 +26,10 @@ export class ApiService {
 
   getAnalysis(id: string): Observable<AnalysisReport> {
     return this.http.get<AnalysisReport>(`${this.base}/analyses/${id}`);
+  }
+
+  cellarMetadata(celex: string): Observable<CellarMetadata> {
+    return this.http.get<CellarMetadata>(`${this.base}/cellar/${celex}`);
   }
 
   /**

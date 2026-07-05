@@ -71,6 +71,14 @@ export interface AnalysisListItem {
   title: string;
 }
 
+export interface CellarMetadata {
+  celex: string;
+  available: boolean;
+  cellar_work?: string | null;
+  title?: string | null;
+  date_document?: string | null;
+}
+
 export interface StreamEvent {
   type: string;
   [key: string]: unknown;

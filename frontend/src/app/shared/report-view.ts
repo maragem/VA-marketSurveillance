@@ -1,17 +1,26 @@
-import { Component, input } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { EUI_ALERT } from '@eui/components/eui-alert';
 import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { EUI_CHIP } from '@eui/components/eui-chip';
+import { ApiService } from '../core/api.service';
 import {
   AnalysisReport,
+  CellarMetadata,
   Finding,
   REGULATION_LABELS,
   Regulation,
   RegulationVerdict,
   Severity,
 } from '../core/models';
+
+export interface SourceRow {
+  celex: string;
+  regulations: string[];
+  eurLexUrl: string;
+  cellar: CellarMetadata | null; // null = lookup in flight
+}
 
 @Component({
   selector: 'app-report-view',
@@ -20,9 +29,53 @@ import {
   styleUrl: './report-view.scss',
 })
 export class ReportView {
+  private readonly api = inject(ApiService);
+
   readonly report = input.required<AnalysisReport>();
+  readonly sources = signal<SourceRow[]>([]);
 
   readonly regulationLabels = REGULATION_LABELS;
+
+  constructor() {
+    // Collect the distinct CELEX numbers cited by the report's findings and
+    // look each one up live in CELLAR (official title, date, work URI).
+    effect(() => {
+      const r = this.report();
+      const byCelex = new Map<string, SourceRow>();
+      for (const verdict of r.verdicts) {
+        for (const finding of verdict.findings) {
+          if (!finding.celex) {
+            continue;
+          }
+          const row = byCelex.get(finding.celex) ?? {
+            celex: finding.celex,
+            regulations: [],
+            eurLexUrl: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:${finding.celex}`,
+            cellar: null,
+          };
+          const label = this.regulationLabel(verdict.regulation);
+          if (!row.regulations.includes(label)) {
+            row.regulations.push(label);
+          }
+          byCelex.set(finding.celex, row);
+        }
+      }
+      const rows = [...byCelex.values()];
+      this.sources.set(rows);
+      for (const row of rows) {
+        this.api.cellarMetadata(row.celex).subscribe({
+          next: (meta) => this.patchSource(row.celex, meta),
+          error: () => this.patchSource(row.celex, { celex: row.celex, available: false }),
+        });
+      }
+    });
+  }
+
+  private patchSource(celex: string, meta: CellarMetadata): void {
+    this.sources.update((rows) =>
+      rows.map((row) => (row.celex === celex ? { ...row, cellar: meta } : row)),
+    );
+  }
 
   regulationLabel(reg: Regulation): string {
     return this.regulationLabels[reg] ?? reg;
