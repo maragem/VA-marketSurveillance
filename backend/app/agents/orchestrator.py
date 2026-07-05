@@ -99,13 +99,13 @@ class Orchestrator:
         self.graph = graph
         self.retriever = retriever
         self.executor = GraphToolExecutor(graph, retriever)
-        self.client = AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY) if config.llm_available() else None
+        self.client = config.make_async_client()
 
     async def run(self, report: AnalysisReport, emit: Callable[[dict], Awaitable[None]]) -> AnalysisReport:
         if self.client is None:
             from .heuristic import run_heuristic_analysis
             await emit({"type": "stage", "stage": "heuristic",
-                        "message": "ANTHROPIC_API_KEY not configured — running deterministic GraphRAG heuristic analysis."})
+                        "message": "No LLM credentials configured — running deterministic GraphRAG heuristic analysis."})
             return await run_heuristic_analysis(report, self.retriever, emit)
 
         block = campaign_block(report.campaign)

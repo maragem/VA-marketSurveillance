@@ -55,7 +55,7 @@ async def run_heuristic_analysis(
             rationale=("Retrieved as relevant by GraphRAG matching against the campaign text "
                        f"(graph path: {' '.join(hit['graph_path'])}). Verify applicability manually — "
                        "heuristic mode performs retrieval, not legal reasoning."),
-            recommendation="Review the campaign against this provision; configure ANTHROPIC_API_KEY for full agentic analysis.",
+            recommendation="Review the campaign against this provision; configure LLM credentials for full agentic analysis.",
             graph_path=hit["graph_path"],
         ))
 
@@ -79,9 +79,9 @@ async def run_heuristic_analysis(
     report.executive_summary = (
         "Heuristic GraphRAG screening completed without LLM reasoning. The provisions listed were "
         "retrieved as potentially relevant to the campaign text and require manual verification. "
-        "Configure ANTHROPIC_API_KEY to enable the full agentic analysis."
+        "Configure ANTHROPIC_API_KEY or Bedrock credentials (AWS_BEARER_TOKEN_BEDROCK + AWS_REGION) to enable the full agentic analysis."
     )
-    report.recommendations = ["Configure ANTHROPIC_API_KEY on the deployment to enable agentic compliance analysis."]
+    report.recommendations = ["Configure ANTHROPIC_API_KEY or Bedrock credentials (AWS_BEARER_TOKEN_BEDROCK + AWS_REGION) on the deployment to enable agentic compliance analysis."]
     report.engine = "heuristic"
     report.status = "completed"
     return report

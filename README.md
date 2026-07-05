@@ -57,14 +57,34 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
 
 1. Create a new Railway project → **Deploy from GitHub repo** → select this repository.
    Railway picks up `railway.json` and builds the `Dockerfile` automatically.
-2. Set environment variables on the service:
+2. Set environment variables on the service. Two LLM providers are supported — configure one:
 
-   | Variable | Required | Description |
-   |---|---|---|
-   | `ANTHROPIC_API_KEY` | recommended | Enables the full agentic analysis. Without it the app runs in heuristic (retrieval-only) mode. |
-   | `CLAUDE_MODEL` | no | Model id, default `claude-opus-4-8`. |
-   | `AGENT_MAX_TURNS` | no | Tool-use round trips per specialist agent (default 8). |
-   | `DATA_DIR` | no | Report storage dir, default `/app/data`. |
+   **Option A — Claude API (first-party):**
+
+   | Variable | Description |
+   |---|---|
+   | `ANTHROPIC_API_KEY` | Anthropic API key. |
+   | `CLAUDE_MODEL` | Optional; default `claude-opus-4-8`. |
+
+   **Option B — Claude on Amazon Bedrock (bearer token / Bedrock API key):**
+
+   | Variable | Description |
+   |---|---|
+   | `AWS_BEARER_TOKEN_BEDROCK` | Your Bedrock API key (bearer token). |
+   | `AWS_REGION` | e.g. `eu-west-1`. |
+   | `ANTHROPIC_MODEL` (or `CLAUDE_MODEL`) | Bedrock model / inference-profile id, e.g. `eu.anthropic.claude-opus-4-8` (the default in Bedrock mode). |
+
+   The provider is auto-detected from which credentials are present
+   (`ANTHROPIC_API_KEY` wins if both are set; override with `CLAUDE_PROVIDER=anthropic|bedrock`).
+   Standard AWS SigV4 credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`) also work for Bedrock.
+   With no credentials at all the app runs in heuristic (retrieval-only) mode.
+
+   **Common:**
+
+   | Variable | Description |
+   |---|---|
+   | `AGENT_MAX_TURNS` | Tool-use round trips per specialist agent (default 8). |
+   | `DATA_DIR` | Report storage dir, default `/app/data`. |
 
 3. (Optional) Attach a **volume** mounted at `/app/data` so analysis reports survive redeploys.
 4. Generate a domain — done. Health check: `GET /api/health`.

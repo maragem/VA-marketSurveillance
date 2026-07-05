@@ -21,6 +21,7 @@ async def health(request: Request):
     return {
         "status": "ok",
         "llm_configured": config.llm_available(),
+        "provider": config.CLAUDE_PROVIDER,
         "model": config.CLAUDE_MODEL if config.llm_available() else None,
         "graph": request.app.state.graph.summary(),
     }

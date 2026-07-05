@@ -26,8 +26,12 @@ async def lifespan(app: FastAPI):
     app.state.orchestrator = Orchestrator(graph, retriever)
     app.state.store = ReportStore(config.DATA_DIR)
     logger.info("Knowledge graph loaded: %s", graph.summary())
-    if not config.llm_available():
-        logger.warning("ANTHROPIC_API_KEY not set — running in heuristic (retrieval-only) mode.")
+    if config.llm_available():
+        logger.info("LLM provider: %s, model: %s", config.CLAUDE_PROVIDER, config.CLAUDE_MODEL)
+    else:
+        logger.warning(
+            "No LLM credentials found (ANTHROPIC_API_KEY or AWS_BEARER_TOKEN_BEDROCK) — "
+            "running in heuristic (retrieval-only) mode.")
     yield
 
 
