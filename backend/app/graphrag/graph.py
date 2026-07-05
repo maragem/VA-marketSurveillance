@@ -9,7 +9,11 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-from .cellar import source_for
+import re
+
+from .cellar import REGULATION_SOURCES, source_from_celex
+
+_CELEX_IN_REF = re.compile(r"CELEX\s+(3\d{4}[A-Z]\d{4})")
 
 
 class KnowledgeGraph:
@@ -21,12 +25,25 @@ class KnowledgeGraph:
         nodes = json.loads((knowledge_dir / "nodes.json").read_text())
         edges = json.loads((knowledge_dir / "edges.json").read_text())
 
+        # CELEX per regulation key: the core corpus is hard-coded; ingested
+        # acts declare theirs on the regulation node (ref "CELEX 3....", or an
+        # explicit "celex" field).
+        celex_by_regulation = {key: src["celex"] for key, src in REGULATION_SOURCES.items()}
+        for node in nodes:
+            if node.get("type") == "regulation" and node.get("regulation"):
+                celex = node.get("celex")
+                if not celex:
+                    m = _CELEX_IN_REF.search(node.get("ref", ""))
+                    celex = m.group(1) if m else None
+                if celex:
+                    celex_by_regulation.setdefault(node["regulation"], celex)
+
         for node in nodes:
             # Anchor every regulation/provision node to its authoritative
             # source in CELLAR / EUR-Lex (CELEX, ELI, deep link).
-            source = source_for(node.get("regulation"), node.get("ref"))
-            if source:
-                node["source"] = source
+            celex = celex_by_regulation.get(node.get("regulation") or "")
+            if celex:
+                node["source"] = source_from_celex(celex, node.get("ref"))
             self.nodes[node["id"]] = node
         self.edges = []
         for edge in edges:

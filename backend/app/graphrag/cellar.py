@@ -62,18 +62,35 @@ def _eur_lex_url(celex: str, ref: Optional[str] = None) -> str:
     return url
 
 
-def source_for(regulation: Optional[str], ref: Optional[str] = None) -> Optional[dict]:
-    """Static source-reference block for a node of the given regulation."""
-    src = REGULATION_SOURCES.get(regulation or "")
-    if not src:
+# CELEX document types -> ELI type segment (sector 3 = legislation).
+_CELEX_RE = re.compile(r"^3(\d{4})([LRD])(\d{4})$")
+_ELI_TYPES = {"L": "dir", "R": "reg", "D": "dec"}
+
+
+def _eli_from_celex(celex: str) -> Optional[str]:
+    m = _CELEX_RE.match(celex)
+    if not m:
         return None
-    celex = src["celex"]
+    year, doc_type, number = m.groups()
+    return f"http://data.europa.eu/eli/{_ELI_TYPES[doc_type]}/{year}/{int(number)}/oj"
+
+
+def source_from_celex(celex: str, ref: Optional[str] = None, eli: Optional[str] = None) -> dict:
+    """Source-reference block for any act identified by CELEX number."""
     return {
         "celex": celex,
-        "eli": src["eli"],
+        "eli": eli or _eli_from_celex(celex),
         "cellar_uri": f"http://publications.europa.eu/resource/celex/{celex}",
         "eur_lex_url": _eur_lex_url(celex, ref),
     }
+
+
+def source_for(regulation: Optional[str], ref: Optional[str] = None) -> Optional[dict]:
+    """Static source-reference block for a node of the given core regulation."""
+    src = REGULATION_SOURCES.get(regulation or "")
+    if not src:
+        return None
+    return source_from_celex(src["celex"], ref, eli=src["eli"])
 
 
 class CellarClient:

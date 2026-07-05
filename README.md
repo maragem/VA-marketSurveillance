@@ -138,16 +138,47 @@ metadata (official title, date, CELLAR work URI) with caching — purely a displ
 that degrades gracefully (`available: false`) if CELLAR is unreachable, so the analysis itself
 never depends on external availability.
 
-Natural next step: use the same SPARQL client to pull full article texts from CELLAR at ingestion
-time and generate knowledge-graph nodes semi-automatically, instead of curating summaries by hand.
-
 ## Extending the knowledge graph
 
-The legal corpus lives in `knowledge/nodes.json` (regulations, provisions, marketing concepts)
-and `knowledge/edges.json` (containment, governance, cross-references). Add nodes/edges and
-restart — the retriever indexes them automatically and agents can cite them immediately.
-Suitable next steps: ePrivacy Directive, Empowering Consumers Directive (EU) 2024/825 blacklist
-items, Health Claims Regulation, national transpositions.
+**Manually:** the legal corpus lives in `knowledge/nodes.json` (regulations, provisions,
+marketing concepts) and `knowledge/edges.json` (containment, governance, cross-references).
+Add nodes/edges and restart — the retriever indexes them automatically and agents can cite
+them immediately.
+
+**Semi-automatically — CELLAR ingestion pipeline:** `python -m app.ingest` (run from
+`backend/`) fetches any act from CELLAR by CELEX number, splits it into articles, and drafts
+graph nodes/edges into a **proposal file** for human review; `--merge` folds an approved
+proposal into the live graph. Ingested acts automatically receive derived ELI identifiers and
+EUR-Lex deep links.
+
+```bash
+# Draft the ePrivacy Directive, LLM-enriched (marketing-relevance summaries,
+# retrieval keywords, links to existing concepts), keeping only relevant articles
+python -m app.ingest --celex 32002L0058 --regulation EPRIVACY \
+    --label "ePrivacy Directive 2002/58/EC" --llm --relevant-only
+
+# Add further GDPR articles to the existing corpus (plain text, no LLM)
+python -m app.ingest --celex 32016R0679 --regulation GDPR \
+    --label "GDPR (Regulation (EU) 2016/679)" --articles 15,17,20
+
+# Review knowledge/proposals/proposal-<CELEX>.json, then:
+python -m app.ingest --merge knowledge/proposals/proposal-32002L0058.json
+# ...and restart the backend to index the new nodes.
+```
+
+Flags: `--articles 1-15` / `--articles 5,9,22` selects articles; `--llm` uses the configured
+Claude provider (Anthropic API or Bedrock) to summarise each article and propose concept
+links; `--relevant-only` drops articles the model judges not marketing-relevant (committees,
+entry into force, …); `--from-file act.html` works offline from saved HTML.
+
+Note: the four **core regulations** (AI Act, GDPR, DSA, UCPD) each have a dedicated specialist
+agent and can appear in findings. Ingested acts enrich the graph — they surface through
+GraphRAG retrieval and graph traversal as context for the agents — but findings always cite
+core-regulation provisions. Promoting an ingested act to a fifth specialist agent is a small
+code change (`config.REGULATIONS`, the `Regulation` literal in `models.py`, and labels).
+
+Suitable candidates: ePrivacy Directive, Empowering Consumers Directive (EU) 2024/825
+blacklist items, Health Claims Regulation (EC) 1924/2006, national transpositions.
 
 ## Repository layout
 
