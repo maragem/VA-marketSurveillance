@@ -21,6 +21,8 @@ export interface Finding {
   evidence_quote?: string | null;
   recommendation: string;
   graph_path: string[];
+  celex?: string | null;
+  source_url?: string | null;
 }
 
 export interface TriageResult {

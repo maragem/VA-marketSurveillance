@@ -9,6 +9,8 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
+from .cellar import source_for
+
 
 class KnowledgeGraph:
     def __init__(self, knowledge_dir: Path):
@@ -20,6 +22,11 @@ class KnowledgeGraph:
         edges = json.loads((knowledge_dir / "edges.json").read_text())
 
         for node in nodes:
+            # Anchor every regulation/provision node to its authoritative
+            # source in CELLAR / EUR-Lex (CELEX, ELI, deep link).
+            source = source_for(node.get("regulation"), node.get("ref"))
+            if source:
+                node["source"] = source
             self.nodes[node["id"]] = node
         self.edges = []
         for edge in edges:

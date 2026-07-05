@@ -28,6 +28,8 @@ class Finding(BaseModel):
     evidence_quote: Optional[str] = None
     recommendation: str
     graph_path: list[str] = Field(default_factory=list)
+    celex: Optional[str] = None
+    source_url: Optional[str] = None
 
 
 class TriageResult(BaseModel):

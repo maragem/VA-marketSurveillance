@@ -57,6 +57,8 @@ async def run_heuristic_analysis(
                        "heuristic mode performs retrieval, not legal reasoning."),
             recommendation="Review the campaign against this provision; configure LLM credentials for full agentic analysis.",
             graph_path=hit["graph_path"],
+            celex=(hit.get("source") or {}).get("celex"),
+            source_url=(hit.get("source") or {}).get("eur_lex_url"),
         ))
 
     verdicts = []

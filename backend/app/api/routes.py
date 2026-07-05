@@ -45,6 +45,18 @@ async def graph_search(q: str, request: Request, regulation: str | None = None, 
     return request.app.state.retriever.search(q, regulation=regulation, top_k=min(top_k, 20))
 
 
+@router.get("/cellar/{celex}")
+async def cellar_metadata(celex: str, request: Request):
+    """Live document metadata from the Publications Office CELLAR repository.
+
+    Display/verification aid only — analysis never depends on it. Returns
+    {"available": false} when CELLAR is unreachable.
+    """
+    if not celex.isalnum() or len(celex) > 20:
+        raise HTTPException(status_code=400, detail="Invalid CELEX identifier")
+    return await request.app.state.cellar.metadata(celex)
+
+
 @router.get("/analyses")
 async def list_analyses(request: Request):
     return await request.app.state.store.list()

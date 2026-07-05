@@ -77,6 +77,12 @@
                   </span>
                   <span class="finding__ref">{{ finding.provision_ref }}</span>
                   <span class="finding__title">{{ finding.title }}</span>
+                  @if (finding.source_url) {
+                    <a class="finding__source" [href]="finding.source_url" target="_blank" rel="noopener"
+                       [title]="'Official text on EUR-Lex (CELEX ' + finding.celex + ')'">
+                      Official text ↗
+                    </a>
+                  }
                 </div>
                 <p class="finding__rationale">{{ finding.rationale }}</p>
                 @if (finding.evidence_quote) {
@@ -109,4 +115,10 @@
       </eui-card-content>
     </eui-card>
   }
+
+  <p class="report__sources">
+    Legal references are anchored to the authoritative EU corpus via the Publications Office
+    <strong>CELLAR</strong> repository (CELEX / ELI identifiers); "Official text" links open the
+    act on EUR-Lex.
+  </p>
 </div>

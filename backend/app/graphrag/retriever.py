@@ -106,6 +106,7 @@ class GraphRetriever:
                 "title": node.get("title"),
                 "severity_hint": node.get("severity_hint"),
                 "text": node.get("text"),
+                "source": node.get("source"),
             })
         results.sort(key=lambda r: r["score"], reverse=True)
         return results[:top_k]

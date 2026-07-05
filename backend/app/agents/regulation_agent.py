@@ -137,6 +137,7 @@ def _to_verdict(regulation: str, submitted: dict, executor: GraphToolExecutor) -
         # Drop hallucinated citations and findings pinned to another regulation's provision.
         if not node or node.get("type") != "provision" or node.get("regulation") != regulation:
             continue
+        source = node.get("source") or {}
         findings.append(Finding(
             regulation=regulation,
             provision_id=node["id"],
@@ -146,6 +147,8 @@ def _to_verdict(regulation: str, submitted: dict, executor: GraphToolExecutor) -
             rationale=raw.get("rationale", ""),
             evidence_quote=raw.get("evidence_quote"),
             recommendation=raw.get("recommendation", ""),
+            celex=source.get("celex"),
+            source_url=source.get("eur_lex_url"),
         ))
     status = submitted.get("status", "attention")
     if findings and status in ("compliant", "not_applicable"):

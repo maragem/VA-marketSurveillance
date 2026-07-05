@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import config
 from .agents.orchestrator import Orchestrator
 from .api.routes import router
+from .graphrag.cellar import CellarClient
 from .graphrag.graph import KnowledgeGraph
 from .graphrag.retriever import GraphRetriever
 from .store import ReportStore
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
     app.state.retriever = retriever
     app.state.orchestrator = Orchestrator(graph, retriever)
     app.state.store = ReportStore(config.DATA_DIR)
+    app.state.cellar = CellarClient()
     logger.info("Knowledge graph loaded: %s", graph.summary())
     if config.llm_available():
         logger.info("LLM provider: %s, model: %s", config.CLAUDE_PROVIDER, config.CLAUDE_MODEL)

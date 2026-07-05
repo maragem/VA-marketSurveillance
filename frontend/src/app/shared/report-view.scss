@@ -67,6 +67,12 @@
     flex-wrap: wrap;
   }
 
+  &__sources {
+    margin: 0;
+    font-size: 0.76rem;
+    color: #5b6873;
+  }
+
   &__recos {
     margin: 0;
     padding-left: 1.2rem;
@@ -120,6 +126,17 @@
   &__title {
     font-size: 0.86rem;
     color: #3a4b5c;
+  }
+
+  &__source {
+    font-size: 0.8rem;
+    color: #004494;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &__rationale {

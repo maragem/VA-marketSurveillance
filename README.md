@@ -119,6 +119,28 @@ cd frontend && npx ng build && cd ../backend && python -m uvicorn app.main:app
 | `GET /api/graph/nodes/{id}` | Node detail + neighbours |
 | `GET /api/health` | Health + configuration status |
 
+## CELLAR / EUR-Lex source anchoring
+
+Every regulation and provision node in the knowledge graph is anchored to the authoritative EU
+corpus maintained by the Publications Office in the **CELLAR** common repository:
+
+- **CELEX** number (e.g. AI Act = `32024R1689`, GDPR = `32016R0679`, DSA = `32022R2065`,
+  UCPD = `32005L0029`)
+- **ELI** (European Legislation Identifier, e.g. `http://data.europa.eu/eli/reg/2024/1689/oj`)
+- **CELLAR resource URI** (`http://publications.europa.eu/resource/celex/{CELEX}`)
+- A deep **EUR-Lex link** with an article/annex anchor where derivable (e.g. `…CELEX:32024R1689#art_5`)
+
+These identifiers flow through the whole pipeline: graph nodes expose them to the agents through
+the GraphRAG tools, every finding in a report carries its `celex` and `source_url`, and the UI
+renders an "Official text" link next to each finding. `GET /api/cellar/{celex}` additionally
+queries the CELLAR SPARQL endpoint (`publications.europa.eu/webapi/rdf/sparql`) live for document
+metadata (official title, date, CELLAR work URI) with caching — purely a display/verification aid
+that degrades gracefully (`available: false`) if CELLAR is unreachable, so the analysis itself
+never depends on external availability.
+
+Natural next step: use the same SPARQL client to pull full article texts from CELLAR at ingestion
+time and generate knowledge-graph nodes semi-automatically, instead of curating summaries by hand.
+
 ## Extending the knowledge graph
 
 The legal corpus lives in `knowledge/nodes.json` (regulations, provisions, marketing concepts)
