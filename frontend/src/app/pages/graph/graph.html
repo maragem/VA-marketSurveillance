@@ -1,0 +1,92 @@
+<h1 class="page-title">Legal knowledge graph</h1>
+<p class="intro">
+  The corpus the agents reason over: regulations and their provisions on the outer ring,
+  cross-cutting marketing concepts in the centre. Hover to trace connections, click a node for
+  its full text and official source.
+</p>
+
+<div class="explorer">
+  <eui-card class="explorer__canvas">
+    <eui-card-content>
+      <div class="toolbar">
+        <input class="toolbar__search" type="search" placeholder="Search the graph (e.g. countdown, deepfake, consent)…"
+               [value]="query()" (input)="query.set($any($event.target).value)" />
+        <div class="legend">
+          <span class="legend__item"><span class="legend__dot" [style.background]="regulationColors['AI_ACT']"></span>AI Act</span>
+          <span class="legend__item"><span class="legend__dot" [style.background]="regulationColors['GDPR']"></span>GDPR</span>
+          <span class="legend__item"><span class="legend__dot" [style.background]="regulationColors['DSA']"></span>DSA</span>
+          <span class="legend__item"><span class="legend__dot" [style.background]="regulationColors['UCPD']"></span>UCPD</span>
+          <span class="legend__item"><span class="legend__dot" [style.background]="conceptColor"></span>concept</span>
+          <span class="legend__item"><span class="legend__line legend__line--solid"></span>contains / governs</span>
+          <span class="legend__item"><span class="legend__line legend__line--dashed"></span>references</span>
+          <span class="legend__item"><span class="legend__line legend__line--dotted"></span>related</span>
+        </div>
+      </div>
+
+      <svg [attr.viewBox]="'0 0 ' + W + ' ' + H" class="graph" role="img"
+           aria-label="Knowledge graph of regulations, provisions and marketing concepts">
+        @for (e of edges(); track e.source + e.target + e.type) {
+          <line class="graph__edge graph__edge--{{ edgeState(e) }}"
+                [attr.x1]="e.x1" [attr.y1]="e.y1" [attr.x2]="e.x2" [attr.y2]="e.y2"
+                [attr.stroke-dasharray]="edgeDash(e.type)" />
+        }
+        @for (n of nodes(); track n.id) {
+          <g class="graph__node graph__node--{{ nodeState(n.id) }}"
+             (click)="select(n.id)"
+             (mouseenter)="hoverId.set(n.id)" (mouseleave)="hoverId.set(null)">
+            <title>{{ n.ref }} — {{ n.title }}</title>
+            <circle [attr.cx]="n.x" [attr.cy]="n.y" [attr.r]="n.r" [attr.fill]="n.color" />
+            <text [attr.x]="n.x + labelDx(n)" [attr.y]="n.type === 'concept' ? n.y + n.r + 11 : n.y + 3"
+                  [attr.text-anchor]="labelAnchor(n)"
+                  class="graph__label graph__label--{{ n.type }}">{{ shortLabel(n) }}</text>
+          </g>
+        }
+      </svg>
+    </eui-card-content>
+  </eui-card>
+
+  <eui-card class="explorer__panel">
+    <eui-card-content>
+      @if (selected(); as node) {
+        <div class="detail">
+          <div class="detail__head">
+            <span class="detail__dot" [style.background]="node.color"></span>
+            <span class="detail__ref">{{ node.ref }}</span>
+          </div>
+          <h2 class="detail__title">{{ node.title }}</h2>
+          @if (node.severity_hint && node.severity_hint !== 'concept') {
+            <eui-chip euiSizeS>{{ node.severity_hint }}</eui-chip>
+          }
+          <p class="detail__text">{{ node.text }}</p>
+          @if (node.source?.eur_lex_url) {
+            <p class="detail__source">
+              <a [href]="node.source?.eur_lex_url" target="_blank" rel="noopener">Official text on EUR-Lex ↗</a>
+              <span class="detail__celex">CELEX {{ node.source?.celex }}</span>
+            </p>
+          }
+          <h3 class="detail__subhead">Connections ({{ neighbours().length }})</h3>
+          <div class="detail__neighbours">
+            @for (nb of neighbours(); track nb.other.id + nb.edge.type) {
+              <button class="neighbour" (click)="select(nb.other.id)">
+                <span class="neighbour__dot" [style.background]="nb.other.color"></span>
+                <span class="neighbour__body">
+                  <span class="neighbour__type">{{ nb.edge.type }} {{ nb.direction === 'in' ? '←' : '→' }}</span>
+                  <span class="neighbour__title">{{ nb.other.title }}</span>
+                  @if (nb.edge.note) {
+                    <span class="neighbour__note">{{ nb.edge.note }}</span>
+                  }
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="detail detail--empty">
+          <p>Select a node to see the provision text, its official source and its connections.</p>
+          <p class="muted">Tip: search for a practice like “countdown” or “deepfake” to light up the
+            relevant part of the graph.</p>
+        </div>
+      }
+    </eui-card-content>
+  </eui-card>
+</div>

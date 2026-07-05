@@ -16,6 +16,7 @@
       <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
       <a routerLink="/analyze" routerLinkActive="is-active">New analysis</a>
       <a routerLink="/analytics" routerLinkActive="is-active">Analytics</a>
+      <a routerLink="/graph" routerLinkActive="is-active">Knowledge graph</a>
       @if (llmConfigured() === false) {
         <span class="app-header__mode" title="ANTHROPIC_API_KEY not configured — retrieval-only screening">heuristic mode</span>
       } @else if (model()) {

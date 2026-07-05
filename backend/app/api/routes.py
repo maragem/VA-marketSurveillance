@@ -32,6 +32,31 @@ async def graph_summary(request: Request):
     return request.app.state.graph.summary()
 
 
+@router.get("/graph/full")
+async def graph_full(request: Request):
+    """Complete graph projection for the explorer visualisation."""
+    graph = request.app.state.graph
+    return {
+        "nodes": [
+            {
+                "id": n["id"],
+                "type": n["type"],
+                "regulation": n.get("regulation"),
+                "ref": n.get("ref"),
+                "title": n.get("title"),
+                "severity_hint": n.get("severity_hint"),
+                "text": n.get("text"),
+                "source": n.get("source"),
+            }
+            for n in graph.nodes.values()
+        ],
+        "edges": [
+            {"source": e["source"], "target": e["target"], "type": e["type"], "note": e.get("note")}
+            for e in graph.edges
+        ],
+    }
+
+
 @router.get("/graph/nodes/{node_id}")
 async def graph_node(node_id: str, request: Request):
     node = request.app.state.graph.get(node_id)

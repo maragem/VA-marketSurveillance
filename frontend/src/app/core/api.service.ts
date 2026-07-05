@@ -7,6 +7,7 @@ import {
   AnalyticsData,
   CampaignSubmission,
   CellarMetadata,
+  GraphFull,
   StreamEvent,
 } from './models';
 
@@ -35,6 +36,10 @@ export class ApiService {
 
   analytics(): Observable<AnalyticsData> {
     return this.http.get<AnalyticsData>(`${this.base}/analytics`);
+  }
+
+  graphFull(): Observable<GraphFull> {
+    return this.http.get<GraphFull>(`${this.base}/graph/full`);
   }
 
   /**

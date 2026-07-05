@@ -71,6 +71,34 @@ export interface AnalysisListItem {
   title: string;
 }
 
+export interface GraphNode {
+  id: string;
+  type: 'regulation' | 'provision' | 'concept';
+  regulation?: string | null;
+  ref?: string | null;
+  title?: string | null;
+  severity_hint?: string | null;
+  text?: string | null;
+  source?: {
+    celex?: string;
+    eli?: string;
+    cellar_uri?: string;
+    eur_lex_url?: string;
+  } | null;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  type: string;
+  note?: string | null;
+}
+
+export interface GraphFull {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
 export interface CellarMetadata {
   celex: string;
   available: boolean;
