@@ -12,7 +12,10 @@ import { ReportView } from '../../shared/report-view';
     @if (report(); as r) {
       <div class="bar">
         <h1 class="page-title">Compliance report — {{ r.campaign.title }}</h1>
-        <a euiButton euiSecondary routerLink="/analyze">New analysis</a>
+        <span class="bar__actions">
+          <a euiButton euiPrimary [href]="'/api/analyses/' + r.id + '/pdf'" download>Download PDF</a>
+          <a euiButton euiSecondary routerLink="/analyze">New analysis</a>
+        </span>
       </div>
       <app-report-view [report]="r" />
     } @else if (notFound()) {
@@ -29,6 +32,11 @@ import { ReportView } from '../../shared/report-view';
       gap: 1rem;
       flex-wrap: wrap;
       margin-bottom: 0.5rem;
+
+      &__actions {
+        display: flex;
+        gap: 0.6rem;
+      }
     }
 
     .page-title {

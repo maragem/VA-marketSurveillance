@@ -3,7 +3,7 @@ import json
 import logging
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 
 from .. import config
 from ..models import AnalysisReport, CampaignSubmission
@@ -100,6 +100,21 @@ async def get_analysis(report_id: str, request: Request):
     if not report:
         raise HTTPException(status_code=404, detail="Unknown analysis")
     return report
+
+
+@router.get("/analyses/{report_id}/pdf")
+async def analysis_pdf(report_id: str, request: Request):
+    report = await request.app.state.store.get(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Unknown analysis")
+    from ..pdf import build_pdf
+    pdf_bytes = await asyncio.to_thread(build_pdf, report)
+    safe_title = "".join(c if c.isalnum() or c in " -_" else "_" for c in report.campaign.title)[:60].strip()
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="compliance-report-{safe_title or report_id}.pdf"'},
+    )
 
 
 @router.post("/analyses/stream")

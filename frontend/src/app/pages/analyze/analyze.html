@@ -111,7 +111,10 @@
 @if (phase() === 'done' && report(); as done) {
   <div class="done-bar">
     <h1 class="page-title">Compliance report — {{ done.campaign.title }}</h1>
-    <button euiButton euiSecondary (buttonClick)="reset()">Analyse another campaign</button>
+    <span class="done-bar__actions">
+      <a euiButton euiPrimary [href]="'/api/analyses/' + done.id + '/pdf'" download>Download PDF</a>
+      <button euiButton euiSecondary (buttonClick)="reset()">Analyse another campaign</button>
+    </span>
   </div>
   <app-report-view [report]="done" />
 }
