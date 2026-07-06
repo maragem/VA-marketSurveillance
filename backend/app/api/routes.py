@@ -91,6 +91,18 @@ async def youtube_search(q: str, upload_date: str | None = None, sort_by: str | 
         raise HTTPException(status_code=502, detail=f"Oxylabs request failed: {exc}")
 
 
+@router.get("/youtube/debug")
+async def youtube_debug(q: str = "test"):
+    """Structural sketch of the raw Oxylabs search response (parser tuning aid)."""
+    from .. import oxylabs
+    if not oxylabs.available():
+        raise HTTPException(status_code=503, detail="Oxylabs credentials not configured")
+    try:
+        return await oxylabs.debug_search(q)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+
+
 @router.get("/youtube/videos/{video_id}")
 async def youtube_video(video_id: str):
     """Fetch metadata + transcript for one video, ready for analysis."""

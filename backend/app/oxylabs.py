@@ -10,6 +10,7 @@ keys instead of assuming exact schemas, and we always keep going on partial
 data — a missing transcript degrades the analysis, it must not fail it.
 """
 import asyncio
+import json
 import logging
 import os
 import re
@@ -74,11 +75,20 @@ def _walk(obj: Any):
             yield from _walk(item)
 
 
+_WATCH_URL_RE = re.compile(r"(?:watch\?v=|youtu\.be/|/shorts/)([A-Za-z0-9_-]{11})")
+
+
 def _extract_video_id(d: dict) -> Optional[str]:
     for key in ("videoId", "video_id", "id"):
         value = d.get(key)
         if isinstance(value, str) and _VIDEO_ID_RE.match(value):
             return value
+    for key in ("url", "link", "href", "video_url", "watch_url"):
+        value = d.get(key)
+        if isinstance(value, str):
+            match = _WATCH_URL_RE.search(value)
+            if match:
+                return match.group(1)
     return None
 
 
@@ -110,8 +120,59 @@ async def _query(payload: dict, timeout: float = 90.0) -> Any:
     # Realtime responses wrap content in results[0].content
     results = data.get("results") if isinstance(data, dict) else None
     if isinstance(results, list) and results:
-        return results[0].get("content", results[0])
-    return data
+        return _normalize_content(results[0].get("content", results[0]))
+    return _normalize_content(data)
+
+
+_YT_INITIAL_DATA_RE = re.compile(r"ytInitialData\s*=\s*(\{.*?\})\s*;", re.S)
+
+
+def _normalize_content(content: Any) -> Any:
+    """Content may arrive as parsed JSON, a JSON-encoded string, or raw HTML
+    with embedded ytInitialData — normalise all of them to Python objects."""
+    for _ in range(3):  # tolerate double-encoded JSON strings
+        if not isinstance(content, str):
+            return content
+        text = content.strip()
+        try:
+            content = json.loads(text)
+            continue
+        except ValueError:
+            pass
+        match = _YT_INITIAL_DATA_RE.search(text)
+        if match:
+            try:
+                return json.loads(match.group(1))
+            except ValueError:
+                pass
+        return content
+    return content
+
+
+def _sketch(obj: Any, depth: int = 0, max_depth: int = 4) -> Any:
+    """Compact structural sketch of a payload for diagnostics (no full dump)."""
+    if depth >= max_depth:
+        return type(obj).__name__
+    if isinstance(obj, dict):
+        return {k: _sketch(v, depth + 1, max_depth) for k, v in list(obj.items())[:12]}
+    if isinstance(obj, list):
+        sketch = [_sketch(v, depth + 1, max_depth) for v in obj[:2]]
+        if len(obj) > 2:
+            sketch.append(f"… +{len(obj) - 2} more")
+        return sketch
+    if isinstance(obj, str):
+        return obj[:120]
+    return obj
+
+
+async def debug_search(query: str) -> dict:
+    """Raw structural view of a youtube_search response, for parser tuning."""
+    content = await _query({"source": "youtube_search", "query": query})
+    return {
+        "content_type": type(content).__name__,
+        "parsed_videos": len(await search(query)),
+        "sketch": _sketch(content),
+    }
 
 
 async def search(query: str, upload_date: str | None = None,
