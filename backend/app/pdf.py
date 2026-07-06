@@ -165,6 +165,11 @@ def build_pdf(report: AnalysisReport) -> bytes:
         styles["meta"]))
     if report.parent_id:
         story.append(Paragraph(f"Re-analysis of report {_e(report.parent_id)}", styles["meta"]))
+    if report.campaign.source_url:
+        story.append(Paragraph(
+            f"Source ({_e(report.campaign.source_platform or 'public')}): "
+            f'<link href="{_e(report.campaign.source_url)}" color="#004494">'
+            f"{_e(report.campaign.source_url)}</link>", styles["meta"]))
     if report.campaign.channels:
         story.append(Paragraph(f"Channels: {_e(', '.join(report.campaign.channels))}", styles["meta"]))
     if report.campaign.target_audience:

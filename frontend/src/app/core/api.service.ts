@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
@@ -10,6 +10,8 @@ import {
   CellarMetadata,
   GraphFull,
   StreamEvent,
+  YouTubeSearchResult,
+  YouTubeVideoBundle,
 } from './models';
 
 @Injectable({ providedIn: 'root' })
@@ -45,6 +47,21 @@ export class ApiService {
 
   getDiff(id: string): Observable<AnalysisDiff> {
     return this.http.get<AnalysisDiff>(`${this.base}/analyses/${id}/diff`);
+  }
+
+  youtubeSearch(q: string, uploadDate?: string, sortBy?: string): Observable<YouTubeSearchResult[]> {
+    let params = new HttpParams().set('q', q);
+    if (uploadDate) {
+      params = params.set('upload_date', uploadDate);
+    }
+    if (sortBy) {
+      params = params.set('sort_by', sortBy);
+    }
+    return this.http.get<YouTubeSearchResult[]>(`${this.base}/youtube/search`, { params });
+  }
+
+  youtubeVideo(videoId: string): Observable<YouTubeVideoBundle> {
+    return this.http.get<YouTubeVideoBundle>(`${this.base}/youtube/videos/${videoId}`);
   }
 
   /**

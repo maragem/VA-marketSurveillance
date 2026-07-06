@@ -1,0 +1,110 @@
+.page-title {
+  font-size: 1.35rem;
+  margin: 0 0 0.4rem;
+}
+
+.intro {
+  margin: 0 0 1rem;
+  color: #44535f;
+  max-width: 56rem;
+}
+
+.muted {
+  color: #5b6873;
+  margin-top: 1rem;
+}
+
+.searchbar {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+
+  &__input {
+    flex: 1;
+    min-width: 240px;
+    border: 1px solid #b9c2cb;
+    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    font: inherit;
+
+    &:focus {
+      outline: 2px solid #004494;
+      outline-offset: 1px;
+    }
+  }
+
+  &__select {
+    border: 1px solid #b9c2cb;
+    border-radius: 6px;
+    padding: 0.55rem 0.5rem;
+    font: inherit;
+    background: #fff;
+  }
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.video {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+
+  &__thumb {
+    width: 128px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex: 0 0 auto;
+    background: #eef1f4;
+
+    &--empty {
+      display: block;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__title {
+    font-weight: 600;
+    color: #232c36;
+    text-decoration: none;
+
+    &:hover {
+      color: #004494;
+      text-decoration: underline;
+    }
+  }
+
+  &__meta {
+    font-size: 0.78rem;
+    color: #5b6873;
+  }
+
+  &__desc {
+    font-size: 0.82rem;
+    color: #44535f;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__actions {
+    flex: 0 0 auto;
+  }
+}

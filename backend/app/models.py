@@ -16,6 +16,9 @@ class CampaignSubmission(BaseModel):
     markets: list[str] = Field(default_factory=list)
     uses_ai_generation: Optional[bool] = None
     uses_personalisation: Optional[bool] = None
+    # Provenance for campaigns acquired from public sources (e.g. YouTube surveillance)
+    source_platform: Optional[str] = None
+    source_url: Optional[str] = None
 
 
 class Finding(BaseModel):

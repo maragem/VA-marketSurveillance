@@ -6,6 +6,7 @@ import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EuiButtonComponent } from '@eui/components/eui-button';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { ApiService } from '../../core/api.service';
+import { PrefillService } from '../../core/prefill.service';
 import { EXAMPLE_CAMPAIGNS, ExampleCampaign } from '../../core/examples';
 import {
   AnalysisReport,
@@ -41,7 +42,24 @@ export class AnalyzePage {
   protected readonly parentId = signal<string | null>(null);
   protected readonly parentTitle = signal<string | null>(null);
 
+  /** Provenance carried when the campaign was acquired from a public source. */
+  protected readonly sourcePlatform = signal<string | null>(null);
+  protected readonly sourceUrl = signal<string | null>(null);
+
   constructor() {
+    const prefill = inject(PrefillService).take();
+    if (prefill) {
+      this.title = prefill.title;
+      this.text = prefill.text;
+      this.channels = prefill.channels.join(', ');
+      this.audience = prefill.target_audience ?? '';
+      this.markets = prefill.markets.join(', ');
+      this.usesAi = !!prefill.uses_ai_generation;
+      this.usesPersonalisation = !!prefill.uses_personalisation;
+      this.sourcePlatform.set(prefill.source_platform ?? null);
+      this.sourceUrl.set(prefill.source_url ?? null);
+    }
+
     const from = this.route.snapshot.queryParamMap.get('from');
     if (from) {
       this.api.getAnalysis(from).subscribe({
@@ -55,6 +73,8 @@ export class AnalyzePage {
           this.markets = r.campaign.markets.join(', ');
           this.usesAi = !!r.campaign.uses_ai_generation;
           this.usesPersonalisation = !!r.campaign.uses_personalisation;
+          this.sourcePlatform.set(r.campaign.source_platform ?? null);
+          this.sourceUrl.set(r.campaign.source_url ?? null);
         },
         error: () => this.parentId.set(null),
       });
@@ -111,6 +131,8 @@ export class AnalyzePage {
       markets: this.splitList(this.markets),
       uses_ai_generation: this.usesAi,
       uses_personalisation: this.usesPersonalisation,
+      source_platform: this.sourcePlatform(),
+      source_url: this.sourceUrl(),
     };
     this.phase.set('running');
     this.progress.set([]);

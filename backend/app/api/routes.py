@@ -18,11 +18,13 @@ def _sse(event: dict) -> str:
 
 @router.get("/health")
 async def health(request: Request):
+    from .. import oxylabs
     return {
         "status": "ok",
         "llm_configured": config.llm_available(),
         "provider": config.CLAUDE_PROVIDER,
         "model": config.CLAUDE_MODEL if config.llm_available() else None,
+        "youtube_configured": oxylabs.available(),
         "graph": request.app.state.graph.summary(),
     }
 
@@ -68,6 +70,40 @@ async def graph_node(node_id: str, request: Request):
 @router.get("/graph/search")
 async def graph_search(q: str, request: Request, regulation: str | None = None, top_k: int = 8):
     return request.app.state.retriever.search(q, regulation=regulation, top_k=min(top_k, 20))
+
+
+@router.get("/youtube/search")
+async def youtube_search(q: str, upload_date: str | None = None, sort_by: str | None = None):
+    """Search YouTube for candidate campaign videos via Oxylabs."""
+    from .. import oxylabs
+    if not oxylabs.available():
+        raise HTTPException(status_code=503, detail="Oxylabs credentials not configured")
+    if upload_date and upload_date not in ("last_hour", "today", "this_week", "this_month", "this_year"):
+        raise HTTPException(status_code=400, detail="Invalid upload_date filter")
+    if sort_by and sort_by not in ("relevance", "rating", "view_count", "upload_date"):
+        raise HTTPException(status_code=400, detail="Invalid sort_by filter")
+    try:
+        return await oxylabs.search(q, upload_date=upload_date, sort_by=sort_by)
+    except oxylabs.OxylabsError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+    except Exception as exc:
+        logger.exception("youtube search failed")
+        raise HTTPException(status_code=502, detail=f"Oxylabs request failed: {exc}")
+
+
+@router.get("/youtube/videos/{video_id}")
+async def youtube_video(video_id: str):
+    """Fetch metadata + transcript for one video, ready for analysis."""
+    from .. import oxylabs
+    if not oxylabs.available():
+        raise HTTPException(status_code=503, detail="Oxylabs credentials not configured")
+    try:
+        return await oxylabs.video_bundle(video_id)
+    except oxylabs.OxylabsError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+    except Exception as exc:
+        logger.exception("youtube video fetch failed")
+        raise HTTPException(status_code=502, detail=f"Oxylabs request failed: {exc}")
 
 
 @router.get("/cellar/{celex}")

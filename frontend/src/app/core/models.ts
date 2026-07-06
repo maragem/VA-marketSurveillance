@@ -9,6 +9,29 @@ export interface CampaignSubmission {
   markets: string[];
   uses_ai_generation?: boolean | null;
   uses_personalisation?: boolean | null;
+  source_platform?: string | null;
+  source_url?: string | null;
+}
+
+export interface YouTubeSearchResult {
+  video_id: string;
+  url: string;
+  title: string;
+  channel: string;
+  views: string;
+  published: string;
+  length: string;
+  description: string;
+  thumbnail: string;
+}
+
+export interface YouTubeVideoBundle {
+  video_id: string;
+  url: string;
+  title: string;
+  channel: string;
+  description: string;
+  transcript: string;
 }
 
 export interface Finding {

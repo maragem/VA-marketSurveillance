@@ -54,6 +54,16 @@
     line-height: 1.5;
   }
 
+  &__provenance {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: #44535f;
+
+    a {
+      color: #004494;
+    }
+  }
+
   &__chips {
     display: flex;
     flex-wrap: wrap;

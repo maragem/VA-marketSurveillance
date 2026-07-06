@@ -1,0 +1,82 @@
+<h1 class="page-title">YouTube surveillance</h1>
+<p class="intro">
+  Search YouTube for marketing content in the wild, then run any result through the compliance
+  analysis. The system retrieves the video's metadata and transcript and assesses the observable
+  claims — an indicator for investigation, not proof of infringement.
+</p>
+
+@if (configured() === false) {
+  <eui-alert euiWarning>
+    <eui-alert-title>Oxylabs not configured</eui-alert-title>
+    Set OXYLABS_USERNAME and OXYLABS_PASSWORD on the deployment to enable YouTube surveillance.
+  </eui-alert>
+} @else {
+  <eui-card>
+    <eui-card-content>
+      <form class="searchbar" (ngSubmit)="search()">
+        <input class="searchbar__input" type="search" name="q" [(ngModel)]="query"
+               placeholder="e.g. collagen supplement, crypto trading course, kids toy unboxing…" required />
+        <select class="searchbar__select" name="uploadDate" [(ngModel)]="uploadDate" aria-label="Upload date">
+          <option value="">any time</option>
+          <option value="today">today</option>
+          <option value="this_week">this week</option>
+          <option value="this_month">this month</option>
+          <option value="this_year">this year</option>
+        </select>
+        <select class="searchbar__select" name="sortBy" [(ngModel)]="sortBy" aria-label="Sort by">
+          <option value="relevance">relevance</option>
+          <option value="view_count">view count</option>
+          <option value="upload_date">upload date</option>
+          <option value="rating">rating</option>
+        </select>
+        <button euiButton euiPrimary type="submit" [euiDisabled]="!query.trim() || searching()">
+          {{ searching() ? 'Searching…' : 'Search' }}
+        </button>
+      </form>
+    </eui-card-content>
+  </eui-card>
+
+  @if (error()) {
+    <eui-alert euiDanger>
+      <eui-alert-title>Request failed</eui-alert-title>
+      {{ error() }}
+    </eui-alert>
+  }
+
+  @if (searched() && !searching()) {
+    @if (results().length === 0) {
+      <p class="muted">No results parsed for this query.</p>
+    } @else {
+      <div class="results">
+        @for (video of results(); track video.video_id) {
+          <div class="video">
+            @if (video.thumbnail) {
+              <img class="video__thumb" [src]="video.thumbnail" alt="" loading="lazy" />
+            } @else {
+              <div class="video__thumb video__thumb--empty"></div>
+            }
+            <div class="video__body">
+              <a class="video__title" [href]="video.url" target="_blank" rel="noopener">{{ video.title }}</a>
+              <span class="video__meta">
+                {{ video.channel }}
+                @if (video.views) { · {{ video.views }} }
+                @if (video.published) { · {{ video.published }} }
+                @if (video.length) { · {{ video.length }} }
+              </span>
+              @if (video.description) {
+                <span class="video__desc">{{ video.description }}</span>
+              }
+            </div>
+            <div class="video__actions">
+              <button euiButton euiPrimary euiSizeS
+                      [euiDisabled]="fetchingId() !== null"
+                      (buttonClick)="analyse(video)">
+                {{ fetchingId() === video.video_id ? 'Fetching…' : 'Analyse' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+}

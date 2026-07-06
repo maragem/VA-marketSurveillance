@@ -80,6 +80,12 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
    Standard AWS SigV4 credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`) also work for Bedrock.
    With no credentials at all the app runs in heuristic (retrieval-only) mode.
 
+   **Optional — YouTube surveillance (Oxylabs Web Scraper API):**
+
+   | Variable | Description |
+   |---|---|
+   | `OXYLABS_USERNAME` / `OXYLABS_PASSWORD` | Oxylabs credentials. When set, the "YouTube" page lets users search YouTube (`youtube_search`), pull a video's metadata + transcript (`youtube_metadata`, `youtube_transcript`) and run it through the compliance analysis, with the video URL kept as provenance in the report and PDF. Without them the page shows a "not configured" notice. |
+
    **Common:**
 
    | Variable | Description |

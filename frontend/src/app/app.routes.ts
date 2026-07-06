@@ -17,6 +17,11 @@ export const routes: Routes = [
     title: 'Analytics — Marketing Compliance Checker',
   },
   {
+    path: 'youtube',
+    loadComponent: () => import('./pages/youtube/youtube').then((m) => m.YouTubePage),
+    title: 'YouTube surveillance — Marketing Compliance Checker',
+  },
+  {
     path: 'graph',
     loadComponent: () => import('./pages/graph/graph').then((m) => m.GraphPage),
     title: 'Knowledge graph — Marketing Compliance Checker',

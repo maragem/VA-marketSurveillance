@@ -12,6 +12,12 @@
         engine: {{ r.engine === 'agentic' ? 'agentic (GraphRAG + Claude agents)' : 'heuristic (GraphRAG retrieval only)' }}
       </span>
     </div>
+    @if (r.campaign.source_url) {
+      <p class="report__provenance">
+        Source ({{ r.campaign.source_platform }}):
+        <a [href]="r.campaign.source_url" target="_blank" rel="noopener">{{ r.campaign.source_url }}</a>
+      </p>
+    }
     <p class="report__summary">{{ r.executive_summary }}</p>
   </div>
 
