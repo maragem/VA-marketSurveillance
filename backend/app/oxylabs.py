@@ -101,7 +101,11 @@ async def _query(payload: dict, timeout: float = 90.0) -> Any:
         )
         if response.status_code in (401, 403):
             raise OxylabsError("Oxylabs rejected the credentials.")
-        response.raise_for_status()
+        if response.status_code >= 400:
+            # Oxylabs explains rejected parameters in the body — surface it.
+            detail = response.text[:300]
+            logger.warning("Oxylabs %s for payload %s: %s", response.status_code, payload, detail)
+            raise OxylabsError(f"Oxylabs returned {response.status_code}: {detail}")
         data = response.json()
     # Realtime responses wrap content in results[0].content
     results = data.get("results") if isinstance(data, dict) else None
@@ -112,14 +116,13 @@ async def _query(payload: dict, timeout: float = 90.0) -> Any:
 
 async def search(query: str, upload_date: str | None = None,
                  sort_by: str | None = None) -> list[dict]:
+    # Search filters are top-level payload parameters (not `context` entries —
+    # context is used by other sources, e.g. transcript language options).
     payload: dict[str, Any] = {"source": "youtube_search", "query": query}
-    context = []
     if upload_date:
-        context.append({"key": "upload_date", "value": upload_date})
-    if sort_by:
-        context.append({"key": "sort_by", "value": sort_by})
-    if context:
-        payload["context"] = context
+        payload["upload_date"] = upload_date
+    if sort_by and sort_by != "relevance":  # relevance is the service default
+        payload["sort_by"] = sort_by
 
     content = await _query(payload)
     videos: dict[str, dict] = {}
@@ -158,8 +161,17 @@ async def video_bundle(video_id: str) -> dict:
     if not _VIDEO_ID_RE.match(video_id):
         raise OxylabsError("Invalid YouTube video id.")
 
+    url = f"https://www.youtube.com/watch?v={video_id}"
+
+    async def _query_id_or_url(payload: dict) -> Any:
+        """Some sources take the bare video id, some the watch URL — try both."""
+        try:
+            return await _query(payload)
+        except OxylabsError:
+            return await _query({**payload, "query": url})
+
     async def _metadata() -> dict:
-        content = await _query({"source": "youtube_metadata", "query": video_id})
+        content = await _query_id_or_url({"source": "youtube_metadata", "query": video_id})
         meta = {"title": "", "channel": "", "description": ""}
         for node in _walk(content):
             if not meta["title"]:
@@ -173,7 +185,7 @@ async def video_bundle(video_id: str) -> dict:
         return meta
 
     async def _transcript() -> str:
-        content = await _query({
+        content = await _query_id_or_url({
             "source": "youtube_transcript",
             "query": video_id,
             "context": [{"key": "language_code", "value": "en"}],
