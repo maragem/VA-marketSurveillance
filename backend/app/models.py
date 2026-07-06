@@ -52,6 +52,7 @@ class RegulationVerdict(BaseModel):
 class AnalysisReport(BaseModel):
     id: str = Field(default_factory=lambda: uuid4().hex[:12])
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    parent_id: Optional[str] = None  # set when this is a re-analysis of an earlier report
     campaign: CampaignSubmission
     triage: Optional[TriageResult] = None
     verdicts: list[RegulationVerdict] = Field(default_factory=list)

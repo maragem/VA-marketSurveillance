@@ -8,6 +8,14 @@
     </eui-alert>
   }
 
+  @if (parentId()) {
+    <eui-alert euiInfo>
+      <eui-alert-title>Re-analysis</eui-alert-title>
+      The form is pre-filled from “{{ parentTitle() }}”. Adjust the campaign to address the
+      findings, then run the analysis — the new report will show which findings were resolved.
+    </eui-alert>
+  }
+
   <div class="examples">
     <span class="examples__label">Try an example campaign:</span>
     @for (example of examples; track example.label) {
@@ -113,6 +121,7 @@
     <h1 class="page-title">Compliance report — {{ done.campaign.title }}</h1>
     <span class="done-bar__actions">
       <a euiButton euiPrimary [href]="'/api/analyses/' + done.id + '/pdf'" download>Download PDF</a>
+      <button euiButton euiSecondary (buttonClick)="reanalyze(done)">Fix &amp; re-analyse</button>
       <button euiButton euiSecondary (buttonClick)="reset()">Analyse another campaign</button>
     </span>
   </div>

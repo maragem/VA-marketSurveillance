@@ -117,17 +117,36 @@ async def analysis_pdf(report_id: str, request: Request):
     )
 
 
+@router.get("/analyses/{report_id}/diff")
+async def analysis_diff(report_id: str, request: Request):
+    """Diff a re-analysis against its parent report."""
+    store = request.app.state.store
+    current = await store.get(report_id)
+    if not current:
+        raise HTTPException(status_code=404, detail="Unknown analysis")
+    if not current.parent_id:
+        raise HTTPException(status_code=400, detail="This analysis has no parent to compare against")
+    parent = await store.get(current.parent_id)
+    if not parent:
+        raise HTTPException(status_code=404, detail="Parent analysis no longer exists")
+    from ..diff import build_diff
+    return build_diff(parent, current)
+
+
 @router.post("/analyses/stream")
-async def analyze_stream(campaign: CampaignSubmission, request: Request):
+async def analyze_stream(campaign: CampaignSubmission, request: Request, parent_id: str | None = None):
     """Run the agentic analysis, streaming progress events as SSE.
 
     The client POSTs the campaign and reads the SSE stream from the response
     body (fetch + ReadableStream — EventSource does not support POST).
     The final event carries the complete report, which is also persisted.
+    Pass ?parent_id= to link the run to an earlier report as a re-analysis.
     """
     orchestrator = request.app.state.orchestrator
     store = request.app.state.store
-    report = AnalysisReport(campaign=campaign, status="running")
+    if parent_id and not await store.get(parent_id):
+        raise HTTPException(status_code=404, detail="Unknown parent analysis")
+    report = AnalysisReport(campaign=campaign, status="running", parent_id=parent_id)
     queue: asyncio.Queue[dict | None] = asyncio.Queue()
 
     async def emit(event: dict) -> None:

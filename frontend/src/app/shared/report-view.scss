@@ -84,6 +84,52 @@
   }
 }
 
+.diff {
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+  }
+
+  &__parent-link {
+    font-size: 0.82rem;
+    color: #004494;
+    margin-left: auto;
+  }
+
+  &__head {
+    margin: 0.7rem 0 0.25rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    &--ok {
+      color: #467a39;
+    }
+
+    &--warn {
+      color: #b45309;
+    }
+
+    &--bad {
+      color: #da2131;
+    }
+  }
+
+  &__list {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.87rem;
+    line-height: 1.55;
+
+    em {
+      color: #5b6873;
+    }
+  }
+}
+
 .sources {
   display: flex;
   flex-direction: column;

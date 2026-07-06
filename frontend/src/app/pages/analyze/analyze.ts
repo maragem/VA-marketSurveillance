@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EUI_ALERT } from '@eui/components/eui-alert';
 import { EUI_BADGE } from '@eui/components/eui-badge';
@@ -31,9 +32,34 @@ type AgentState = 'pending' | 'running' | 'done';
 })
 export class AnalyzePage {
   private readonly api = inject(ApiService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly regulationLabels = REGULATION_LABELS;
   protected readonly examples = EXAMPLE_CAMPAIGNS;
+
+  /** Set when this run re-analyses an earlier report (?from=<id>). */
+  protected readonly parentId = signal<string | null>(null);
+  protected readonly parentTitle = signal<string | null>(null);
+
+  constructor() {
+    const from = this.route.snapshot.queryParamMap.get('from');
+    if (from) {
+      this.api.getAnalysis(from).subscribe({
+        next: (r) => {
+          this.parentId.set(r.id);
+          this.parentTitle.set(r.campaign.title);
+          this.title = r.campaign.title;
+          this.text = r.campaign.text;
+          this.channels = r.campaign.channels.join(', ');
+          this.audience = r.campaign.target_audience ?? '';
+          this.markets = r.campaign.markets.join(', ');
+          this.usesAi = !!r.campaign.uses_ai_generation;
+          this.usesPersonalisation = !!r.campaign.uses_personalisation;
+        },
+        error: () => this.parentId.set(null),
+      });
+    }
+  }
 
   // form model
   protected title = '';
@@ -92,7 +118,7 @@ export class AnalyzePage {
     this.report.set(null);
     this.errorMessage.set(null);
     try {
-      await this.api.analyzeStream(campaign, (event) => this.onEvent(event));
+      await this.api.analyzeStream(campaign, (event) => this.onEvent(event), this.parentId());
       if (this.phase() === 'running') {
         this.phase.set(this.report() ? 'done' : 'failed');
       }
@@ -102,7 +128,20 @@ export class AnalyzePage {
     }
   }
 
+  /** Keep the just-analysed campaign in the form and link the next run to this report. */
+  protected reanalyze(report: AnalysisReport): void {
+    this.parentId.set(report.id);
+    this.parentTitle.set(report.campaign.title);
+    this.phase.set('form');
+    this.report.set(null);
+    this.progress.set([]);
+    this.agentStates.set({});
+    this.errorMessage.set(null);
+  }
+
   protected reset(): void {
+    this.parentId.set(null);
+    this.parentTitle.set(null);
     this.phase.set('form');
     this.report.set(null);
     this.progress.set([]);

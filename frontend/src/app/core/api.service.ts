@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  AnalysisDiff,
   AnalysisListItem,
   AnalysisReport,
   AnalyticsData,
@@ -42,6 +43,10 @@ export class ApiService {
     return this.http.get<GraphFull>(`${this.base}/graph/full`);
   }
 
+  getDiff(id: string): Observable<AnalysisDiff> {
+    return this.http.get<AnalysisDiff>(`${this.base}/analyses/${id}/diff`);
+  }
+
   /**
    * POST the campaign and consume the SSE progress stream from the response
    * body (EventSource cannot POST, so events are parsed off a fetch stream).
@@ -49,9 +54,11 @@ export class ApiService {
   async analyzeStream(
     campaign: CampaignSubmission,
     onEvent: (event: StreamEvent) => void,
+    parentId?: string | null,
     signal?: AbortSignal,
   ): Promise<void> {
-    const response = await fetch(`${this.base}/analyses/stream`, {
+    const query = parentId ? `?parent_id=${encodeURIComponent(parentId)}` : '';
+    const response = await fetch(`${this.base}/analyses/stream${query}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(campaign),

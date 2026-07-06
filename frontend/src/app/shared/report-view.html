@@ -15,6 +15,55 @@
     <p class="report__summary">{{ r.executive_summary }}</p>
   </div>
 
+  @if (diff(); as d) {
+    <eui-card class="diff">
+      <eui-card-header>
+        <eui-card-header-title>Changes since previous analysis</eui-card-header-title>
+        <eui-card-header-subtitle>
+          Compared with report {{ d.parent.id }} ({{ d.parent.created_at | date: 'medium' }}) —
+          overall risk {{ d.parent.overall_risk }} → {{ d.current.overall_risk }}
+        </eui-card-header-subtitle>
+      </eui-card-header>
+      <eui-card-content>
+        <div class="diff__stats">
+          <span euiBadge euiSuccess>{{ d.resolved.length }} resolved</span>
+          <span euiBadge euiWarning>{{ d.remaining.length }} remaining</span>
+          <span euiBadge [euiDanger]="d.new.length > 0">{{ d.new.length }} new</span>
+          <a class="diff__parent-link" [href]="'/reports/' + d.parent.id">View previous report</a>
+        </div>
+        @if (d.resolved.length > 0) {
+          <h4 class="diff__head diff__head--ok">Resolved</h4>
+          <ul class="diff__list">
+            @for (f of d.resolved; track f.provision_id) {
+              <li><s>{{ f.provision_ref }} — {{ f.title }}</s></li>
+            }
+          </ul>
+        }
+        @if (d.remaining.length > 0) {
+          <h4 class="diff__head diff__head--warn">Still open</h4>
+          <ul class="diff__list">
+            @for (f of d.remaining; track f.provision_id) {
+              <li>
+                {{ f.provision_ref }} — {{ f.title }}
+                @if (f.previous_severity && f.previous_severity !== f.severity) {
+                  <em>({{ f.previous_severity }} → {{ f.severity }})</em>
+                }
+              </li>
+            }
+          </ul>
+        }
+        @if (d.new.length > 0) {
+          <h4 class="diff__head diff__head--bad">New findings</h4>
+          <ul class="diff__list">
+            @for (f of d.new; track f.provision_id) {
+              <li>{{ f.provision_ref }} — {{ f.title }}</li>
+            }
+          </ul>
+        }
+      </eui-card-content>
+    </eui-card>
+  }
+
   @if (r.engine === 'heuristic') {
     <eui-alert euiWarning>
       <eui-alert-title>Heuristic screening only</eui-alert-title>

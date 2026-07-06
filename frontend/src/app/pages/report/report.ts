@@ -14,6 +14,7 @@ import { ReportView } from '../../shared/report-view';
         <h1 class="page-title">Compliance report — {{ r.campaign.title }}</h1>
         <span class="bar__actions">
           <a euiButton euiPrimary [href]="'/api/analyses/' + r.id + '/pdf'" download>Download PDF</a>
+          <a euiButton euiSecondary routerLink="/analyze" [queryParams]="{ from: r.id }">Fix &amp; re-analyse</a>
           <a euiButton euiSecondary routerLink="/analyze">New analysis</a>
         </span>
       </div>

@@ -163,6 +163,8 @@ def build_pdf(report: AnalysisReport) -> bytes:
     story.append(Paragraph(
         f"Report {_e(report.id)} · {_e(report.created_at[:19].replace('T', ' '))} UTC · engine: {engine}",
         styles["meta"]))
+    if report.parent_id:
+        story.append(Paragraph(f"Re-analysis of report {_e(report.parent_id)}", styles["meta"]))
     if report.campaign.channels:
         story.append(Paragraph(f"Channels: {_e(', '.join(report.campaign.channels))}", styles["meta"]))
     if report.campaign.target_audience:

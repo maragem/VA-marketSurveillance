@@ -6,6 +6,7 @@ import { EUI_CARD } from '@eui/components/eui-card';
 import { EUI_CHIP } from '@eui/components/eui-chip';
 import { ApiService } from '../core/api.service';
 import {
+  AnalysisDiff,
   AnalysisReport,
   CellarMetadata,
   Finding,
@@ -33,12 +34,25 @@ export class ReportView {
 
   readonly report = input.required<AnalysisReport>();
   readonly sources = signal<SourceRow[]>([]);
+  readonly diff = signal<AnalysisDiff | null>(null);
 
   readonly regulationLabels = REGULATION_LABELS;
 
   constructor() {
     // Collect the distinct CELEX numbers cited by the report's findings and
     // look each one up live in CELLAR (official title, date, work URI).
+    // Re-analyses get a resolved/remaining/new diff against their parent.
+    effect(() => {
+      const r = this.report();
+      this.diff.set(null);
+      if (r.parent_id) {
+        this.api.getDiff(r.id).subscribe({
+          next: (d) => this.diff.set(d),
+          error: () => this.diff.set(null),
+        });
+      }
+    });
+
     effect(() => {
       const r = this.report();
       const byCelex = new Map<string, SourceRow>();

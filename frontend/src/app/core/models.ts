@@ -52,6 +52,7 @@ export interface RegulationVerdict {
 export interface AnalysisReport {
   id: string;
   created_at: string;
+  parent_id?: string | null;
   campaign: CampaignSubmission;
   triage?: TriageResult | null;
   verdicts: RegulationVerdict[];
@@ -97,6 +98,18 @@ export interface GraphEdge {
 export interface GraphFull {
   nodes: GraphNode[];
   edges: GraphEdge[];
+}
+
+export interface DiffFinding extends Finding {
+  previous_severity?: Severity;
+}
+
+export interface AnalysisDiff {
+  parent: { id: string; created_at: string; overall_risk: string; findings: number };
+  current: { id: string; created_at: string; overall_risk: string; findings: number };
+  resolved: DiffFinding[];
+  remaining: DiffFinding[];
+  new: DiffFinding[];
 }
 
 export interface CellarMetadata {
