@@ -113,7 +113,7 @@ export class YouTubePage {
           bundle.transcript ? `Transcript:\n${bundle.transcript}` : '',
         ].filter(Boolean);
         this.prefill.set({
-          title: bundle.title || fallbackTitle || `YouTube video ${videoId}`,
+          title: this.deriveTitle(bundle, fallbackTitle, videoId),
           text: sections.join('\n\n') || fallbackText,
           channels: ['youtube'],
           target_audience: null,
@@ -131,5 +131,28 @@ export class YouTubePage {
         this.fetchingId.set(null);
       },
     });
+  }
+
+  /** Human-readable report title even when the video metadata has no title:
+   *  fall back to "<channel> — <content snippet>" rather than a bare video id. */
+  private deriveTitle(
+    bundle: { title: string; channel: string; description: string; transcript: string },
+    fallbackTitle: string,
+    videoId: string,
+  ): string {
+    if (bundle.title.trim()) {
+      return bundle.title.trim();
+    }
+    if (fallbackTitle.trim()) {
+      return fallbackTitle.trim();
+    }
+    const snippet = (bundle.description || bundle.transcript || '').replace(/\s+/g, ' ').trim();
+    const cut = snippet.lastIndexOf(' ', 80);
+    const clipped = snippet.length > 80 ? `${snippet.slice(0, cut > 40 ? cut : 80)}…` : snippet;
+    const channel = bundle.channel.trim();
+    if (channel && clipped) {
+      return `${channel} — ${clipped}`;
+    }
+    return clipped || (channel ? `${channel} (YouTube video)` : `YouTube video ${videoId}`);
   }
 }

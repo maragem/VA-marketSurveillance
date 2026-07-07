@@ -46,6 +46,23 @@ class ReportStore:
         async with self._lock:
             await asyncio.to_thread(_write)
 
+    async def rename(self, report_id: str, title: str) -> AnalysisReport | None:
+        """Update a stored report's title (column + campaign.title in the payload)."""
+        def _write():
+            with self._connect() as conn:
+                row = conn.execute("SELECT payload FROM reports WHERE id = ?", (report_id,)).fetchone()
+                if not row:
+                    return None
+                payload = json.loads(row[0])
+                payload["campaign"]["title"] = title
+                payload_json = json.dumps(payload, ensure_ascii=False)
+                conn.execute("UPDATE reports SET title = ?, payload = ? WHERE id = ?",
+                             (title, payload_json, report_id))
+                return payload_json
+        async with self._lock:
+            payload = await asyncio.to_thread(_write)
+        return AnalysisReport(**json.loads(payload)) if payload else None
+
     async def get(self, report_id: str) -> AnalysisReport | None:
         def _read():
             with self._connect() as conn:

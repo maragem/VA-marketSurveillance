@@ -33,6 +33,10 @@ export class ApiService {
     return this.http.get<AnalysisReport>(`${this.base}/analyses/${id}`);
   }
 
+  renameAnalysis(id: string, title: string): Observable<AnalysisReport> {
+    return this.http.patch<AnalysisReport>(`${this.base}/analyses/${id}`, { title });
+  }
+
   cellarMetadata(celex: string): Observable<CellarMetadata> {
     return this.http.get<CellarMetadata>(`${this.base}/cellar/${celex}`);
   }

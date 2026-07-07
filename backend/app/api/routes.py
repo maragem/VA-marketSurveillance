@@ -4,6 +4,7 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
+from pydantic import BaseModel
 
 from .. import config
 from ..models import AnalysisReport, CampaignSubmission
@@ -151,6 +152,24 @@ async def list_analyses(request: Request):
 @router.get("/analyses/{report_id}")
 async def get_analysis(report_id: str, request: Request):
     report = await request.app.state.store.get(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Unknown analysis")
+    return report
+
+
+class RenameRequest(BaseModel):
+    title: str
+
+
+@router.patch("/analyses/{report_id}")
+async def rename_analysis(report_id: str, body: RenameRequest, request: Request):
+    """Rename a stored analysis (report title = campaign title)."""
+    title = " ".join(body.title.split())
+    if not title:
+        raise HTTPException(status_code=400, detail="Title must not be empty")
+    if len(title) > 200:
+        raise HTTPException(status_code=400, detail="Title too long (max 200 characters)")
+    report = await request.app.state.store.rename(report_id, title)
     if not report:
         raise HTTPException(status_code=404, detail="Unknown analysis")
     return report
