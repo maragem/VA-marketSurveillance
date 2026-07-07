@@ -22,6 +22,7 @@ export class YouTubePage {
   protected query = '';
   protected uploadDate = '';
   protected sortBy = 'relevance';
+  protected directUrl = '';
 
   protected readonly configured = signal<boolean | null>(null);
   protected readonly searching = signal(false);
@@ -58,20 +59,45 @@ export class YouTubePage {
   }
 
   protected analyse(video: YouTubeSearchResult): void {
+    this.analyseById(video.video_id, video.title, video.description);
+  }
+
+  /** Extract the video id from a pasted YouTube URL (or a bare 11-char id). */
+  protected parseVideoId(input: string): string | null {
+    const trimmed = input.trim();
+    if (/^[A-Za-z0-9_-]{11}$/.test(trimmed)) {
+      return trimmed;
+    }
+    const match = trimmed.match(
+      /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+    );
+    return match ? match[1] : null;
+  }
+
+  protected analyseUrl(): void {
+    const videoId = this.parseVideoId(this.directUrl);
+    if (!videoId) {
+      this.error.set('Could not recognise a YouTube video URL. Supported: youtube.com/watch?v=…, youtu.be/…, shorts, embed.');
+      return;
+    }
+    this.analyseById(videoId);
+  }
+
+  private analyseById(videoId: string, fallbackTitle = '', fallbackText = ''): void {
     if (this.fetchingId()) {
       return;
     }
-    this.fetchingId.set(video.video_id);
+    this.fetchingId.set(videoId);
     this.error.set(null);
-    this.api.youtubeVideo(video.video_id).subscribe({
+    this.api.youtubeVideo(videoId).subscribe({
       next: (bundle) => {
         const sections = [
           bundle.description ? `Video description:\n${bundle.description}` : '',
           bundle.transcript ? `Transcript:\n${bundle.transcript}` : '',
         ].filter(Boolean);
         this.prefill.set({
-          title: bundle.title || video.title,
-          text: sections.join('\n\n') || video.description,
+          title: bundle.title || fallbackTitle || `YouTube video ${videoId}`,
+          text: sections.join('\n\n') || fallbackText,
           channels: ['youtube'],
           target_audience: null,
           markets: [],

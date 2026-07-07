@@ -40,6 +40,24 @@
     font: inherit;
     background: #fff;
   }
+
+  &__divider {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0.9rem 0;
+    color: #5b6873;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid #e2e7ec;
+    }
+  }
 }
 
 .results {

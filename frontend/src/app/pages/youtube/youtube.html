@@ -13,6 +13,15 @@
 } @else {
   <eui-card>
     <eui-card-content>
+      <form class="searchbar searchbar--direct" (ngSubmit)="analyseUrl()">
+        <input class="searchbar__input" type="url" name="directUrl" [(ngModel)]="directUrl"
+               placeholder="Paste a YouTube video URL to analyse it directly — https://www.youtube.com/watch?v=…" />
+        <button euiButton euiPrimary type="submit"
+                [euiDisabled]="!directUrl.trim() || fetchingId() !== null">
+          {{ fetchingId() && !searching() ? 'Fetching…' : 'Analyse URL' }}
+        </button>
+      </form>
+      <div class="searchbar__divider"><span>or search</span></div>
       <form class="searchbar" (ngSubmit)="search()">
         <input class="searchbar__input" type="search" name="q" [(ngModel)]="query"
                placeholder="e.g. collagen supplement, crypto trading course, kids toy unboxing…" required />
