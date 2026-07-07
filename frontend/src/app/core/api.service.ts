@@ -60,8 +60,12 @@ export class ApiService {
     return this.http.get<YouTubeSearchResult[]>(`${this.base}/youtube/search`, { params });
   }
 
-  youtubeVideo(videoId: string): Observable<YouTubeVideoBundle> {
-    return this.http.get<YouTubeVideoBundle>(`${this.base}/youtube/videos/${videoId}`);
+  youtubeVideo(videoId: string, language?: string): Observable<YouTubeVideoBundle> {
+    let params = new HttpParams();
+    if (language && language !== 'auto') {
+      params = params.set('language', language);
+    }
+    return this.http.get<YouTubeVideoBundle>(`${this.base}/youtube/videos/${videoId}`, { params });
   }
 
   /**

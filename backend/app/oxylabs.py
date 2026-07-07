@@ -217,10 +217,17 @@ def _thumbnail(node: dict) -> str:
     return ""
 
 
-async def video_bundle(video_id: str) -> dict:
-    """Metadata + transcript for one video, assembled for analysis."""
+async def video_bundle(video_id: str, language: str | None = None) -> dict:
+    """Metadata + transcript for one video, assembled for analysis.
+
+    `language` is an ISO code for the preferred transcript language; None or
+    "auto" tries the source default first, then falls back through common
+    variants, so non-English videos work out of the box.
+    """
     if not _VIDEO_ID_RE.match(video_id):
         raise OxylabsError("Invalid YouTube video id.")
+    if language and language.lower() in ("auto", "any"):
+        language = None
 
     url = f"https://www.youtube.com/watch?v={video_id}"
 
@@ -245,12 +252,11 @@ async def video_bundle(video_id: str) -> dict:
                                                     "video_description"))
         return meta
 
-    async def _transcript() -> str:
-        content = await _query_id_or_url({
-            "source": "youtube_transcript",
-            "query": video_id,
-            "context": [{"key": "language_code", "value": "en"}],
-        })
+    async def _transcript_attempt(lang: str | None) -> str:
+        payload: dict[str, Any] = {"source": "youtube_transcript", "query": video_id}
+        if lang:
+            payload["context"] = [{"key": "language_code", "value": lang}]
+        content = await _query_id_or_url(payload)
         # Extract at the shallowest node exposing a text key and do not descend
         # into that subtree again (wrappers and their inner `runs` would
         # otherwise both match and duplicate every segment).
@@ -272,6 +278,23 @@ async def video_bundle(video_id: str) -> dict:
         if not transcript and isinstance(content, str):
             transcript = content
         return transcript[:MAX_TRANSCRIPT_CHARS]
+
+    async def _transcript() -> str:
+        # Preferred language first, then the source default (whatever captions
+        # exist), then English — the first attempt yielding text wins.
+        attempts: list[str | None] = []
+        for lang in (language, None, "en"):
+            if lang not in attempts:
+                attempts.append(lang)
+        for lang in attempts:
+            try:
+                transcript = await _transcript_attempt(lang)
+            except OxylabsError as exc:
+                logger.info("transcript attempt (lang=%s) failed for %s: %s", lang, video_id, exc)
+                continue
+            if transcript:
+                return transcript
+        return ""
 
     meta_result, transcript_result = await asyncio.gather(
         _metadata(), _transcript(), return_exceptions=True)

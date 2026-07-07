@@ -16,6 +16,13 @@
       <form class="searchbar searchbar--direct" (ngSubmit)="analyseUrl()">
         <input class="searchbar__input" type="url" name="directUrl" [(ngModel)]="directUrl"
                placeholder="Paste a YouTube video URL to analyse it directly — https://www.youtube.com/watch?v=…" />
+        <select class="searchbar__select" name="language" [(ngModel)]="language"
+                aria-label="Preferred transcript language"
+                title="Preferred transcript language — 'auto' takes whatever captions the video has">
+          @for (lang of languages; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
         <button euiButton euiPrimary type="submit"
                 [euiDisabled]="!directUrl.trim() || fetchingId() !== null">
           {{ fetchingId() && !searching() ? 'Fetching…' : 'Analyse URL' }}

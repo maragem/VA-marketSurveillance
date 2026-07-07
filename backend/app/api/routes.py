@@ -104,13 +104,19 @@ async def youtube_debug(q: str = "test"):
 
 
 @router.get("/youtube/videos/{video_id}")
-async def youtube_video(video_id: str):
-    """Fetch metadata + transcript for one video, ready for analysis."""
+async def youtube_video(video_id: str, language: str | None = None):
+    """Fetch metadata + transcript for one video, ready for analysis.
+
+    `language` is the preferred transcript language (ISO code) — omit or pass
+    "auto" to take whatever captions the video has, with an English fallback.
+    """
     from .. import oxylabs
     if not oxylabs.available():
         raise HTTPException(status_code=503, detail="Oxylabs credentials not configured")
+    if language and not (2 <= len(language) <= 7 and language.replace("-", "").isalpha()):
+        raise HTTPException(status_code=400, detail="Invalid language code")
     try:
-        return await oxylabs.video_bundle(video_id)
+        return await oxylabs.video_bundle(video_id, language=language)
     except oxylabs.OxylabsError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
     except Exception as exc:

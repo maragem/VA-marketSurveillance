@@ -23,6 +23,23 @@ export class YouTubePage {
   protected uploadDate = '';
   protected sortBy = 'relevance';
   protected directUrl = '';
+  protected language = 'auto';
+
+  protected readonly languages: { code: string; label: string }[] = [
+    { code: 'auto', label: 'transcript: auto' },
+    { code: 'bg', label: 'Bulgarian' }, { code: 'cs', label: 'Czech' },
+    { code: 'da', label: 'Danish' }, { code: 'de', label: 'German' },
+    { code: 'el', label: 'Greek' }, { code: 'en', label: 'English' },
+    { code: 'es', label: 'Spanish' }, { code: 'et', label: 'Estonian' },
+    { code: 'fi', label: 'Finnish' }, { code: 'fr', label: 'French' },
+    { code: 'hr', label: 'Croatian' }, { code: 'hu', label: 'Hungarian' },
+    { code: 'it', label: 'Italian' }, { code: 'lt', label: 'Lithuanian' },
+    { code: 'lv', label: 'Latvian' }, { code: 'mt', label: 'Maltese' },
+    { code: 'nl', label: 'Dutch' }, { code: 'pl', label: 'Polish' },
+    { code: 'pt', label: 'Portuguese' }, { code: 'ro', label: 'Romanian' },
+    { code: 'sk', label: 'Slovak' }, { code: 'sl', label: 'Slovenian' },
+    { code: 'sv', label: 'Swedish' },
+  ];
 
   protected readonly configured = signal<boolean | null>(null);
   protected readonly searching = signal(false);
@@ -89,7 +106,7 @@ export class YouTubePage {
     }
     this.fetchingId.set(videoId);
     this.error.set(null);
-    this.api.youtubeVideo(videoId).subscribe({
+    this.api.youtubeVideo(videoId, this.language).subscribe({
       next: (bundle) => {
         const sections = [
           bundle.description ? `Video description:\n${bundle.description}` : '',
