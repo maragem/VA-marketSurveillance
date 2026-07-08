@@ -1,0 +1,214 @@
+<div class="bar">
+  <h1 class="page-title">Benchmark gold set</h1>
+  <span class="bar__actions">
+    <button euiButton euiSecondary (buttonClick)="addCase()">Add case</button>
+    <a euiButton euiPrimary href="/api/bench/export" download>Export cases.jsonl</a>
+  </span>
+</div>
+<p class="intro">
+  Review and correct the gold labels the benchmark scores against. Edits are saved to the
+  server's data volume immediately; when you're happy with the set, export
+  <code>cases.jsonl</code> and commit it to the repository as the new seed.
+</p>
+
+@if (error()) {
+  <eui-alert euiDanger>
+    <eui-alert-title>Something went wrong</eui-alert-title>
+    {{ error() }}
+  </eui-alert>
+}
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else if (cases().length === 0) {
+  <p class="muted">No benchmark cases found — is <code>bench/cases.jsonl</code> deployed?</p>
+}
+
+@for (c of cases(); track c.id) {
+  <eui-card class="case">
+    <eui-card-content>
+      <div class="case__head" (click)="toggle(c)">
+        <span class="case__id">{{ c.id }}</span>
+        <span euiBadge euiSizeS>tier {{ c.tier }} · {{ tierLabel(c.tier) }}</span>
+        @if (c.gold.compliant) {
+          <span euiBadge euiSizeS euiSuccess>compliant control</span>
+        } @else {
+          <span euiBadge euiSizeS euiDanger>min risk: {{ c.gold.min_risk }}</span>
+        }
+        @for (reg of c.gold.relevant; track reg) {
+          <span class="chip chip--reg">{{ reg }}</span>
+        }
+        <span class="case__spacer"></span>
+        @if (savedTick() === c.id) {
+          <span class="case__saved">✓ saved</span>
+        }
+        <span class="case__count">
+          {{ c.gold.provisions.length }} must-find · {{ c.gold.acceptable_extra.length }} extra
+        </span>
+        <span class="case__caret">{{ expandedId() === c.id ? '▾' : '▸' }}</span>
+      </div>
+
+      @if (expandedId() === c.id && draft) {
+        <div class="editor">
+          @if (saveErrors().length > 0) {
+            <eui-alert euiDanger>
+              <eui-alert-title>Cannot save</eui-alert-title>
+              <ul class="editor__errors">
+                @for (e of saveErrors(); track e) { <li>{{ e }}</li> }
+              </ul>
+            </eui-alert>
+          }
+
+          <div class="editor__grid">
+            <section class="editor__col">
+              <h3>Campaign</h3>
+              @if (draft.isNew) {
+                <label class="field">
+                  <span>Case id</span>
+                  <input name="id" [(ngModel)]="draft.id" />
+                </label>
+                <label class="field">
+                  <span>Tier</span>
+                  <select name="tier" [(ngModel)]="draft.tier">
+                    <option [ngValue]="1">1 — enforcement-inspired</option>
+                    <option [ngValue]="2">2 — dataset-adapted</option>
+                    <option [ngValue]="3">3 — synthetic</option>
+                  </select>
+                </label>
+              }
+              <label class="field">
+                <span>Source / rationale</span>
+                <input name="source" [(ngModel)]="draft.source" />
+              </label>
+              <label class="field">
+                <span>Title</span>
+                <input name="title" [(ngModel)]="draft.title" />
+              </label>
+              <label class="field">
+                <span>Campaign text</span>
+                <textarea name="text" rows="9" [(ngModel)]="draft.text"></textarea>
+              </label>
+              <div class="field-row">
+                <label class="field">
+                  <span>Channels (comma-separated)</span>
+                  <input name="channels" [(ngModel)]="draft.channels" />
+                </label>
+                <label class="field">
+                  <span>Markets</span>
+                  <input name="markets" [(ngModel)]="draft.markets" />
+                </label>
+              </div>
+              <label class="field">
+                <span>Target audience</span>
+                <input name="audience" [(ngModel)]="draft.target_audience" />
+              </label>
+              <div class="field-row field-row--checks">
+                <label class="check">
+                  <input type="checkbox" name="ai" [(ngModel)]="draft.uses_ai_generation" /> uses AI generation
+                </label>
+                <label class="check">
+                  <input type="checkbox" name="pers" [(ngModel)]="draft.uses_personalisation" /> uses personalisation
+                </label>
+              </div>
+            </section>
+
+            <section class="editor__col">
+              <h3>Gold labels</h3>
+              <label class="check check--strong">
+                <input type="checkbox" name="compliant" [(ngModel)]="draft.compliant" />
+                compliant control — any finding ≥ medium counts as a false positive
+              </label>
+
+              <div class="field">
+                <span>Regulations triage must route</span>
+                <div class="regchecks">
+                  @for (reg of regulations; track reg) {
+                    <label class="check">
+                      <input type="checkbox" [name]="'rel-' + reg"
+                             [checked]="relevantHas(reg)" (change)="toggleRelevant(reg)" />
+                      {{ reg }}
+                    </label>
+                  }
+                </div>
+              </div>
+
+              @if (!draft.compliant) {
+                <label class="field field--narrow">
+                  <span>Minimum overall risk</span>
+                  <select name="minrisk" [(ngModel)]="draft.min_risk">
+                    @for (risk of risks; track risk) {
+                      <option [value]="risk">{{ risk }}</option>
+                    }
+                  </select>
+                </label>
+
+                <div class="field">
+                  <span>Must-find provisions (recall-scored)</span>
+                  <div class="provlist">
+                    @for (id of draft.provisions; track id) {
+                      <span class="prov prov--must">
+                        {{ provisionLabel(id) }}
+                        <button type="button" class="prov__act" title="Demote to acceptable extra"
+                                (click)="moveProvision('provisions', id)">↓</button>
+                        <button type="button" class="prov__act" title="Remove"
+                                (click)="removeProvision('provisions', id)">×</button>
+                      </span>
+                    } @empty { <span class="muted">none</span> }
+                  </div>
+                  <select class="provadd" (change)="addProvision('provisions', $event)">
+                    <option value="">+ add must-find provision…</option>
+                    @for (reg of regulations; track reg) {
+                      <optgroup [label]="reg">
+                        @for (n of provisionsByRegulation().get(reg); track n.id) {
+                          <option [value]="n.id">{{ n.ref }} — {{ n.title }}</option>
+                        }
+                      </optgroup>
+                    }
+                  </select>
+                </div>
+              }
+
+              <div class="field">
+                <span>Acceptable extras (defensible, not required)</span>
+                <div class="provlist">
+                  @for (id of draft.acceptable_extra; track id) {
+                    <span class="prov prov--extra">
+                      {{ provisionLabel(id) }}
+                      @if (!draft.compliant) {
+                        <button type="button" class="prov__act" title="Promote to must-find"
+                                (click)="moveProvision('acceptable_extra', id)">↑</button>
+                      }
+                      <button type="button" class="prov__act" title="Remove"
+                              (click)="removeProvision('acceptable_extra', id)">×</button>
+                    </span>
+                  } @empty { <span class="muted">none</span> }
+                </div>
+                <select class="provadd" (change)="addProvision('acceptable_extra', $event)">
+                  <option value="">+ add acceptable extra…</option>
+                  @for (reg of regulations; track reg) {
+                    <optgroup [label]="reg">
+                      @for (n of provisionsByRegulation().get(reg); track n.id) {
+                        <option [value]="n.id">{{ n.ref }} — {{ n.title }}</option>
+                      }
+                    </optgroup>
+                  }
+                </select>
+              </div>
+            </section>
+          </div>
+
+          <div class="editor__actions">
+            <button euiButton euiPrimary [euiDisabled]="saving()" (buttonClick)="save(c)">
+              {{ saving() ? 'Saving…' : (draft.isNew ? 'Create case' : 'Save changes') }}
+            </button>
+            <button euiButton euiSecondary (buttonClick)="cancelEdit(c)">Cancel</button>
+            <span class="editor__spacer"></span>
+            @if (!draft.isNew) {
+              <button euiButton euiDanger (buttonClick)="remove(c)">Delete case</button>
+            }
+          </div>
+        </div>
+      }
+    </eui-card-content>
+  </eui-card>
+}

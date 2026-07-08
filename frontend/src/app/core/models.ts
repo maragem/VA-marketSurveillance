@@ -13,6 +13,22 @@ export interface CampaignSubmission {
   source_url?: string | null;
 }
 
+export interface BenchGold {
+  compliant: boolean;
+  relevant: Regulation[];
+  provisions: string[];
+  acceptable_extra: string[];
+  min_risk: 'critical' | 'high' | 'medium' | 'low' | 'compliant';
+}
+
+export interface BenchCase {
+  id: string;
+  tier: 1 | 2 | 3;
+  source: string;
+  campaign: CampaignSubmission;
+  gold: BenchGold;
+}
+
 export interface YouTubeSearchResult {
   video_id: string;
   url: string;

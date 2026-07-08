@@ -137,6 +137,63 @@ async def cellar_metadata(celex: str, request: Request):
     return await request.app.state.cellar.metadata(celex)
 
 
+# ---------------------------------------------------------------------------
+# Benchmark gold-set editing
+# ---------------------------------------------------------------------------
+
+@router.get("/bench/cases")
+async def bench_cases(request: Request):
+    """The benchmark working copy (seeded from bench/cases.jsonl on first use)."""
+    return {"cases": await request.app.state.bench.list()}
+
+
+@router.post("/bench/cases", status_code=201)
+async def bench_create(case: dict, request: Request):
+    from ..bench import validate_case
+    errors = validate_case(case, request.app.state.graph)
+    if errors:
+        raise HTTPException(status_code=422, detail=errors)
+    try:
+        await request.app.state.bench.upsert(case, create=True)
+    except KeyError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+    return case
+
+
+@router.put("/bench/cases/{case_id}")
+async def bench_update(case_id: str, case: dict, request: Request):
+    if case.get("id") != case_id:
+        raise HTTPException(status_code=400, detail="Case id in the body must match the URL.")
+    from ..bench import validate_case
+    errors = validate_case(case, request.app.state.graph)
+    if errors:
+        raise HTTPException(status_code=422, detail=errors)
+    try:
+        await request.app.state.bench.upsert(case, create=False)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return case
+
+
+@router.delete("/bench/cases/{case_id}", status_code=204)
+async def bench_delete(case_id: str, request: Request):
+    try:
+        await request.app.state.bench.delete(case_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.get("/bench/export")
+async def bench_export(request: Request):
+    """Download the working copy as cases.jsonl, ready to commit to the repo."""
+    text = await request.app.state.bench.export_text()
+    return Response(
+        content=text,
+        media_type="application/jsonl",
+        headers={"Content-Disposition": 'attachment; filename="cases.jsonl"'},
+    )
+
+
 @router.get("/analytics")
 async def analytics(request: Request):
     from ..analytics import build_analytics

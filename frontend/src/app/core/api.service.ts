@@ -6,6 +6,7 @@ import {
   AnalysisListItem,
   AnalysisReport,
   AnalyticsData,
+  BenchCase,
   CampaignSubmission,
   CellarMetadata,
   GraphFull,
@@ -51,6 +52,22 @@ export class ApiService {
 
   getDiff(id: string): Observable<AnalysisDiff> {
     return this.http.get<AnalysisDiff>(`${this.base}/analyses/${id}/diff`);
+  }
+
+  benchCases(): Observable<{ cases: BenchCase[] }> {
+    return this.http.get<{ cases: BenchCase[] }>(`${this.base}/bench/cases`);
+  }
+
+  createBenchCase(benchCase: BenchCase): Observable<BenchCase> {
+    return this.http.post<BenchCase>(`${this.base}/bench/cases`, benchCase);
+  }
+
+  updateBenchCase(benchCase: BenchCase): Observable<BenchCase> {
+    return this.http.put<BenchCase>(`${this.base}/bench/cases/${encodeURIComponent(benchCase.id)}`, benchCase);
+  }
+
+  deleteBenchCase(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/bench/cases/${encodeURIComponent(id)}`);
   }
 
   youtubeSearch(q: string, uploadDate?: string, sortBy?: string): Observable<YouTubeSearchResult[]> {

@@ -15,11 +15,13 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 
 COPY backend/ backend/
 COPY knowledge/ knowledge/
+COPY bench/ bench/
 COPY --from=frontend /build/dist/frontend/browser frontend/dist/frontend/browser
 
 ENV KNOWLEDGE_DIR=/app/knowledge \
     STATIC_DIR=/app/frontend/dist/frontend/browser \
     DATA_DIR=/app/data \
+    BENCH_DIR=/app/bench \
     PYTHONUNBUFFERED=1
 
 EXPOSE 8000

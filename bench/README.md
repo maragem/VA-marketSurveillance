@@ -55,6 +55,17 @@ Provision ids must exist in `knowledge/nodes.json`. Scoring conventions:
 
 ## Reviewing / correcting the gold labels
 
+**The easiest way is the built-in UI: the “Benchmark” page in the app.**
+It lists every case with its labels, and each case expands into an editor —
+relevant-regulation checkboxes, must-find / acceptable-extra provision pickers
+(populated from the knowledge graph, so ids are always valid), min-risk,
+compliant-control toggle, and the campaign text itself. You can also add and
+delete cases. Edits are saved to the deployment's data volume; the
+**Export cases.jsonl** button downloads the corrected set — commit it over
+`bench/cases.jsonl` to version it. (The harness reads the repo file, so
+commit the export before scoring against the corrected labels, or point
+`--cases` at the downloaded file.)
+
 The seed labels were drafted by the system's author-model and **need human
 legal review** — treat them as proposals:
 

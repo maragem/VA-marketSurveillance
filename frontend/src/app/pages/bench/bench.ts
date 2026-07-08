@@ -1,0 +1,259 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { EUI_ALERT } from '@eui/components/eui-alert';
+import { EUI_BADGE } from '@eui/components/eui-badge';
+import { EuiButtonComponent } from '@eui/components/eui-button';
+import { EUI_CARD } from '@eui/components/eui-card';
+import { ApiService } from '../../core/api.service';
+import { BenchCase, GraphNode, Regulation } from '../../core/models';
+
+/** Editable working copy of a case: list fields flattened to comma strings. */
+interface Draft {
+  id: string;
+  tier: 1 | 2 | 3;
+  source: string;
+  title: string;
+  text: string;
+  channels: string;
+  target_audience: string;
+  markets: string;
+  uses_ai_generation: boolean;
+  uses_personalisation: boolean;
+  compliant: boolean;
+  relevant: Regulation[];
+  provisions: string[];
+  acceptable_extra: string[];
+  min_risk: string;
+  isNew: boolean;
+}
+
+const REGULATIONS: Regulation[] = ['AI_ACT', 'GDPR', 'DSA', 'UCPD'];
+const RISKS = ['critical', 'high', 'medium', 'low', 'compliant'];
+
+@Component({
+  selector: 'app-bench',
+  imports: [FormsModule, EuiButtonComponent, ...EUI_CARD, ...EUI_BADGE, ...EUI_ALERT],
+  templateUrl: './bench.html',
+  styleUrl: './bench.scss',
+})
+export class BenchPage {
+  private readonly api = inject(ApiService);
+
+  protected readonly regulations = REGULATIONS;
+  protected readonly risks = RISKS;
+
+  protected readonly cases = signal<BenchCase[]>([]);
+  protected readonly loading = signal(true);
+  protected readonly error = signal<string | null>(null);
+  protected readonly expandedId = signal<string | null>(null);
+  protected readonly saving = signal(false);
+  protected readonly saveErrors = signal<string[]>([]);
+  protected readonly savedTick = signal<string | null>(null);
+  protected readonly provisionNodes = signal<GraphNode[]>([]);
+
+  protected draft: Draft | null = null;
+
+  /** Provisions grouped per regulation, for the add-provision selects. */
+  protected readonly provisionsByRegulation = computed(() => {
+    const groups = new Map<string, GraphNode[]>();
+    for (const reg of REGULATIONS) {
+      groups.set(reg, this.provisionNodes().filter((n) => n.regulation === reg));
+    }
+    return groups;
+  });
+
+  constructor() {
+    this.api.benchCases().subscribe({
+      next: (r) => {
+        this.cases.set(r.cases);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Could not load the benchmark cases.');
+        this.loading.set(false);
+      },
+    });
+    this.api.graphFull().subscribe({
+      next: (g) => this.provisionNodes.set(g.nodes.filter((n) => n.type === 'provision')),
+    });
+  }
+
+  protected provisionLabel(id: string): string {
+    const node = this.provisionNodes().find((n) => n.id === id);
+    return node ? `${node.ref} — ${node.title}` : id;
+  }
+
+  protected tierLabel(tier: number): string {
+    return ({ 1: 'enforcement-inspired', 2: 'dataset-adapted', 3: 'synthetic' } as Record<number, string>)[tier] ?? `${tier}`;
+  }
+
+  protected toggle(benchCase: BenchCase): void {
+    if (this.expandedId() === benchCase.id) {
+      this.expandedId.set(null);
+      this.draft = null;
+      return;
+    }
+    this.expandedId.set(benchCase.id);
+    this.saveErrors.set([]);
+    this.draft = this.toDraft(benchCase, false);
+  }
+
+  private toDraft(c: BenchCase, isNew: boolean): Draft {
+    return {
+      id: c.id,
+      tier: c.tier,
+      source: c.source,
+      title: c.campaign.title,
+      text: c.campaign.text,
+      channels: (c.campaign.channels ?? []).join(', '),
+      target_audience: c.campaign.target_audience ?? '',
+      markets: (c.campaign.markets ?? []).join(', '),
+      uses_ai_generation: !!c.campaign.uses_ai_generation,
+      uses_personalisation: !!c.campaign.uses_personalisation,
+      compliant: c.gold.compliant,
+      relevant: [...c.gold.relevant],
+      provisions: [...c.gold.provisions],
+      acceptable_extra: [...c.gold.acceptable_extra],
+      min_risk: c.gold.min_risk,
+      isNew,
+    };
+  }
+
+  private fromDraft(d: Draft): BenchCase {
+    const split = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean);
+    return {
+      id: d.id.trim(),
+      tier: d.tier,
+      source: d.source.trim(),
+      campaign: {
+        title: d.title.trim(),
+        text: d.text.trim(),
+        channels: split(d.channels),
+        target_audience: d.target_audience.trim() || null,
+        markets: split(d.markets),
+        uses_ai_generation: d.uses_ai_generation,
+        uses_personalisation: d.uses_personalisation,
+      },
+      gold: {
+        compliant: d.compliant,
+        relevant: [...d.relevant],
+        provisions: d.compliant ? [] : [...d.provisions],
+        acceptable_extra: [...d.acceptable_extra],
+        min_risk: d.min_risk as BenchCase['gold']['min_risk'],
+      },
+    };
+  }
+
+  protected relevantHas(reg: Regulation): boolean {
+    return this.draft?.relevant.includes(reg) ?? false;
+  }
+
+  protected toggleRelevant(reg: Regulation): void {
+    if (!this.draft) return;
+    this.draft.relevant = this.relevantHas(reg)
+      ? this.draft.relevant.filter((r) => r !== reg)
+      : [...this.draft.relevant, reg];
+  }
+
+  protected addProvision(list: 'provisions' | 'acceptable_extra', event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const id = select.value;
+    select.value = '';
+    if (!this.draft || !id) return;
+    if (!this.draft[list].includes(id)) {
+      this.draft[list] = [...this.draft[list], id];
+    }
+    const other: 'provisions' | 'acceptable_extra' = list === 'provisions' ? 'acceptable_extra' : 'provisions';
+    this.draft[other] = this.draft[other].filter((p) => p !== id);
+  }
+
+  protected removeProvision(list: 'provisions' | 'acceptable_extra', id: string): void {
+    if (!this.draft) return;
+    this.draft[list] = this.draft[list].filter((p) => p !== id);
+  }
+
+  protected moveProvision(from: 'provisions' | 'acceptable_extra', id: string): void {
+    if (!this.draft) return;
+    const to: 'provisions' | 'acceptable_extra' = from === 'provisions' ? 'acceptable_extra' : 'provisions';
+    this.draft[from] = this.draft[from].filter((p) => p !== id);
+    if (!this.draft[to].includes(id)) {
+      this.draft[to] = [...this.draft[to], id];
+    }
+  }
+
+  protected addCase(): void {
+    const existing = new Set(this.cases().map((c) => c.id));
+    let n = 1;
+    while (existing.has(`t3-new-case-${n}`)) n++;
+    const blank: BenchCase = {
+      id: `t3-new-case-${n}`,
+      tier: 3,
+      source: 'Describe where this case comes from / why it exists',
+      campaign: {
+        title: 'New case title',
+        text: 'Describe the campaign: claims, mechanics, targeting, channels…',
+        channels: [],
+        target_audience: null,
+        markets: ['EU'],
+        uses_ai_generation: false,
+        uses_personalisation: false,
+      },
+      gold: { compliant: false, relevant: [], provisions: [], acceptable_extra: [], min_risk: 'medium' },
+    };
+    this.cases.update((cs) => [blank, ...cs]);
+    this.expandedId.set(blank.id);
+    this.saveErrors.set([]);
+    this.draft = this.toDraft(blank, true);
+  }
+
+  protected cancelEdit(benchCase: BenchCase): void {
+    if (this.draft?.isNew) {
+      this.cases.update((cs) => cs.filter((c) => c.id !== benchCase.id));
+    }
+    this.expandedId.set(null);
+    this.draft = null;
+    this.saveErrors.set([]);
+  }
+
+  protected save(original: BenchCase): void {
+    if (!this.draft || this.saving()) return;
+    const updated = this.fromDraft(this.draft);
+    const wasNew = this.draft.isNew;
+    if (!wasNew && updated.id !== original.id) {
+      this.saveErrors.set(['Case ids are stable — add a new case instead of renaming.']);
+      return;
+    }
+    this.saving.set(true);
+    this.saveErrors.set([]);
+    const request = wasNew ? this.api.createBenchCase(updated) : this.api.updateBenchCase(updated);
+    request.subscribe({
+      next: () => {
+        this.cases.update((cs) => cs.map((c) => (c.id === original.id ? updated : c)));
+        this.saving.set(false);
+        this.expandedId.set(null);
+        this.draft = null;
+        this.savedTick.set(updated.id);
+        setTimeout(() => this.savedTick.set(null), 2500);
+      },
+      error: (err) => {
+        const detail = err?.error?.detail;
+        this.saveErrors.set(Array.isArray(detail) ? detail : [detail ?? 'Could not save the case.']);
+        this.saving.set(false);
+      },
+    });
+  }
+
+  protected remove(benchCase: BenchCase): void {
+    if (!confirm(`Delete case "${benchCase.id}" from the benchmark?`)) return;
+    this.api.deleteBenchCase(benchCase.id).subscribe({
+      next: () => {
+        this.cases.update((cs) => cs.filter((c) => c.id !== benchCase.id));
+        if (this.expandedId() === benchCase.id) {
+          this.expandedId.set(null);
+          this.draft = null;
+        }
+      },
+      error: (err) => this.error.set(err?.error?.detail ?? 'Could not delete the case.'),
+    });
+  }
+}

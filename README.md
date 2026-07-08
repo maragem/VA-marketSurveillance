@@ -198,7 +198,9 @@ python bench/run.py --base-url https://<your-app>.up.railway.app --runs 3
 ```
 
 See `bench/README.md` for the case format, the gold-label review workflow, and metric
-definitions. Run it after any prompt, graph, or model change.
+definitions. Run it after any prompt, graph, or model change. The **Benchmark** page in
+the app provides a review UI for the gold labels: edit cases with graph-validated
+provision pickers, then export the corrected `cases.jsonl` to commit back.
 
 ## Repository layout
 

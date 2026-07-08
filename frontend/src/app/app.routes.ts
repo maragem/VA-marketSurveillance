@@ -27,6 +27,11 @@ export const routes: Routes = [
     title: 'Knowledge graph — Marketing Compliance Checker',
   },
   {
+    path: 'benchmark',
+    loadComponent: () => import('./pages/bench/bench').then((m) => m.BenchPage),
+    title: 'Benchmark — Marketing Compliance Checker',
+  },
+  {
     path: 'reports/:id',
     loadComponent: () => import('./pages/report/report').then((m) => m.ReportPage),
     title: 'Report — Marketing Compliance Checker',

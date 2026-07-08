@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 KNOWLEDGE_DIR = Path(os.environ.get("KNOWLEDGE_DIR", BASE_DIR / "knowledge"))
 DATA_DIR = Path(os.environ.get("DATA_DIR", BASE_DIR / "data"))
+BENCH_DIR = Path(os.environ.get("BENCH_DIR", BASE_DIR / "bench"))
 STATIC_DIR = Path(os.environ.get("STATIC_DIR", BASE_DIR / "frontend" / "dist" / "frontend" / "browser"))
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
