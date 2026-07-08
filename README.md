@@ -186,6 +186,20 @@ code change (`config.REGULATIONS`, the `Regulation` literal in `models.py`, and 
 Suitable candidates: ePrivacy Directive, Empowering Consumers Directive (EU) 2024/825
 blacklist items, Health Claims Regulation (EC) 1924/2006, national transpositions.
 
+## Benchmarking the engine
+
+`bench/` contains a versioned gold-standard test set (20 cases: enforcement-inspired,
+dataset-adapted, and synthetic controls) and a harness that replays it against a running
+instance, scoring triage routing, provision-level recall/precision, false positives on
+compliant campaigns, risk calibration, and run-to-run stability:
+
+```bash
+python bench/run.py --base-url https://<your-app>.up.railway.app --runs 3
+```
+
+See `bench/README.md` for the case format, the gold-label review workflow, and metric
+definitions. Run it after any prompt, graph, or model change.
+
 ## Repository layout
 
 ```
