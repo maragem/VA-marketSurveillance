@@ -1,0 +1,238 @@
+<h1 class="page-title">User manual</h1>
+<p class="intro">
+  Everything you need to operate the Marketing Compliance Checker — from submitting a first
+  campaign to reviewing findings, sweeping YouTube, and maintaining the evaluation benchmark.
+</p>
+
+<div class="help">
+  <nav class="help__toc" aria-label="Manual contents">
+    <div class="help__toc-title">Contents</div>
+    @for (entry of toc; track entry.id) {
+      <a (click)="scrollTo(entry.id)">{{ entry.label }}</a>
+    }
+  </nav>
+
+  <div class="help__body">
+    <section id="about">
+      <h2>What this tool is</h2>
+      <p>
+        The Marketing Compliance Checker is a decision-support tool for <strong>market
+        surveillance of marketing campaigns under EU law</strong>. It screens campaign material —
+        submitted as text or collected from public sources such as YouTube — against four
+        regulations:
+      </p>
+      <ul>
+        <li><strong>AI Act</strong> (Regulation (EU) 2024/1689) — manipulative AI, undisclosed chatbots, unmarked synthetic content and deep fakes;</li>
+        <li><strong>GDPR</strong> (Regulation (EU) 2016/679) — lawful basis, consent, profiling, direct-marketing rights, children's data;</li>
+        <li><strong>DSA</strong> (Regulation (EU) 2022/2065) — dark patterns, advertising transparency, protection of minors on platforms;</li>
+        <li><strong>UCPD</strong> (Directive 2005/29/EC) — misleading and aggressive practices and the Annex I blacklist.</li>
+      </ul>
+      <p>
+        Every finding is anchored to a specific provision in a curated legal knowledge graph and
+        deep-linked to the official text on EUR-Lex (resolved through the Publications Office
+        CELLAR repository). Results are <em>indicative screening to prioritise human review</em> —
+        an indicator for investigation, not proof of infringement and not legal advice.
+      </p>
+    </section>
+
+    <section id="quickstart">
+      <h2>Quick start</h2>
+      <ol>
+        <li>Open <strong>New analysis</strong>.</li>
+        <li>Paste the campaign brief into the text field — messaging, claims, mechanics
+            (timers, discounts, chatbots), targeting and channels. The more concrete the text,
+            the more precise the findings. Or click one of the <strong>example campaigns</strong>
+            to see the system in action on deliberately non-compliant material.</li>
+        <li>Optionally set audience, markets and the AI-generation / personalisation flags —
+            these steer the triage.</li>
+        <li>Submit and watch the <strong>live agent console</strong>: triage, then one specialist
+            agent per relevant regulation querying the knowledge graph, then the synthesised
+            report.</li>
+      </ol>
+      <p>
+        The header shows which engine is active
+        @if (engine() === 'agentic') { (currently <strong>agentic</strong> — full multi-agent analysis). }
+        @else if (engine() === 'heuristic') { (currently <strong>heuristic mode</strong> — no LLM credentials
+        configured, so screening is retrieval-only and much coarser). }
+        @else { (agentic when LLM credentials are configured, otherwise a coarser retrieval-only heuristic). }
+      </p>
+    </section>
+
+    <section id="pipeline">
+      <h2>How an analysis works</h2>
+      <p>The pipeline has three stages, all visible in the live console:</p>
+      <ol>
+        <li><strong>Triage.</strong> A supervisor agent reads the campaign once and decides which
+            regulations are plausibly engaged and why — like a hospital triage nurse routing
+            patients to specialists. It extracts risk signals (urgency claims, health claims,
+            minors, AI usage, personal data) and routes only the relevant regulations onward.
+            Triage is deliberately inclusive: when in doubt, a regulation is routed in and the
+            specialist makes the call.</li>
+        <li><strong>Specialist agents.</strong> Each routed regulation gets a dedicated agent that
+            investigates using GraphRAG tools: hybrid keyword + graph search over the legal
+            knowledge graph, expanding from marketing concepts (e.g. <em>countdown timer</em>) to
+            the provisions that govern them. Agents may only cite provisions they actually
+            retrieved — citations are validated against the graph, so hallucinated articles are
+            dropped.</li>
+        <li><strong>Synthesis.</strong> A final agent merges the verdicts into an overall risk
+            level, an executive summary and a prioritised remediation plan.</li>
+      </ol>
+      <p>
+        Without LLM credentials the system falls back to <strong>heuristic mode</strong>: pure
+        retrieval scoring against the same graph. It is useful as a smoke test but flags far more
+        false positives — the report banner and the <code>engine</code> field tell you which mode
+        produced a report.
+      </p>
+    </section>
+
+    <section id="report">
+      <h2>Reading a report</h2>
+      <p>A report is organised top-down, most important first:</p>
+      <ul>
+        <li><strong>Overview</strong> — overall risk, executive summary, and (for scraped
+            content) the source provenance line.</li>
+        <li><strong>Triage card</strong> — what the supervisor detected and which regulations it
+            routed.</li>
+        <li><strong>One verdict card per regulation</strong> — a status badge, the specialist's
+            overall notes, and individual findings. Each finding shows: severity, the provision
+            reference with an <em>Official text ↗</em> link to EUR-Lex, the rationale, a verbatim
+            evidence quote from the campaign, a concrete recommendation, and the graph path that
+            grounds it.</li>
+        <li><strong>Remediation plan</strong> — all recommendations merged and prioritised.</li>
+        <li><strong>Legal sources</strong> — the acts cited, verified live against CELLAR.</li>
+      </ul>
+      <p>From the report page you can also:</p>
+      <ul>
+        <li><strong>Rename</strong> the report (pencil icon next to the title);</li>
+        <li><strong>Download PDF</strong> — a formatted report for sharing or case files;</li>
+        <li><strong>Fix &amp; re-analyse</strong> — reopens the campaign in the form, linked to the
+            original. The new report includes a <strong>diff card</strong>: findings resolved,
+            still remaining (with severity changes) and newly introduced — ideal for verifying
+            that a remediation actually worked.</li>
+      </ul>
+    </section>
+
+    <section id="youtube">
+      <h2>YouTube surveillance</h2>
+      <p>
+        The YouTube page turns the checker into a surveillance instrument for campaigns
+        <em>in the wild</em>, using the Oxylabs Web Scraper API:
+      </p>
+      <ul>
+        <li><strong>Paste a URL</strong> — any <code>youtube.com/watch</code>, <code>youtu.be</code>,
+            Shorts, embed or live link (or a bare video id) is fetched and analysed directly.</li>
+        <li><strong>Search</strong> — query YouTube by keyword (e.g. <em>collagen supplement</em>,
+            <em>crypto course</em>), filter by upload date and sort order, then hit
+            <strong>Analyse</strong> on any result.</li>
+      </ul>
+      <p>
+        For each video the system retrieves the <strong>metadata (title, channel, description)
+        and the spoken transcript</strong>, assembles them into a campaign submission (with the
+        video URL recorded as provenance) and drops you into the analysis form for review before
+        submitting. The <strong>transcript language selector</strong> next to the URL bar defaults
+        to <em>auto</em> — it takes whatever captions the video has, falling back through your
+        preferred language and English, so non-English videos work out of the box.
+      </p>
+      <p class="help__note">
+        Scraped material is treated strictly as <em>data under analysis</em>. A missing transcript
+        degrades the analysis but never blocks it — the description and metadata still go through.
+        Requires <code>OXYLABS_USERNAME</code> / <code>OXYLABS_PASSWORD</code> on the deployment.
+      </p>
+    </section>
+
+    <section id="dashboard">
+      <h2>Dashboard &amp; analytics</h2>
+      <p>
+        The <strong>Dashboard</strong> lists all stored analyses, newest first, with risk and
+        status badges — reports persist on the server volume across redeploys. The
+        <strong>Analytics</strong> page aggregates them: risk distribution, findings per
+        regulation with severity breakdowns, the most-violated provisions, activity timeline and
+        channel mix. Use it to spot patterns across a portfolio of screened campaigns — e.g.
+        which rules a market segment keeps breaking.
+      </p>
+    </section>
+
+    <section id="graph">
+      <h2>Knowledge graph</h2>
+      <p>
+        The <strong>Knowledge graph</strong> page is an interactive explorer of the legal corpus
+        the agents reason over: regulations, their provisions, and marketing concepts
+        (urgency &amp; scarcity, hidden advertising, deep fakes…) connected by
+        <em>contains / governed-by / references</em> edges. Click any node to inspect its text,
+        its EUR-Lex source and its neighbourhood; search to jump to a concept. This is exactly
+        the material specialists retrieve from — if a practice matters to you and is missing
+        here, it cannot be cited in findings. The corpus can be extended manually
+        (<code>knowledge/*.json</code>) or via the CELLAR ingestion pipeline
+        (<code>python -m app.ingest</code>) documented in the README.
+      </p>
+    </section>
+
+    <section id="benchmark">
+      <h2>Benchmark</h2>
+      <p>
+        The <strong>Benchmark</strong> page maintains the gold-standard test set used to measure
+        engine quality (20 seed cases: real-enforcement-inspired, dataset-adapted, and synthetic
+        controls including deliberately compliant campaigns). Each case pairs a campaign with
+        gold labels: the regulations triage must route, the provisions findings must cite,
+        defensible extras, and a minimum overall risk.
+      </p>
+      <ul>
+        <li>Expand a case to <strong>edit its labels</strong> — provision pickers are populated
+            from the knowledge graph, so invalid citations are impossible; ↑/↓ promote or demote
+            between must-find and acceptable-extra.</li>
+        <li><strong>Add or delete cases</strong> to grow the set; keep ids stable so scorecards
+            stay comparable.</li>
+        <li><strong>Export cases.jsonl</strong> and commit it to the repository to version the
+            corrected gold.</li>
+      </ul>
+      <p>
+        Scoring runs from the repository:
+        <code>python bench/run.py --base-url &lt;deployment&gt; --runs 3</code> replays every case
+        and reports provision recall, missed routings, unexpected findings, false positives on
+        compliant controls, risk calibration and run-to-run stability. Run it after any prompt,
+        graph or model change.
+      </p>
+    </section>
+
+    <section id="reference">
+      <h2>Severity &amp; status reference</h2>
+      <h3>Finding severity</h3>
+      <table>
+        <tr><th>critical</th><td>A blacklisted / prohibited practice is clearly present (e.g. UCPD Annex I, AI Act Art. 5).</td></tr>
+        <tr><th>high</th><td>A prohibition or key obligation is likely breached.</td></tr>
+        <tr><th>medium</th><td>An obligation is engaged and probably not satisfied as described.</td></tr>
+        <tr><th>low</th><td>An obligation is engaged but easily fixed.</td></tr>
+        <tr><th>info</th><td>Worth flagging; no likely breach.</td></tr>
+      </table>
+      <h3>Regulation verdict status</h3>
+      <table>
+        <tr><th>violation likely</th><td>At least one serious breach identified.</td></tr>
+        <tr><th>risk identified</th><td>Material risks found; review recommended.</td></tr>
+        <tr><th>needs attention</th><td>Obligations engaged; check the notes and findings.</td></tr>
+        <tr><th>compliant</th><td>Examined; no issues supported by the material.</td></tr>
+        <tr><th>not applicable</th><td>The regulation is not engaged by this campaign.</td></tr>
+      </table>
+      <h3>Overall risk</h3>
+      <p>
+        The worst supported finding drives the level: <strong>critical → high → medium → low →
+        compliant</strong>. Overall risk prioritises the review queue; the finding-level detail is
+        what a case handler should act on.
+      </p>
+    </section>
+
+    <section id="disclaimer">
+      <h2>Data handling &amp; disclaimer</h2>
+      <ul>
+        <li>Reports are stored in a SQLite database on the deployment's data volume; they are not
+            sent anywhere except to the configured Claude model (Anthropic API or Amazon Bedrock,
+            per your deployment) for the analysis itself.</li>
+        <li>Scraped YouTube content is public material, wrapped as data-under-analysis and never
+            executed as instructions.</li>
+        <li>Findings are automated, indicative screening over the submitted text only. They do not
+            establish infringement, do not cover facts outside the text, and are
+            <strong>not legal advice</strong>. Always route flagged material to qualified human
+            review before any enforcement or remediation decision.</li>
+      </ul>
+    </section>
+  </div>
+</div>

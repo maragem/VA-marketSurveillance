@@ -1,0 +1,144 @@
+.page-title {
+  font-size: 1.35rem;
+  margin: 0 0 0.4rem;
+}
+
+.intro {
+  color: #44535f;
+  max-width: 60rem;
+  margin: 0 0 1.5rem;
+}
+
+.help {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__toc {
+    position: sticky;
+    top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.9rem 1rem;
+    background: #f4f6f9;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+
+    @media (max-width: 860px) {
+      position: static;
+    }
+
+    a {
+      font-size: 0.88rem;
+      color: #004494;
+      cursor: pointer;
+      padding: 0.22rem 0.3rem;
+      border-radius: 4px;
+      text-decoration: none;
+
+      &:hover {
+        background: #e8eef5;
+      }
+    }
+  }
+
+  &__toc-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7a89;
+    margin-bottom: 0.4rem;
+  }
+
+  &__body {
+    max-width: 52rem;
+
+    section {
+      scroll-margin-top: 1rem;
+      padding-bottom: 1.6rem;
+      margin-bottom: 1.6rem;
+      border-bottom: 1px solid #e9edf2;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 0 0 0.7rem;
+      color: #232c36;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 1.1rem 0 0.45rem;
+    }
+
+    p,
+    li {
+      line-height: 1.6;
+      color: #2c3844;
+    }
+
+    p {
+      margin: 0 0 0.75rem;
+    }
+
+    ul,
+    ol {
+      margin: 0 0 0.9rem;
+      padding-left: 1.4rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    code {
+      background: #f0f3f7;
+      border: 1px solid #e0e6ec;
+      border-radius: 3px;
+      padding: 0.05rem 0.3rem;
+      font-size: 0.85em;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.4rem 0 0.9rem;
+      font-size: 0.9rem;
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.4rem 0.6rem;
+        border: 1px solid #e3e8ee;
+        line-height: 1.45;
+      }
+
+      th {
+        white-space: nowrap;
+        background: #f4f6f9;
+        font-weight: 600;
+        width: 9rem;
+      }
+    }
+  }
+
+  &__note {
+    background: #f4f8fb;
+    border-left: 3px solid #006fb4;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.92rem;
+  }
+}

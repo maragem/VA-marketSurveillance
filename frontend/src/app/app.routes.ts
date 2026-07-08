@@ -32,6 +32,11 @@ export const routes: Routes = [
     title: 'Benchmark — Marketing Compliance Checker',
   },
   {
+    path: 'help',
+    loadComponent: () => import('./pages/help/help').then((m) => m.HelpPage),
+    title: 'User manual — Marketing Compliance Checker',
+  },
+  {
     path: 'reports/:id',
     loadComponent: () => import('./pages/report/report').then((m) => m.ReportPage),
     title: 'Report — Marketing Compliance Checker',
