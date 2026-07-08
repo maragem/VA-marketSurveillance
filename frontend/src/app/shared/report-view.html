@@ -82,9 +82,9 @@
     <eui-card>
       <eui-card-header>
         <eui-card-header-title>Triage</eui-card-header-title>
-        <eui-card-header-subtitle>{{ triage.summary }}</eui-card-header-subtitle>
       </eui-card-header>
       <eui-card-content>
+        <p class="report__notes">{{ triage.summary }}</p>
         <div class="report__chips">
           @for (practice of triage.detected_practices; track practice) {
             <eui-chip euiSizeS>{{ practice }}</eui-chip>
@@ -111,12 +111,13 @@
             </span>
           </span>
         </eui-card-header-title>
-        @if (verdict.notes) {
-          <eui-card-header-subtitle>{{ verdict.notes }}</eui-card-header-subtitle>
-        }
       </eui-card-header>
-      @if (verdict.findings.length > 0) {
+      @if (verdict.notes || verdict.findings.length > 0) {
         <eui-card-content>
+          @if (verdict.notes) {
+            <p class="report__notes">{{ verdict.notes }}</p>
+          }
+          @if (verdict.findings.length > 0) {
           <div class="findings">
             @for (finding of sortedFindings(verdict); track finding.provision_id + finding.rationale) {
               <div class="finding"
@@ -150,6 +151,7 @@
               </div>
             }
           </div>
+          }
         </eui-card-content>
       }
     </eui-card>

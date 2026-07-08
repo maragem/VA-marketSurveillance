@@ -64,6 +64,12 @@
     }
   }
 
+  &__notes {
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+    color: var(--eui-c-text-light, #44535f);
+  }
+
   &__chips {
     display: flex;
     flex-wrap: wrap;
