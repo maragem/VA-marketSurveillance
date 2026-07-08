@@ -26,6 +26,9 @@ OXYLABS_PASSWORD = os.environ.get("OXYLABS_PASSWORD", "")
 
 MAX_TRANSCRIPT_CHARS = 30000
 _VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+# A bare video-time marker like "0:05", "12:34" or "1:02:33" — caption timing
+# noise, not spoken content.
+_TIMESTAMP_RE = re.compile(r"^(?:\d{1,2}:)?\d{1,2}:\d{2}$")
 
 
 def available() -> bool:
@@ -259,19 +262,23 @@ async def video_bundle(video_id: str, language: str | None = None) -> dict:
         content = await _query_id_or_url(payload)
         # Extract at the shallowest node exposing a text key and do not descend
         # into that subtree again (wrappers and their inner `runs` would
-        # otherwise both match and duplicate every segment).
+        # otherwise both match and duplicate every segment). Timing metadata
+        # (startTimeText etc.) also nests simpleText — skip those subtrees and
+        # drop any segment that is just a timestamp.
         segments: list[str] = []
         stack: list[Any] = [content]
         text_keys = ("snippet", "segment_text", "simpleText", "text")
+        skip_keys = ("startTimeText", "endTimeText", "timestampText", "timeText",
+                     "startTime", "endTime", "startMs", "endMs", "timestamp")
         while stack:
             node = stack.pop(0)
             if isinstance(node, dict):
                 matched = next((k for k in text_keys if k in node), None)
                 if matched:
                     text = _text(node[matched]).strip()
-                    if text:
+                    if text and not _TIMESTAMP_RE.match(text):
                         segments.append(text)
-                stack.extend(v for k, v in node.items() if k != matched)
+                stack.extend(v for k, v in node.items() if k != matched and k not in skip_keys)
             elif isinstance(node, list):
                 stack = node + stack
         transcript = " ".join(segments).strip()
