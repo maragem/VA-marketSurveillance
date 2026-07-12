@@ -5,7 +5,26 @@ import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EuiButtonComponent } from '@eui/components/eui-button';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { ApiService } from '../../core/api.service';
-import { BenchCase, GraphNode, Regulation } from '../../core/models';
+import { AnalysisReport, BenchCase, GraphNode, Regulation } from '../../core/models';
+
+/** Gold-vs-run comparison, mirroring the scoring rules of bench/run.py. */
+interface RunOutcome {
+  engine: string;
+  overallRisk: string;
+  riskOk: boolean;
+  compliantControl: boolean;
+  falsePositive: boolean;
+  routed: string[];
+  routingMissed: string[];
+  routingExtra: string[];
+  matched: string[];
+  missed: string[];
+  unexpected: { id: string; severity: string }[];
+  pass: boolean;
+}
+
+const RISK_ORDER: Record<string, number> = { compliant: 0, low: 1, medium: 2, high: 3, critical: 4, unknown: -1 };
+const ACTIONABLE = ['critical', 'high', 'medium'];
 
 /** Editable working copy of a case: list fields flattened to comma strings. */
 interface Draft {
@@ -51,7 +70,14 @@ export class BenchPage {
   protected readonly savedTick = signal<string | null>(null);
   protected readonly provisionNodes = signal<GraphNode[]>([]);
 
+  protected readonly running = signal(false);
+  protected readonly runStatus = signal<string | null>(null);
+  protected readonly runError = signal<string | null>(null);
+  protected readonly outcome = signal<RunOutcome | null>(null);
+
   protected draft: Draft | null = null;
+  private lastReport: AnalysisReport | null = null;
+  private runAbort: AbortController | null = null;
 
   /** Provisions grouped per regulation, for the add-provision selects. */
   protected readonly provisionsByRegulation = computed(() => {
@@ -88,6 +114,7 @@ export class BenchPage {
   }
 
   protected toggle(benchCase: BenchCase): void {
+    this.resetRun();
     if (this.expandedId() === benchCase.id) {
       this.expandedId.set(null);
       this.draft = null;
@@ -96,6 +123,16 @@ export class BenchPage {
     this.expandedId.set(benchCase.id);
     this.saveErrors.set([]);
     this.draft = this.toDraft(benchCase, false);
+  }
+
+  private resetRun(): void {
+    this.runAbort?.abort();
+    this.runAbort = null;
+    this.running.set(false);
+    this.runStatus.set(null);
+    this.runError.set(null);
+    this.outcome.set(null);
+    this.lastReport = null;
   }
 
   private toDraft(c: BenchCase, isNew: boolean): Draft {
@@ -182,6 +219,7 @@ export class BenchPage {
   }
 
   protected addCase(): void {
+    this.resetRun();
     const existing = new Set(this.cases().map((c) => c.id));
     let n = 1;
     while (existing.has(`t3-new-case-${n}`)) n++;
@@ -207,12 +245,109 @@ export class BenchPage {
   }
 
   protected cancelEdit(benchCase: BenchCase): void {
+    this.resetRun();
     if (this.draft?.isNew) {
       this.cases.update((cs) => cs.filter((c) => c.id !== benchCase.id));
     }
     this.expandedId.set(null);
     this.draft = null;
     this.saveErrors.set([]);
+  }
+
+  /** Run the case's campaign through the engine (not persisted) and compare
+   *  the outcome against the gold labels currently on screen. */
+  protected async runCase(): Promise<void> {
+    if (!this.draft || this.running()) return;
+    const campaign = this.fromDraft(this.draft).campaign;
+    this.resetRun();
+    this.running.set(true);
+    this.runStatus.set('Submitting campaign…');
+    this.runAbort = new AbortController();
+    try {
+      await this.api.analyzeStream(
+        campaign,
+        (event) => {
+          const e = event as { type: string; message?: string; regulation?: string; report?: AnalysisReport };
+          if (e.type === 'stage' && e.message) {
+            this.runStatus.set(e.message);
+          } else if (e.type === 'agent_completed' && e.regulation) {
+            this.runStatus.set(`${e.regulation} specialist finished…`);
+          } else if (e.type === 'report' && e.report) {
+            this.lastReport = e.report;
+            this.outcome.set(this.compare(e.report));
+          } else if (e.type === 'error') {
+            this.runError.set(e.message ?? 'Analysis failed.');
+          }
+        },
+        null,
+        this.runAbort.signal,
+        false,
+      );
+    } catch (err) {
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        this.runError.set(err instanceof Error ? err.message : 'Analysis failed.');
+      }
+    } finally {
+      this.running.set(false);
+      this.runStatus.set(null);
+      this.runAbort = null;
+    }
+  }
+
+  private compare(report: AnalysisReport): RunOutcome {
+    const d = this.draft!;
+    const goldRelevant = new Set<string>(d.relevant);
+    const goldProvisions = new Set(d.compliant ? [] : d.provisions);
+    const allowed = new Set([...goldProvisions, ...d.acceptable_extra]);
+
+    const routed = report.triage?.regulations_to_check ?? [];
+    const all = report.verdicts.flatMap((v) => v.findings);
+    const foundAny = new Set(all.map((f) => f.provision_id));
+    const actionable = all.filter((f) => ACTIONABLE.includes(f.severity));
+
+    const matched = [...goldProvisions].filter((p) => foundAny.has(p));
+    const missed = [...goldProvisions].filter((p) => !foundAny.has(p));
+    const seen = new Set<string>();
+    const unexpected = actionable
+      .filter((f) => !allowed.has(f.provision_id) && !seen.has(f.provision_id) && seen.add(f.provision_id) !== undefined)
+      .map((f) => ({ id: f.provision_id, severity: f.severity }));
+
+    const riskRank = RISK_ORDER[report.overall_risk] ?? -1;
+    const falsePositive = d.compliant && (actionable.length > 0 || riskRank >= RISK_ORDER['medium']);
+    const riskOk = d.compliant ? !falsePositive : riskRank >= (RISK_ORDER[d.min_risk] ?? 2);
+    const routingMissed = [...goldRelevant].filter((r) => !routed.includes(r as Regulation));
+
+    return {
+      engine: report.engine,
+      overallRisk: report.overall_risk,
+      riskOk,
+      compliantControl: d.compliant,
+      falsePositive,
+      routed,
+      routingMissed,
+      routingExtra: routed.filter((r) => !goldRelevant.has(r)),
+      matched,
+      missed,
+      unexpected,
+      pass: riskOk && missed.length === 0 && routingMissed.length === 0 && !falsePositive && unexpected.length === 0,
+    };
+  }
+
+  /** Accept an unexpected finding into the gold labels and re-compare. */
+  protected acceptUnexpected(id: string, list: 'provisions' | 'acceptable_extra'): void {
+    if (!this.draft) return;
+    if (list === 'provisions') {
+      const node = this.provisionNodes().find((n) => n.id === id);
+      if (node?.regulation && !this.draft.relevant.includes(node.regulation as Regulation)) {
+        this.draft.relevant = [...this.draft.relevant, node.regulation as Regulation];
+      }
+    }
+    if (!this.draft[list].includes(id)) {
+      this.draft[list] = [...this.draft[list], id];
+    }
+    if (this.lastReport) {
+      this.outcome.set(this.compare(this.lastReport));
+    }
   }
 
   protected save(original: BenchCase): void {

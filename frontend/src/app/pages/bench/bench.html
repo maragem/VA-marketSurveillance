@@ -201,12 +201,102 @@
             <button euiButton euiPrimary [euiDisabled]="saving()" (buttonClick)="save(c)">
               {{ saving() ? 'Saving…' : (draft.isNew ? 'Create case' : 'Save changes') }}
             </button>
+            <button euiButton euiSecondary [euiDisabled]="running()" (buttonClick)="runCase()">
+              {{ running() ? 'Running…' : 'Run case' }}
+            </button>
             <button euiButton euiSecondary (buttonClick)="cancelEdit(c)">Cancel</button>
             <span class="editor__spacer"></span>
             @if (!draft.isNew) {
               <button euiButton euiDanger (buttonClick)="remove(c)">Delete case</button>
             }
           </div>
+
+          @if (running() && runStatus()) {
+            <p class="run-status"><span class="run-status__pulse"></span>{{ runStatus() }}</p>
+          }
+          @if (runError()) {
+            <eui-alert euiDanger>
+              <eui-alert-title>Run failed</eui-alert-title>
+              {{ runError() }}
+            </eui-alert>
+          }
+
+          @if (outcome(); as o) {
+            <div class="run" [class.run--pass]="o.pass" [class.run--fail]="!o.pass">
+              <div class="run__head">
+                <strong>{{ o.pass ? '✅ Run matches the gold labels' : '❌ Run deviates from the gold labels' }}</strong>
+                <span class="run__engine" [class.run__engine--warn]="o.engine === 'heuristic'">
+                  engine: {{ o.engine }}{{ o.engine === 'heuristic' ? ' — configure LLM credentials for meaningful comparisons' : '' }}
+                </span>
+              </div>
+
+              <div class="run__row">
+                <span class="run__label">Overall risk</span>
+                @if (o.compliantControl) {
+                  <span [class]="o.falsePositive ? 'run__bad' : 'run__good'">
+                    {{ o.overallRisk }} — {{ o.falsePositive ? 'control was flagged (false positive)' : 'control came back clean' }}
+                  </span>
+                } @else {
+                  <span [class]="o.riskOk ? 'run__good' : 'run__bad'">
+                    {{ o.overallRisk }} (gold minimum: {{ draft.min_risk }}) {{ o.riskOk ? '✓' : '— understated' }}
+                  </span>
+                }
+              </div>
+
+              <div class="run__row">
+                <span class="run__label">Triage routing</span>
+                <span>
+                  routed: {{ o.routed.join(', ') || '—' }}
+                  @if (o.routingMissed.length > 0) {
+                    <span class="run__bad"> · missed: {{ o.routingMissed.join(', ') }}</span>
+                  }
+                  @if (o.routingExtra.length > 0) {
+                    <span class="muted"> · extra (not penalised): {{ o.routingExtra.join(', ') }}</span>
+                  }
+                </span>
+              </div>
+
+              @if (!o.compliantControl) {
+                <div class="run__row">
+                  <span class="run__label">Must-find provisions</span>
+                  <span>
+                    @for (id of o.matched; track id) {
+                      <span class="run__good run__item">✓ {{ provisionLabel(id) }}</span>
+                    }
+                    @for (id of o.missed; track id) {
+                      <span class="run__bad run__item">✗ missed: {{ provisionLabel(id) }}</span>
+                    }
+                    @if (o.matched.length === 0 && o.missed.length === 0) { <span class="muted">none defined</span> }
+                  </span>
+                </div>
+              }
+
+              <div class="run__row">
+                <span class="run__label">Unexpected findings</span>
+                <span>
+                  @for (u of o.unexpected; track u.id) {
+                    <span class="run__item run__unexpected">
+                      <span euiBadge euiSizeS euiWarning>{{ u.severity }}</span>
+                      {{ provisionLabel(u.id) }}
+                      <button type="button" class="run__accept" title="Accept as must-find gold label"
+                              (click)="acceptUnexpected(u.id, 'provisions')">→ must-find</button>
+                      <button type="button" class="run__accept" title="Accept as acceptable extra"
+                              (click)="acceptUnexpected(u.id, 'acceptable_extra')">→ extra</button>
+                    </span>
+                  } @empty {
+                    <span class="run__good">none — all findings within the allowed set</span>
+                  }
+                </span>
+              </div>
+
+              @if (o.unexpected.length > 0 || !o.pass) {
+                <p class="run__hint">
+                  Accepting a finding updates the labels above — remember to <strong>Save changes</strong>.
+                  Findings you don't accept remain genuine engine errors. Test runs are not stored in the dashboard.
+                </p>
+              }
+            </div>
+          }
         </div>
       }
     </eui-card-content>

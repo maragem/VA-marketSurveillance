@@ -98,8 +98,16 @@ export class ApiService {
     onEvent: (event: StreamEvent) => void,
     parentId?: string | null,
     signal?: AbortSignal,
+    persist = true,
   ): Promise<void> {
-    const query = parentId ? `?parent_id=${encodeURIComponent(parentId)}` : '';
+    const params = new URLSearchParams();
+    if (parentId) {
+      params.set('parent_id', parentId);
+    }
+    if (!persist) {
+      params.set('persist', 'false');
+    }
+    const query = params.size ? `?${params.toString()}` : '';
     const response = await fetch(`${this.base}/analyses/stream${query}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

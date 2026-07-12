@@ -264,13 +264,16 @@ async def analysis_diff(report_id: str, request: Request):
 
 
 @router.post("/analyses/stream")
-async def analyze_stream(campaign: CampaignSubmission, request: Request, parent_id: str | None = None):
+async def analyze_stream(campaign: CampaignSubmission, request: Request,
+                         parent_id: str | None = None, persist: bool = True):
     """Run the agentic analysis, streaming progress events as SSE.
 
     The client POSTs the campaign and reads the SSE stream from the response
     body (fetch + ReadableStream — EventSource does not support POST).
     The final event carries the complete report, which is also persisted.
-    Pass ?parent_id= to link the run to an earlier report as a re-analysis.
+    Pass ?parent_id= to link the run to an earlier report as a re-analysis,
+    or ?persist=false for throwaway runs (e.g. benchmark test runs) that
+    should not appear in the dashboard.
     """
     orchestrator = request.app.state.orchestrator
     store = request.app.state.store
@@ -285,13 +288,15 @@ async def analyze_stream(campaign: CampaignSubmission, request: Request, parent_
     async def run() -> None:
         try:
             result = await orchestrator.run(report, emit)
-            await store.save(result)
+            if persist:
+                await store.save(result)
             await queue.put({"type": "report", "report": json.loads(result.model_dump_json())})
         except Exception as exc:
             logger.exception("analysis %s failed", report.id)
             report.status = "failed"
             report.error = str(exc)
-            await store.save(report)
+            if persist:
+                await store.save(report)
             await queue.put({"type": "error", "message": str(exc), "report_id": report.id})
         finally:
             await queue.put(None)
