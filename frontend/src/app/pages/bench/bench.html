@@ -42,6 +42,12 @@
         @if (savedTick() === c.id) {
           <span class="case__saved">✓ saved</span>
         }
+        @if (storedRuns()[c.id]; as run) {
+          <span class="case__run" [class.case__run--pass]="run.pass" [class.case__run--fail]="!run.pass"
+                [title]="'Last run: ' + (run.pass ? 'passed' : 'deviations') + ' · ' + run.engine + ' · ' + runDate(run)">
+            {{ run.pass ? '✓' : '✗' }} last run
+          </span>
+        }
         <span class="case__count">
           {{ c.gold.provisions.length }} must-find · {{ c.gold.acceptable_extra.length }} extra
         </span>
@@ -227,6 +233,7 @@
                 <strong>{{ o.pass ? '✅ Run matches the gold labels' : '❌ Run deviates from the gold labels' }}</strong>
                 <span class="run__engine" [class.run__engine--warn]="o.engine === 'heuristic'">
                   engine: {{ o.engine }}{{ o.engine === 'heuristic' ? ' — configure LLM credentials for meaningful comparisons' : '' }}
+                  @if (o.recorded_at) { · recorded {{ runDate(o) }} }
                 </span>
               </div>
 

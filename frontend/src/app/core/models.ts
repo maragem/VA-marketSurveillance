@@ -29,6 +29,23 @@ export interface BenchCase {
   gold: BenchGold;
 }
 
+/** Stored gold-vs-run comparison for a benchmark case (mirrors bench/run.py scoring). */
+export interface BenchRunOutcome {
+  engine: string;
+  overallRisk: string;
+  riskOk: boolean;
+  compliantControl: boolean;
+  falsePositive: boolean;
+  routed: string[];
+  routingMissed: string[];
+  routingExtra: string[];
+  matched: string[];
+  missed: string[];
+  unexpected: { id: string; severity: string }[];
+  pass: boolean;
+  recorded_at?: string;
+}
+
 export interface YouTubeSearchResult {
   video_id: string;
   url: string;

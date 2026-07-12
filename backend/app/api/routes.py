@@ -183,6 +183,26 @@ async def bench_delete(case_id: str, request: Request):
         raise HTTPException(status_code=404, detail=str(exc))
 
 
+@router.get("/bench/runs")
+async def bench_runs(request: Request):
+    """Stored last-run outcome per case id."""
+    return await request.app.state.bench.runs()
+
+
+@router.put("/bench/runs/{case_id}")
+async def bench_save_run(case_id: str, outcome: dict, request: Request):
+    """Persist the outcome of a UI test run for a case (last run wins)."""
+    if len(json.dumps(outcome)) > 100_000:
+        raise HTTPException(status_code=413, detail="Run outcome too large")
+    from datetime import datetime, timezone
+    outcome["recorded_at"] = datetime.now(timezone.utc).isoformat()
+    try:
+        await request.app.state.bench.save_run(case_id, outcome)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return outcome
+
+
 @router.get("/bench/export")
 async def bench_export(request: Request):
     """Download the working copy as cases.jsonl, ready to commit to the repo."""

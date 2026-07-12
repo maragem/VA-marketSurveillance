@@ -64,6 +64,26 @@
     font-size: 0.85rem;
     font-weight: 600;
   }
+
+  &__run {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+
+    &--pass {
+      color: #2d5a23;
+      background: #ecf4e9;
+      border: 1px solid #b9d6b1;
+    }
+
+    &--fail {
+      color: #9c1a24;
+      background: #fdf0f0;
+      border: 1px solid #f0c6c9;
+    }
+  }
 }
 
 .chip--reg {

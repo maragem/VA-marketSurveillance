@@ -58,6 +58,9 @@ class BenchStore:
     def __init__(self, seed_path: Path, data_dir: Path):
         self._seed = seed_path
         self._working = data_dir / "bench-cases.jsonl"
+        # Last run outcome per case id — kept separate from the cases file so
+        # the exported gold set stays pure.
+        self._runs_path = data_dir / "bench-runs.json"
         self._lock = asyncio.Lock()
 
     def _ensure_working(self) -> None:
@@ -106,8 +109,38 @@ class BenchStore:
                 if len(remaining) == len(cases):
                     raise KeyError(f"Unknown case id: {case_id}")
                 self._write(remaining)
+                runs = self._read_runs()
+                if runs.pop(case_id, None) is not None:
+                    self._write_runs(runs)
             await asyncio.to_thread(_apply)
 
     async def export_text(self) -> str:
         cases = await self.list()
         return "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cases)
+
+    # -- stored run outcomes -------------------------------------------------
+
+    def _read_runs(self) -> dict:
+        if not self._runs_path.exists():
+            return {}
+        return json.loads(self._runs_path.read_text())
+
+    def _write_runs(self, runs: dict) -> None:
+        self._runs_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = self._runs_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(runs, ensure_ascii=False, indent=1))
+        tmp.replace(self._runs_path)
+
+    async def runs(self) -> dict:
+        async with self._lock:
+            return await asyncio.to_thread(self._read_runs)
+
+    async def save_run(self, case_id: str, outcome: dict) -> None:
+        async with self._lock:
+            def _apply():
+                if not any(c["id"] == case_id for c in self._read()):
+                    raise KeyError(f"Unknown case id: {case_id}")
+                runs = self._read_runs()
+                runs[case_id] = outcome
+                self._write_runs(runs)
+            await asyncio.to_thread(_apply)

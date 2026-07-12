@@ -5,23 +5,7 @@ import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EuiButtonComponent } from '@eui/components/eui-button';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { ApiService } from '../../core/api.service';
-import { AnalysisReport, BenchCase, GraphNode, Regulation } from '../../core/models';
-
-/** Gold-vs-run comparison, mirroring the scoring rules of bench/run.py. */
-interface RunOutcome {
-  engine: string;
-  overallRisk: string;
-  riskOk: boolean;
-  compliantControl: boolean;
-  falsePositive: boolean;
-  routed: string[];
-  routingMissed: string[];
-  routingExtra: string[];
-  matched: string[];
-  missed: string[];
-  unexpected: { id: string; severity: string }[];
-  pass: boolean;
-}
+import { AnalysisReport, BenchCase, BenchRunOutcome, GraphNode, Regulation } from '../../core/models';
 
 const RISK_ORDER: Record<string, number> = { compliant: 0, low: 1, medium: 2, high: 3, critical: 4, unknown: -1 };
 const ACTIONABLE = ['critical', 'high', 'medium'];
@@ -73,7 +57,8 @@ export class BenchPage {
   protected readonly running = signal(false);
   protected readonly runStatus = signal<string | null>(null);
   protected readonly runError = signal<string | null>(null);
-  protected readonly outcome = signal<RunOutcome | null>(null);
+  protected readonly outcome = signal<BenchRunOutcome | null>(null);
+  protected readonly storedRuns = signal<Record<string, BenchRunOutcome>>({});
 
   protected draft: Draft | null = null;
   private lastReport: AnalysisReport | null = null;
@@ -102,6 +87,13 @@ export class BenchPage {
     this.api.graphFull().subscribe({
       next: (g) => this.provisionNodes.set(g.nodes.filter((n) => n.type === 'provision')),
     });
+    this.api.benchRuns().subscribe({
+      next: (runs) => this.storedRuns.set(runs),
+    });
+  }
+
+  protected runDate(outcome: BenchRunOutcome): string {
+    return outcome.recorded_at ? `${outcome.recorded_at.slice(0, 16).replace('T', ' ')} UTC` : '';
   }
 
   protected provisionLabel(id: string): string {
@@ -123,6 +115,12 @@ export class BenchPage {
     this.expandedId.set(benchCase.id);
     this.saveErrors.set([]);
     this.draft = this.toDraft(benchCase, false);
+    // Restore the stored last-run comparison, if any (accept buttons still
+    // work on it; a fresh Run recomputes against the live engine).
+    const stored = this.storedRuns()[benchCase.id];
+    if (stored) {
+      this.outcome.set(stored);
+    }
   }
 
   private resetRun(): void {
@@ -274,7 +272,9 @@ export class BenchPage {
             this.runStatus.set(`${e.regulation} specialist finished…`);
           } else if (e.type === 'report' && e.report) {
             this.lastReport = e.report;
-            this.outcome.set(this.compare(e.report));
+            const outcome = this.compare(e.report);
+            this.outcome.set(outcome);
+            this.persistRun(outcome);
           } else if (e.type === 'error') {
             this.runError.set(e.message ?? 'Analysis failed.');
           }
@@ -294,7 +294,21 @@ export class BenchPage {
     }
   }
 
-  private compare(report: AnalysisReport): RunOutcome {
+  /** Store the outcome server-side so the test result survives page reloads. */
+  private persistRun(outcome: BenchRunOutcome): void {
+    const caseId = this.expandedId();
+    if (!caseId || this.draft?.isNew) {
+      return;
+    }
+    this.api.saveBenchRun(caseId, outcome).subscribe({
+      next: (stored) => {
+        this.storedRuns.update((runs) => ({ ...runs, [caseId]: stored }));
+        this.outcome.set(stored);
+      },
+    });
+  }
+
+  private compare(report: AnalysisReport): BenchRunOutcome {
     const d = this.draft!;
     const goldRelevant = new Set<string>(d.relevant);
     const goldProvisions = new Set(d.compliant ? [] : d.provisions);
@@ -346,7 +360,21 @@ export class BenchPage {
       this.draft[list] = [...this.draft[list], id];
     }
     if (this.lastReport) {
-      this.outcome.set(this.compare(this.lastReport));
+      const updated = this.compare(this.lastReport);
+      this.outcome.set(updated);
+      this.persistRun(updated);
+      return;
+    }
+    // Stored outcome (no live report this session): update it in place.
+    const o = this.outcome();
+    if (o) {
+      const unexpected = o.unexpected.filter((u) => u.id !== id);
+      const matched = list === 'provisions' && !o.matched.includes(id) ? [...o.matched, id] : o.matched;
+      const pass = o.riskOk && o.missed.length === 0 && o.routingMissed.length === 0
+        && !o.falsePositive && unexpected.length === 0;
+      const updated = { ...o, unexpected, matched, pass };
+      this.outcome.set(updated);
+      this.persistRun(updated);
     }
   }
 
@@ -383,6 +411,10 @@ export class BenchPage {
     this.api.deleteBenchCase(benchCase.id).subscribe({
       next: () => {
         this.cases.update((cs) => cs.filter((c) => c.id !== benchCase.id));
+        this.storedRuns.update((runs) => {
+          const { [benchCase.id]: _removed, ...rest } = runs;
+          return rest;
+        });
         if (this.expandedId() === benchCase.id) {
           this.expandedId.set(null);
           this.draft = null;

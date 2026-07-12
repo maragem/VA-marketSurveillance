@@ -7,6 +7,7 @@ import {
   AnalysisReport,
   AnalyticsData,
   BenchCase,
+  BenchRunOutcome,
   CampaignSubmission,
   CellarMetadata,
   GraphFull,
@@ -68,6 +69,14 @@ export class ApiService {
 
   deleteBenchCase(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/bench/cases/${encodeURIComponent(id)}`);
+  }
+
+  benchRuns(): Observable<Record<string, BenchRunOutcome>> {
+    return this.http.get<Record<string, BenchRunOutcome>>(`${this.base}/bench/runs`);
+  }
+
+  saveBenchRun(id: string, outcome: BenchRunOutcome): Observable<BenchRunOutcome> {
+    return this.http.put<BenchRunOutcome>(`${this.base}/bench/runs/${encodeURIComponent(id)}`, outcome);
   }
 
   youtubeSearch(q: string, uploadDate?: string, sortBy?: string): Observable<YouTubeSearchResult[]> {
