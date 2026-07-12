@@ -200,7 +200,15 @@ python bench/run.py --base-url https://<your-app>.up.railway.app --runs 3
 See `bench/README.md` for the case format, the gold-label review workflow, and metric
 definitions. Run it after any prompt, graph, or model change. The **Benchmark** page in
 the app provides a review UI for the gold labels: edit cases with graph-validated
-provision pickers, then export the corrected `cases.jsonl` to commit back.
+provision pickers, run cases against the live engine with a gold-vs-outcome comparison,
+then export the corrected `cases.jsonl` to commit back.
+
+The benchmark also feeds **engine calibration** (`knowledge/calibration.json`): human-approved
+rules — general legal principles distilled from review deviations, e.g. DSA platform duties
+don't bind advertisers — are injected into the specialist agents' prompts on every analysis.
+The Benchmark page manages the rules ("Propose lessons from benchmark" drafts candidates from
+stored deviations; you approve or dismiss) and exports the file for committing. To keep the
+benchmark an honest measurement, rules must never encode case-specific answers.
 
 ## Repository layout
 

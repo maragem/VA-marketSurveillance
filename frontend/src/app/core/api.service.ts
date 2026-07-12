@@ -9,7 +9,10 @@ import {
   BenchAdjudication,
   BenchCase,
   BenchRunOutcome,
+  Calibration,
+  CalibrationRule,
   CampaignSubmission,
+  LessonProposal,
   CellarMetadata,
   GraphFull,
   StreamEvent,
@@ -70,6 +73,22 @@ export class ApiService {
 
   deleteBenchCase(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/bench/cases/${encodeURIComponent(id)}`);
+  }
+
+  calibration(): Observable<Calibration> {
+    return this.http.get<Calibration>(`${this.base}/calibration`);
+  }
+
+  addCalibrationRule(regulation: string, rule: string, origin: string): Observable<CalibrationRule> {
+    return this.http.post<CalibrationRule>(`${this.base}/calibration/rules`, { regulation, rule, origin });
+  }
+
+  deleteCalibrationRule(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/calibration/rules/${encodeURIComponent(id)}`);
+  }
+
+  proposeLessons(): Observable<{ proposals: LessonProposal[] }> {
+    return this.http.post<{ proposals: LessonProposal[] }>(`${this.base}/bench/lessons/propose`, {});
   }
 
   adjudicateFinding(campaign: CampaignSubmission, finding: {

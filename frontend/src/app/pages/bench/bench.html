@@ -18,6 +18,86 @@
   </eui-alert>
 }
 
+<eui-card class="case calib">
+  <eui-card-content>
+    <div class="case__head" (click)="calibOpen.set(!calibOpen())">
+      <span class="case__id">⚙ Engine calibration — lessons learned</span>
+      <span euiBadge euiSizeS euiInfo>{{ calibCount() }} active rule{{ calibCount() === 1 ? '' : 's' }}</span>
+      <span class="case__spacer"></span>
+      <span class="case__count">injected into every analysis</span>
+      <span class="case__caret">{{ calibOpen() ? '▾' : '▸' }}</span>
+    </div>
+
+    @if (calibOpen()) {
+      <div class="calib__body">
+        <p class="calib__intro">
+          Approved rules are added to the specialist agents' prompts on every analysis, correcting
+          error patterns found through benchmark review. Rules must be general legal principles —
+          never case-specific facts, or the benchmark stops being an honest measurement.
+          Export and commit <code>knowledge/calibration.json</code> to version them.
+        </p>
+
+        @for (section of sections; track section) {
+          @if ((calibration()[section] ?? []).length > 0) {
+            <p class="calib__section">{{ section === 'GLOBAL' ? 'GLOBAL (all specialists)' : section }}</p>
+            @for (rule of calibration()[section]; track rule.id) {
+              <div class="calib__rule">
+                <span class="calib__text">{{ rule.rule }}</span>
+                <span class="calib__origin">{{ rule.origin }}</span>
+                <button type="button" class="prov__act" title="Remove rule"
+                        (click)="deleteRule(section, rule)">×</button>
+              </div>
+            }
+          }
+        }
+
+        <form class="calib__add" (ngSubmit)="addManualRule()">
+          <select name="newRuleReg" [(ngModel)]="newRuleReg" aria-label="Rule scope">
+            @for (section of sections; track section) {
+              <option [value]="section">{{ section }}</option>
+            }
+          </select>
+          <input name="newRuleText" [(ngModel)]="newRuleText"
+                 placeholder="Write a general calibration rule (min 20 characters)…" />
+          <button euiButton euiSecondary euiSizeS type="submit"
+                  [euiDisabled]="newRuleText.trim().length < 20">Add rule</button>
+        </form>
+        @if (calibError()) {
+          <p class="uxf__err">{{ calibError() }}</p>
+        }
+
+        <div class="calib__actions">
+          <button euiButton euiPrimary euiSizeS [euiDisabled]="proposing()" (buttonClick)="proposeLessons()">
+            {{ proposing() ? 'Analysing benchmark deviations…' : '✨ Propose lessons from benchmark' }}
+          </button>
+          <a euiButton euiSecondary euiSizeS href="/api/calibration/export" download>Export calibration.json</a>
+        </div>
+        @if (proposeError()) {
+          <p class="uxf__err">{{ proposeError() }}</p>
+        }
+
+        @if (proposals(); as props) {
+          @if (props.length === 0) {
+            <p class="muted calib__none">No systematic patterns found in the stored runs — nothing to learn yet.</p>
+          }
+          @for (p of props; track p.rule) {
+            <div class="calib__proposal">
+              <p class="calib__ptext"><strong>{{ p.regulation }}</strong> — {{ p.rule }}</p>
+              <p class="calib__why">{{ p.why }}
+                <span class="calib__origin">evidence: {{ p.evidence_case_ids.join(', ') }}</span>
+              </p>
+              <div class="calib__pactions">
+                <button type="button" class="run__accept" (click)="approveProposal(p)">✓ Approve — teach the engine</button>
+                <button type="button" class="run__accept" (click)="dismissProposal(p)">Dismiss</button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+  </eui-card-content>
+</eui-card>
+
 @if (loading()) {
   <p class="muted">Loading…</p>
 } @else if (cases().length === 0) {

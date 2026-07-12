@@ -49,7 +49,7 @@ You review a marketing campaign submitted as text and assess it ONLY against thi
 
 Provisions of your regulation available in the knowledge graph:
 {digest}
-
+{calibration}
 Method:
 1. Identify the concrete practices in the campaign (claims, targeting, AI usage, design tactics, audiences).
 2. Use search_regulation_graph / expand_provision / get_provision to ground every finding in a specific provision. Never cite a provision you have not retrieved from the graph.
@@ -60,6 +60,14 @@ Method:
 When done, call submit_assessment exactly once with all findings."""
 
 
+def _calibration_block(rules: list[str]) -> str:
+    if not rules:
+        return ""
+    lines = "\n".join(f"- {rule}" for rule in rules)
+    return ("\nCalibration notes from human benchmark review — they correct known past errors "
+            f"of this system; apply them strictly:\n{lines}\n")
+
+
 async def run_regulation_agent(
     client: AsyncAnthropic,
     regulation: str,
@@ -67,11 +75,13 @@ async def run_regulation_agent(
     triage_summary: str,
     executor: GraphToolExecutor,
     emit: Callable[[dict], Awaitable[None]],
+    calibration: list[str] | None = None,
 ) -> RegulationVerdict:
     graph = executor.graph
     system = SYSTEM_PROMPT.format(
         label=config.REGULATION_LABELS[regulation],
         digest=graph.regulation_digest(regulation),
+        calibration=_calibration_block(calibration or []),
     )
     messages = [{
         "role": "user",

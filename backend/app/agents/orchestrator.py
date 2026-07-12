@@ -100,11 +100,12 @@ async def _forced_tool_call(client: AsyncAnthropic, system: str, user: str, tool
 
 
 class Orchestrator:
-    def __init__(self, graph: KnowledgeGraph, retriever: GraphRetriever):
+    def __init__(self, graph: KnowledgeGraph, retriever: GraphRetriever, calibration=None):
         self.graph = graph
         self.retriever = retriever
         self.executor = GraphToolExecutor(graph, retriever)
         self.client = config.make_async_client()
+        self.calibration = calibration  # CalibrationStore | None
 
     async def run(self, report: AnalysisReport, emit: Callable[[dict], Awaitable[None]]) -> AnalysisReport:
         if self.client is None:
@@ -138,11 +139,15 @@ class Orchestrator:
                     "message": f"Dispatching {len(regulations)} specialist agents: {', '.join(regulations)}",
                     "regulations": regulations})
 
+        calibration_rules = {reg: await self.calibration.rules_for(reg) for reg in regulations} \
+            if self.calibration else {}
+
         async def run_one(reg: str) -> RegulationVerdict:
             await emit({"type": "agent_started", "regulation": reg})
             try:
                 verdict = await run_regulation_agent(
-                    self.client, reg, block, triage_summary, self.executor, emit)
+                    self.client, reg, block, triage_summary, self.executor, emit,
+                    calibration=calibration_rules.get(reg))
             except Exception as exc:  # one agent failing must not sink the run
                 verdict = RegulationVerdict(
                     regulation=reg, status="attention", findings=[],

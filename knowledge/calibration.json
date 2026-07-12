@@ -1,0 +1,20 @@
+{
+  "_comment": "Human-approved calibration rules injected into the specialist agents' prompts. They encode lessons from benchmark review — general legal principles only, never case-specific facts. GLOBAL rules reach every specialist; regulation keys reach that specialist only. Managed from the Benchmark page (working copy on the data volume); export and commit here to version.",
+  "GLOBAL": [
+    {
+      "id": "global-specificity",
+      "rule": "Cite the most specific provision that covers the conduct. When a specific prohibition squarely applies (e.g. a UCPD Annex I blacklist item), do not add separate findings for general clauses that merely restate the same conduct — reference them in the rationale instead.",
+      "origin": "seed — benchmark review 2026-07-12"
+    }
+  ],
+  "AI_ACT": [],
+  "GDPR": [],
+  "DSA": [
+    {
+      "id": "dsa-addressee",
+      "rule": "The DSA's platform obligations (Articles 25, 26 and 28) are addressed to providers of online platforms, not to advertisers or traders whose campaigns merely run on a platform. Cite them only when the campaign's operator itself provides the online interface in question (e.g. its own marketplace or booking platform); advertiser-side conduct belongs under the UCPD, or the GDPR for data practices.",
+      "origin": "seed — benchmark review 2026-07-12"
+    }
+  ],
+  "UCPD": []
+}

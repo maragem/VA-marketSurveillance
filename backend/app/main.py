@@ -22,9 +22,12 @@ logger = logging.getLogger("marketsurveillance")
 async def lifespan(app: FastAPI):
     graph = KnowledgeGraph(config.KNOWLEDGE_DIR)
     retriever = GraphRetriever(graph)
+    from .calibration import CalibrationStore
+    calibration = CalibrationStore(config.KNOWLEDGE_DIR / "calibration.json", config.DATA_DIR)
     app.state.graph = graph
     app.state.retriever = retriever
-    app.state.orchestrator = Orchestrator(graph, retriever)
+    app.state.calibration = calibration
+    app.state.orchestrator = Orchestrator(graph, retriever, calibration)
     app.state.store = ReportStore(config.DATA_DIR)
     app.state.cellar = CellarClient()
     from .bench import BenchStore

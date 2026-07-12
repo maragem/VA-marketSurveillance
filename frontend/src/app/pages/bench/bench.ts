@@ -10,7 +10,10 @@ import {
   BenchCase,
   BenchRunOutcome,
   BenchUnexpectedFinding,
+  Calibration,
+  CalibrationRule,
   GraphNode,
+  LessonProposal,
   Regulation,
 } from '../../core/models';
 
@@ -70,6 +73,19 @@ export class BenchPage {
   protected readonly adjudicatingId = signal<string | null>(null);
   protected readonly adjError = signal<string | null>(null);
 
+  protected readonly sections = ['GLOBAL', 'AI_ACT', 'GDPR', 'DSA', 'UCPD'];
+  protected readonly calibration = signal<Calibration>({});
+  protected readonly calibOpen = signal(false);
+  protected readonly calibError = signal<string | null>(null);
+  protected readonly proposing = signal(false);
+  protected readonly proposals = signal<LessonProposal[] | null>(null);
+  protected readonly proposeError = signal<string | null>(null);
+  protected newRuleReg = 'GLOBAL';
+  protected newRuleText = '';
+
+  protected readonly calibCount = computed(() =>
+    this.sections.reduce((n, s) => n + (this.calibration()[s]?.length ?? 0), 0));
+
   protected draft: Draft | null = null;
   private lastReport: AnalysisReport | null = null;
   private runAbort: AbortController | null = null;
@@ -96,6 +112,9 @@ export class BenchPage {
     });
     this.api.graphFull().subscribe({
       next: (g) => this.provisionNodes.set(g.nodes.filter((n) => n.type === 'provision')),
+    });
+    this.api.calibration().subscribe({
+      next: (calibration) => this.calibration.set(calibration),
     });
     this.api.benchRuns().subscribe({
       next: (runs) => {
@@ -195,6 +214,70 @@ export class BenchPage {
         this.adjError.set(err?.error?.detail ?? 'Could not get a second opinion.');
         this.adjudicatingId.set(null);
       },
+    });
+  }
+
+  // ---- calibration (lessons learned) -------------------------------------
+
+  protected proposeLessons(): void {
+    if (this.proposing()) return;
+    this.proposing.set(true);
+    this.proposeError.set(null);
+    this.api.proposeLessons().subscribe({
+      next: (r) => {
+        this.proposals.set(r.proposals);
+        this.proposing.set(false);
+      },
+      error: (err) => {
+        this.proposeError.set(err?.error?.detail ?? 'Could not generate proposals.');
+        this.proposing.set(false);
+      },
+    });
+  }
+
+  protected approveProposal(proposal: LessonProposal): void {
+    this.calibError.set(null);
+    const origin = `benchmark lessons — evidence: ${proposal.evidence_case_ids.join(', ')}`;
+    this.api.addCalibrationRule(proposal.regulation, proposal.rule, origin).subscribe({
+      next: (rule) => {
+        this.calibration.update((c) => ({
+          ...c,
+          [proposal.regulation]: [...(c[proposal.regulation] ?? []), rule],
+        }));
+        this.dismissProposal(proposal);
+      },
+      error: (err) => this.calibError.set(err?.error?.detail ?? 'Could not add the rule.'),
+    });
+  }
+
+  protected dismissProposal(proposal: LessonProposal): void {
+    this.proposals.update((props) => (props ?? []).filter((p) => p !== proposal));
+  }
+
+  protected addManualRule(): void {
+    const rule = this.newRuleText.trim();
+    if (rule.length < 20) return;
+    this.calibError.set(null);
+    this.api.addCalibrationRule(this.newRuleReg, rule, 'manual').subscribe({
+      next: (added) => {
+        this.calibration.update((c) => ({
+          ...c,
+          [this.newRuleReg]: [...(c[this.newRuleReg] ?? []), added],
+        }));
+        this.newRuleText = '';
+      },
+      error: (err) => this.calibError.set(err?.error?.detail ?? 'Could not add the rule.'),
+    });
+  }
+
+  protected deleteRule(section: string, rule: CalibrationRule): void {
+    if (!confirm('Remove this calibration rule? Future analyses will no longer apply it.')) return;
+    this.api.deleteCalibrationRule(rule.id).subscribe({
+      next: () => this.calibration.update((c) => ({
+        ...c,
+        [section]: (c[section] ?? []).filter((r) => r.id !== rule.id),
+      })),
+      error: (err) => this.calibError.set(err?.error?.detail ?? 'Could not remove the rule.'),
     });
   }
 

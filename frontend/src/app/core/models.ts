@@ -29,6 +29,21 @@ export interface BenchCase {
   gold: BenchGold;
 }
 
+export interface CalibrationRule {
+  id: string;
+  rule: string;
+  origin?: string;
+}
+
+export type Calibration = Record<string, CalibrationRule[]>;
+
+export interface LessonProposal {
+  regulation: string;
+  rule: string;
+  why: string;
+  evidence_case_ids: string[];
+}
+
 export interface BenchAdjudication {
   verdict: 'must_find' | 'acceptable_extra' | 'reject';
   confidence: 'high' | 'medium' | 'low';

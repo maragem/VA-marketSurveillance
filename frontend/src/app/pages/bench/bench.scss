@@ -364,6 +364,108 @@
   }
 }
 
+.calib {
+  &__body {
+    margin-top: 1rem;
+    border-top: 1px solid #e3e8ee;
+    padding-top: 1rem;
+  }
+
+  &__intro {
+    color: #44535f;
+    font-size: 0.88rem;
+    max-width: 58rem;
+    margin: 0 0 1rem;
+  }
+
+  &__section {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7a89;
+    margin: 0.8rem 0 0.35rem;
+  }
+
+  &__rule {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.45rem 0.65rem;
+    background: #f4f6f9;
+    border: 1px solid #e3e8ee;
+    border-radius: 4px;
+    margin-bottom: 0.35rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__origin {
+    font-size: 0.72rem;
+    color: #8d9aa7;
+    white-space: nowrap;
+  }
+
+  &__add {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+
+    select,
+    input {
+      font: inherit;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid #cfd5de;
+      border-radius: 4px;
+    }
+
+    input {
+      flex: 1;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  &__none {
+    margin-top: 0.8rem;
+  }
+
+  &__proposal {
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #cfe0f0;
+    border-left: 3px solid #006fb4;
+    border-radius: 0 4px 4px 0;
+    background: #f6fafd;
+  }
+
+  &__ptext {
+    margin: 0 0 0.3rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
+  }
+
+  &__why {
+    margin: 0 0 0.5rem;
+    font-size: 0.82rem;
+    color: #44535f;
+  }
+
+  &__pactions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
 .uxf {
   margin-bottom: 0.45rem;
 

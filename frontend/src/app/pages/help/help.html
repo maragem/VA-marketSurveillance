@@ -190,6 +190,14 @@
             deliberately skeptical reviewer model to adjudicate the citation on scope, addressee
             and textual support. It returns a verdict — correct citation, defensible extra, or
             likely engine error — with reasoning and a one-click Apply.</li>
+        <li>The <strong>Engine calibration</strong> panel at the top closes the loop: it holds
+            human-approved rules that are injected into the specialist agents' prompts on every
+            analysis, so the engine stops repeating mistakes found in review. <strong>Propose
+            lessons from benchmark</strong> distils the stored deviations into candidate rules —
+            general legal principles only, never case answers — which you approve, edit or
+            dismiss. Export <code>calibration.json</code> and commit it to version what the
+            engine has been taught. Because the engine learns from these cases, keep new cases
+            coming — a case that shaped a rule no longer measures it independently.</li>
         <li><strong>Add or delete cases</strong> to grow the set; keep ids stable so scorecards
             stay comparable.</li>
         <li><strong>Export cases.jsonl</strong> and commit it to the repository to version the

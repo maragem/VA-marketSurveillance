@@ -183,6 +183,73 @@ async def bench_delete(case_id: str, request: Request):
         raise HTTPException(status_code=404, detail=str(exc))
 
 
+# ---------------------------------------------------------------------------
+# Engine calibration (lessons learned from benchmark review)
+# ---------------------------------------------------------------------------
+
+class CalibrationRuleRequest(BaseModel):
+    regulation: str
+    rule: str
+    origin: str = "manual"
+
+
+@router.get("/calibration")
+async def calibration_rules(request: Request):
+    """Approved calibration rules, grouped by section (GLOBAL + one per regulation)."""
+    return await request.app.state.calibration.all()
+
+
+@router.post("/calibration/rules", status_code=201)
+async def calibration_add(body: CalibrationRuleRequest, request: Request):
+    try:
+        return await request.app.state.calibration.add(
+            body.regulation, body.rule, body.origin[:200])
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.delete("/calibration/rules/{rule_id}", status_code=204)
+async def calibration_remove(rule_id: str, request: Request):
+    try:
+        await request.app.state.calibration.remove(rule_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.get("/calibration/export")
+async def calibration_export(request: Request):
+    """Download the working calibration set, ready to commit to knowledge/calibration.json."""
+    text = await request.app.state.calibration.export_text()
+    return Response(
+        content=text,
+        media_type="application/json",
+        headers={"Content-Disposition": 'attachment; filename="calibration.json"'},
+    )
+
+
+@router.post("/bench/lessons/propose")
+async def bench_propose_lessons(request: Request):
+    """Distil benchmark deviations into candidate calibration rules (human approves)."""
+    if not config.llm_available():
+        raise HTTPException(status_code=503,
+                            detail="Lesson proposals require LLM credentials (agentic mode).")
+    from ..calibration import propose_lessons
+    bench = request.app.state.bench
+    cases = await bench.list()
+    runs = await bench.runs()
+    if not any(c["id"] in runs for c in cases):
+        raise HTTPException(status_code=400,
+                            detail="No stored test runs yet — run some cases first, so there are "
+                                   "deviations to learn from.")
+    existing = await request.app.state.calibration.all()
+    try:
+        proposals = await propose_lessons(request.app.state.graph, cases, runs, existing)
+    except Exception as exc:
+        logger.exception("lesson proposal failed")
+        raise HTTPException(status_code=502, detail=f"Lesson proposal failed: {exc}")
+    return {"proposals": proposals}
+
+
 class AdjudicateRequest(BaseModel):
     campaign: CampaignSubmission
     provision_id: str
