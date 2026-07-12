@@ -5,7 +5,14 @@ import { EUI_BADGE } from '@eui/components/eui-badge';
 import { EuiButtonComponent } from '@eui/components/eui-button';
 import { EUI_CARD } from '@eui/components/eui-card';
 import { ApiService } from '../../core/api.service';
-import { AnalysisReport, BenchCase, BenchRunOutcome, GraphNode, Regulation } from '../../core/models';
+import {
+  AnalysisReport,
+  BenchCase,
+  BenchRunOutcome,
+  BenchUnexpectedFinding,
+  GraphNode,
+  Regulation,
+} from '../../core/models';
 
 const RISK_ORDER: Record<string, number> = { compliant: 0, low: 1, medium: 2, high: 3, critical: 4, unknown: -1 };
 const ACTIONABLE = ['critical', 'high', 'medium'];
@@ -59,6 +66,9 @@ export class BenchPage {
   protected readonly runError = signal<string | null>(null);
   protected readonly outcome = signal<BenchRunOutcome | null>(null);
   protected readonly storedRuns = signal<Record<string, BenchRunOutcome>>({});
+  protected readonly whyOpen = signal<string | null>(null);
+  protected readonly adjudicatingId = signal<string | null>(null);
+  protected readonly adjError = signal<string | null>(null);
 
   protected draft: Draft | null = null;
   private lastReport: AnalysisReport | null = null;
@@ -88,7 +98,15 @@ export class BenchPage {
       next: (g) => this.provisionNodes.set(g.nodes.filter((n) => n.type === 'provision')),
     });
     this.api.benchRuns().subscribe({
-      next: (runs) => this.storedRuns.set(runs),
+      next: (runs) => {
+        this.storedRuns.set(runs);
+        // The user may have expanded a case before the stored runs arrived —
+        // restore its outcome now.
+        const expanded = this.expandedId();
+        if (expanded && !this.outcome() && runs[expanded]) {
+          this.outcome.set(runs[expanded]);
+        }
+      },
     });
   }
 
@@ -131,6 +149,62 @@ export class BenchPage {
     this.runError.set(null);
     this.outcome.set(null);
     this.lastReport = null;
+    this.whyOpen.set(null);
+    this.adjudicatingId.set(null);
+    this.adjError.set(null);
+  }
+
+  protected toggleWhy(id: string): void {
+    this.adjError.set(null);
+    this.whyOpen.set(this.whyOpen() === id ? null : id);
+  }
+
+  protected adjVerdictLabel(verdict: string): string {
+    return ({
+      must_find: 'correct citation — should be a must-find',
+      acceptable_extra: 'defensible — acceptable extra',
+      reject: 'likely engine error — do not accept',
+    } as Record<string, string>)[verdict] ?? verdict;
+  }
+
+  /** Ask the model for an adversarial second opinion on a disputed citation. */
+  protected adjudicate(finding: BenchUnexpectedFinding): void {
+    if (!this.draft || this.adjudicatingId()) return;
+    const campaign = this.fromDraft(this.draft).campaign;
+    this.adjudicatingId.set(finding.id);
+    this.adjError.set(null);
+    this.api.adjudicateFinding(campaign, {
+      provision_id: finding.id,
+      severity: finding.severity,
+      rationale: finding.rationale,
+      evidence_quote: finding.evidence_quote,
+    }).subscribe({
+      next: (adjudication) => {
+        const o = this.outcome();
+        if (o) {
+          const updated = {
+            ...o,
+            unexpected: o.unexpected.map((u) => (u.id === finding.id ? { ...u, adjudication } : u)),
+          };
+          this.outcome.set(updated);
+          this.persistRun(updated);
+        }
+        this.adjudicatingId.set(null);
+      },
+      error: (err) => {
+        this.adjError.set(err?.error?.detail ?? 'Could not get a second opinion.');
+        this.adjudicatingId.set(null);
+      },
+    });
+  }
+
+  protected applyAdjudication(finding: BenchUnexpectedFinding): void {
+    const verdict = finding.adjudication?.verdict;
+    if (verdict === 'must_find') {
+      this.acceptUnexpected(finding.id, 'provisions');
+    } else if (verdict === 'acceptable_extra') {
+      this.acceptUnexpected(finding.id, 'acceptable_extra');
+    }
   }
 
   private toDraft(c: BenchCase, isNew: boolean): Draft {
@@ -322,9 +396,14 @@ export class BenchPage {
     const matched = [...goldProvisions].filter((p) => foundAny.has(p));
     const missed = [...goldProvisions].filter((p) => !foundAny.has(p));
     const seen = new Set<string>();
-    const unexpected = actionable
+    const unexpected: BenchUnexpectedFinding[] = actionable
       .filter((f) => !allowed.has(f.provision_id) && !seen.has(f.provision_id) && seen.add(f.provision_id) !== undefined)
-      .map((f) => ({ id: f.provision_id, severity: f.severity }));
+      .map((f) => ({
+        id: f.provision_id,
+        severity: f.severity,
+        rationale: f.rationale,
+        evidence_quote: f.evidence_quote,
+      }));
 
     const riskRank = RISK_ORDER[report.overall_risk] ?? -1;
     const falsePositive = d.compliant && (actionable.length > 0 || riskRank >= RISK_ORDER['medium']);

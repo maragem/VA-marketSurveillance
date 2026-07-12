@@ -29,6 +29,20 @@ export interface BenchCase {
   gold: BenchGold;
 }
 
+export interface BenchAdjudication {
+  verdict: 'must_find' | 'acceptable_extra' | 'reject';
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+}
+
+export interface BenchUnexpectedFinding {
+  id: string;
+  severity: string;
+  rationale?: string;
+  evidence_quote?: string | null;
+  adjudication?: BenchAdjudication;
+}
+
 /** Stored gold-vs-run comparison for a benchmark case (mirrors bench/run.py scoring). */
 export interface BenchRunOutcome {
   engine: string;
@@ -41,7 +55,7 @@ export interface BenchRunOutcome {
   routingExtra: string[];
   matched: string[];
   missed: string[];
-  unexpected: { id: string; severity: string }[];
+  unexpected: BenchUnexpectedFinding[];
   pass: boolean;
   recorded_at?: string;
 }

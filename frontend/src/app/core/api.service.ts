@@ -6,6 +6,7 @@ import {
   AnalysisListItem,
   AnalysisReport,
   AnalyticsData,
+  BenchAdjudication,
   BenchCase,
   BenchRunOutcome,
   CampaignSubmission,
@@ -69,6 +70,18 @@ export class ApiService {
 
   deleteBenchCase(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/bench/cases/${encodeURIComponent(id)}`);
+  }
+
+  adjudicateFinding(campaign: CampaignSubmission, finding: {
+    provision_id: string; severity: string; rationale?: string; evidence_quote?: string | null;
+  }): Observable<BenchAdjudication> {
+    return this.http.post<BenchAdjudication>(`${this.base}/bench/adjudicate`, {
+      campaign,
+      provision_id: finding.provision_id,
+      severity: finding.severity,
+      rationale: finding.rationale ?? '',
+      evidence_quote: finding.evidence_quote ?? null,
+    });
   }
 
   benchRuns(): Observable<Record<string, BenchRunOutcome>> {

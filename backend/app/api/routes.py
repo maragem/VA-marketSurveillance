@@ -183,6 +183,32 @@ async def bench_delete(case_id: str, request: Request):
         raise HTTPException(status_code=404, detail=str(exc))
 
 
+class AdjudicateRequest(BaseModel):
+    campaign: CampaignSubmission
+    provision_id: str
+    severity: str = "medium"
+    rationale: str = ""
+    evidence_quote: str | None = None
+
+
+@router.post("/bench/adjudicate")
+async def bench_adjudicate(body: AdjudicateRequest, request: Request):
+    """Second opinion on a disputed engine citation (benchmark review aid)."""
+    if not config.llm_available():
+        raise HTTPException(status_code=503,
+                            detail="Second opinions require LLM credentials (agentic mode).")
+    from ..bench import adjudicate_finding
+    try:
+        return await adjudicate_finding(
+            request.app.state.graph, body.campaign, body.provision_id,
+            body.severity, body.rationale, body.evidence_quote)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except Exception as exc:
+        logger.exception("adjudication failed")
+        raise HTTPException(status_code=502, detail=f"Adjudication failed: {exc}")
+
+
 @router.get("/bench/runs")
 async def bench_runs(request: Request):
     """Stored last-run outcome per case id."""

@@ -364,6 +364,121 @@
   }
 }
 
+.uxf {
+  margin-bottom: 0.45rem;
+
+  &__why {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: #006fb4;
+    text-decoration: underline;
+    padding: 0 0.15rem;
+
+    &:hover {
+      color: #004494;
+    }
+  }
+
+  &__detail {
+    margin: 0.45rem 0 0.6rem 0.4rem;
+    padding: 0.65rem 0.85rem;
+    background: #fff;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+    max-width: 46rem;
+  }
+
+  &__title {
+    margin: 0 0 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7a89;
+  }
+
+  &__rationale,
+  &__reasoning {
+    margin: 0 0 0.45rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #2c3844;
+  }
+
+  &__quote {
+    margin: 0 0 0.5rem;
+    padding: 0.35rem 0.7rem;
+    border-left: 3px solid #cfd5de;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #44535f;
+  }
+
+  &__adj {
+    margin-top: 0.55rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0 4px 4px 0;
+    border-left: 3px solid #6b7a89;
+    background: #f7f9fb;
+
+    &--must {
+      border-left-color: #467a39;
+      background: #f4f9f2;
+    }
+
+    &--extra {
+      border-left-color: #006fb4;
+      background: #f3f8fc;
+    }
+
+    &--reject {
+      border-left-color: #da2131;
+      background: #fdf6f6;
+    }
+  }
+
+  &__conf {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: 0.5rem;
+    color: #8d9aa7;
+  }
+
+  &__keep {
+    font-size: 0.82rem;
+    color: #9c1a24;
+    font-weight: 600;
+  }
+
+  &__adjbtn {
+    border: 1px solid #006fb4;
+    background: #fff;
+    color: #006fb4;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #f3f8fc;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+  }
+
+  &__err {
+    margin: 0.4rem 0 0;
+    font-size: 0.82rem;
+    color: #da2131;
+  }
+}
+
 .provadd {
   font: inherit;
   font-size: 0.85rem;

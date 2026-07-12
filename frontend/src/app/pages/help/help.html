@@ -183,7 +183,13 @@
         <li><strong>Run case</strong> executes the campaign through the engine (without storing a
             report) and shows a gold-vs-outcome comparison: risk calibration, triage routing,
             matched and missed must-finds, and unexpected findings — each of which you can accept
-            into the labels with one click, then save.</li>
+            into the labels with one click, then save. Run results are stored per case, shown as
+            a pass/fail badge in the list.</li>
+        <li>For each unexpected finding, <strong>why?</strong> reveals the engine's own rationale
+            and evidence quote, and <strong>⚖ Get second opinion</strong> asks an independent,
+            deliberately skeptical reviewer model to adjudicate the citation on scope, addressee
+            and textual support. It returns a verdict — correct citation, defensible extra, or
+            likely engine error — with reasoning and a one-click Apply.</li>
         <li><strong>Add or delete cases</strong> to grow the set; keep ids stable so scorecards
             stay comparable.</li>
         <li><strong>Export cases.jsonl</strong> and commit it to the repository to version the

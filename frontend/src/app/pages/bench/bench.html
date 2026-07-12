@@ -282,14 +282,63 @@
                 <span class="run__label">Unexpected findings</span>
                 <span>
                   @for (u of o.unexpected; track u.id) {
-                    <span class="run__item run__unexpected">
-                      <span euiBadge euiSizeS euiWarning>{{ u.severity }}</span>
-                      {{ provisionLabel(u.id) }}
-                      <button type="button" class="run__accept" title="Accept as must-find gold label"
-                              (click)="acceptUnexpected(u.id, 'provisions')">→ must-find</button>
-                      <button type="button" class="run__accept" title="Accept as acceptable extra"
-                              (click)="acceptUnexpected(u.id, 'acceptable_extra')">→ extra</button>
-                    </span>
+                    <div class="uxf">
+                      <span class="run__item run__unexpected">
+                        <span euiBadge euiSizeS euiWarning>{{ u.severity }}</span>
+                        {{ provisionLabel(u.id) }}
+                        <button type="button" class="run__accept" title="Accept as must-find gold label"
+                                (click)="acceptUnexpected(u.id, 'provisions')">→ must-find</button>
+                        <button type="button" class="run__accept" title="Accept as acceptable extra"
+                                (click)="acceptUnexpected(u.id, 'acceptable_extra')">→ extra</button>
+                        <button type="button" class="uxf__why"
+                                (click)="toggleWhy(u.id)">{{ whyOpen() === u.id ? 'hide reasoning' : 'why?' }}</button>
+                      </span>
+                      @if (whyOpen() === u.id) {
+                        <div class="uxf__detail">
+                          <p class="uxf__title">Engine's justification</p>
+                          @if (u.rationale) {
+                            <p class="uxf__rationale">{{ u.rationale }}</p>
+                            @if (u.evidence_quote) {
+                              <blockquote class="uxf__quote">“{{ u.evidence_quote }}”</blockquote>
+                            }
+                          } @else {
+                            <p class="muted">Not stored for this run — re-run the case to capture the
+                              engine's rationale.</p>
+                          }
+
+                          @if (u.adjudication; as adj) {
+                            <div class="uxf__adj"
+                                 [class.uxf__adj--must]="adj.verdict === 'must_find'"
+                                 [class.uxf__adj--extra]="adj.verdict === 'acceptable_extra'"
+                                 [class.uxf__adj--reject]="adj.verdict === 'reject'">
+                              <p class="uxf__title">
+                                ⚖ Second opinion: {{ adjVerdictLabel(adj.verdict) }}
+                                <span class="uxf__conf">confidence: {{ adj.confidence }}</span>
+                              </p>
+                              <p class="uxf__reasoning">{{ adj.reasoning }}</p>
+                              @if (adj.verdict === 'must_find' || adj.verdict === 'acceptable_extra') {
+                                <button type="button" class="run__accept"
+                                        (click)="applyAdjudication(u)">
+                                  Apply — {{ adj.verdict === 'must_find' ? 'add to must-find' : 'add to acceptable extras' }}
+                                </button>
+                              } @else {
+                                <span class="uxf__keep">Recommendation: don't accept — leave it counted
+                                  as an engine error.</span>
+                              }
+                            </div>
+                          } @else {
+                            <button type="button" class="uxf__adjbtn"
+                                    [disabled]="adjudicatingId() === u.id"
+                                    (click)="adjudicate(u)">
+                              {{ adjudicatingId() === u.id ? '⚖ Getting second opinion…' : '⚖ Get second opinion' }}
+                            </button>
+                            @if (adjError()) {
+                              <p class="uxf__err">{{ adjError() }}</p>
+                            }
+                          }
+                        </div>
+                      }
+                    </div>
                   } @empty {
                     <span class="run__good">none — all findings within the allowed set</span>
                   }
