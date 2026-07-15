@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EUI_ALERT } from '@eui/components/eui-alert';
@@ -9,6 +10,7 @@ import {
   AnalysisReport,
   BenchCase,
   BenchRunOutcome,
+  BenchSummary,
   BenchUnexpectedFinding,
   Calibration,
   CalibrationRule,
@@ -45,7 +47,7 @@ const RISKS = ['critical', 'high', 'medium', 'low', 'compliant'];
 
 @Component({
   selector: 'app-bench',
-  imports: [FormsModule, EuiButtonComponent, ...EUI_CARD, ...EUI_BADGE, ...EUI_ALERT],
+  imports: [DecimalPipe, FormsModule, EuiButtonComponent, ...EUI_CARD, ...EUI_BADGE, ...EUI_ALERT],
   templateUrl: './bench.html',
   styleUrl: './bench.scss',
 })
@@ -72,6 +74,10 @@ export class BenchPage {
   protected readonly whyOpen = signal<string | null>(null);
   protected readonly adjudicatingId = signal<string | null>(null);
   protected readonly adjError = signal<string | null>(null);
+
+  protected readonly summaryOpen = signal(false);
+  protected readonly summary = signal<BenchSummary | null>(null);
+  protected readonly summaryLoading = signal(false);
 
   protected readonly sections = ['GLOBAL', 'AI_ACT', 'GDPR', 'DSA', 'UCPD'];
   protected readonly calibration = signal<Calibration>({});
@@ -215,6 +221,31 @@ export class BenchPage {
         this.adjudicatingId.set(null);
       },
     });
+  }
+
+  /** Fetch a fresh aggregate of the stored runs whenever the panel opens. */
+  protected toggleSummary(): void {
+    const opening = !this.summaryOpen();
+    this.summaryOpen.set(opening);
+    if (opening) {
+      this.summaryLoading.set(true);
+      this.api.benchSummary().subscribe({
+        next: (s) => {
+          this.summary.set(s);
+          this.summaryLoading.set(false);
+        },
+        error: () => {
+          this.error.set('Could not load the results summary.');
+          this.summaryLoading.set(false);
+        },
+      });
+    }
+  }
+
+  protected rowResult(row: { run: boolean; pass?: boolean; false_positive?: boolean }): string {
+    if (!row.run) return '— not run';
+    if (row.pass) return '✅ pass';
+    return row.false_positive ? '❌ false positive' : '❌ deviates';
   }
 
   // ---- calibration (lessons learned) -------------------------------------

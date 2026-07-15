@@ -9,6 +9,7 @@ import {
   BenchAdjudication,
   BenchCase,
   BenchRunOutcome,
+  BenchSummary,
   Calibration,
   CalibrationRule,
   CampaignSubmission,
@@ -73,6 +74,10 @@ export class ApiService {
 
   deleteBenchCase(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/bench/cases/${encodeURIComponent(id)}`);
+  }
+
+  benchSummary(): Observable<BenchSummary> {
+    return this.http.get<BenchSummary>(`${this.base}/bench/summary`);
   }
 
   calibration(): Observable<Calibration> {

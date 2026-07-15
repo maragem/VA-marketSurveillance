@@ -9,6 +9,7 @@ back to the repository as the new seed.
 import asyncio
 import json
 import shutil
+from collections import Counter
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -229,3 +230,122 @@ class BenchStore:
                 runs[case_id] = outcome
                 self._write_runs(runs)
             await asyncio.to_thread(_apply)
+
+
+# ---------------------------------------------------------------------------
+# Results summary over the stored UI test runs
+# ---------------------------------------------------------------------------
+
+def build_summary(cases: list[dict], runs: dict, graph) -> dict:
+    """Aggregate the stored last-run outcomes into a scorecard-style summary."""
+    def ref(pid: str) -> str:
+        node = graph.get(pid)
+        return node["ref"] if node else pid
+
+    rows: list[dict] = []
+    unexpected_counter: Counter = Counter()
+    missed_counter: Counter = Counter()
+    gold_total = matched_total = 0
+    controls_run = false_positives = 0
+    risk_pass = routing_missed = 0
+    passed = 0
+    engines: set[str] = set()
+    latest = ""
+
+    for case in cases:
+        run = runs.get(case["id"])
+        row: dict = {"id": case["id"], "tier": case["tier"],
+                     "compliant_control": bool(case["gold"].get("compliant")), "run": bool(run)}
+        if run:
+            engines.add(run.get("engine") or "unknown")
+            latest = max(latest, run.get("recorded_at") or "")
+            unexpected_ids = [u.get("id") for u in run.get("unexpected") or []]
+            row.update({
+                "pass": bool(run.get("pass")),
+                "engine": run.get("engine"),
+                "overall_risk": run.get("overallRisk"),
+                "min_risk": case["gold"].get("min_risk"),
+                "risk_ok": bool(run.get("riskOk")),
+                "matched": run.get("matched") or [],
+                "missed": run.get("missed") or [],
+                "unexpected": unexpected_ids,
+                "false_positive": bool(run.get("falsePositive")),
+                "routing_missed": run.get("routingMissed") or [],
+                "recorded_at": run.get("recorded_at"),
+            })
+            passed += 1 if row["pass"] else 0
+            risk_pass += 1 if row["risk_ok"] else 0
+            routing_missed += len(row["routing_missed"])
+            if row["compliant_control"]:
+                controls_run += 1
+                false_positives += 1 if row["false_positive"] else 0
+            else:
+                gold_total += len(case["gold"].get("provisions") or [])
+                matched_total += len(row["matched"])
+            for pid in unexpected_ids:
+                unexpected_counter[pid] += 1
+            for pid in row["missed"]:
+                missed_counter[pid] += 1
+        rows.append(row)
+
+    run_count = sum(1 for r in rows if r["run"])
+    return {
+        "cases_total": len(cases),
+        "cases_run": run_count,
+        "cases_not_run": [r["id"] for r in rows if not r["run"]],
+        "passed": passed,
+        "failed": run_count - passed,
+        "engines": sorted(engines),
+        "latest_run_at": latest or None,
+        "gold_provision_recall": round(matched_total / gold_total, 3) if gold_total else None,
+        "gold_provisions_total": gold_total,
+        "gold_provisions_matched": matched_total,
+        "risk_calibration_passed": risk_pass,
+        "routing_missed_total": routing_missed,
+        "unexpected_total": sum(unexpected_counter.values()),
+        "false_positives_on_controls": false_positives,
+        "controls_run": controls_run,
+        "top_unexpected": [{"provision_id": pid, "ref": ref(pid), "count": count}
+                           for pid, count in unexpected_counter.most_common(8)],
+        "top_missed": [{"provision_id": pid, "ref": ref(pid), "count": count}
+                       for pid, count in missed_counter.most_common(8)],
+        "cases": rows,
+    }
+
+
+def summary_markdown(summary: dict) -> str:
+    lines = [
+        "# Benchmark results summary",
+        "",
+        f"- Engine(s): **{', '.join(summary['engines']) or '—'}** · latest run: {summary['latest_run_at'] or '—'}",
+        f"- Cases run: **{summary['cases_run']}/{summary['cases_total']}**"
+        + (f" (not yet run: {', '.join(summary['cases_not_run'])})" if summary["cases_not_run"] else ""),
+        f"- Passed: **{summary['passed']}** · deviating: **{summary['failed']}**",
+        f"- Gold-provision recall: **{summary['gold_provision_recall'] if summary['gold_provision_recall'] is not None else '—'}**"
+        f" ({summary['gold_provisions_matched']}/{summary['gold_provisions_total']})",
+        f"- Risk calibration passed: **{summary['risk_calibration_passed']}/{summary['cases_run']}**",
+        f"- Missed triage routings: **{summary['routing_missed_total']}**",
+        f"- Unexpected actionable findings: **{summary['unexpected_total']}**",
+        f"- False positives on compliant controls: **{summary['false_positives_on_controls']}/{summary['controls_run']}**",
+    ]
+    if summary["top_unexpected"]:
+        lines += ["", "## Most frequent unexpected citations", ""]
+        lines += [f"- {u['ref']} — {u['count']}×" for u in summary["top_unexpected"]]
+    if summary["top_missed"]:
+        lines += ["", "## Most frequently missed must-finds", ""]
+        lines += [f"- {m['ref']} — {m['count']}×" for m in summary["top_missed"]]
+    lines += [
+        "", "## Per case", "",
+        "| case | tier | result | risk (min) | missed | unexpected | recorded |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for r in summary["cases"]:
+        if not r["run"]:
+            lines.append(f"| {r['id']} | {r['tier']} | — not run | | | | |")
+            continue
+        result = "✅ pass" if r["pass"] else ("❌ false positive" if r["false_positive"] else "❌ deviates")
+        recorded = (r.get("recorded_at") or "")[:16].replace("T", " ")
+        lines.append(
+            f"| {r['id']} | {r['tier']} | {result} | {r['overall_risk']} ({r['min_risk']}) "
+            f"| {', '.join(r['missed']) or '—'} | {', '.join(r['unexpected']) or '—'} | {recorded} |")
+    return "\n".join(lines) + "\n"

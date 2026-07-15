@@ -296,6 +296,34 @@ async def bench_save_run(case_id: str, outcome: dict, request: Request):
     return outcome
 
 
+@router.get("/bench/summary")
+async def bench_summary(request: Request):
+    """Scorecard-style aggregate of the stored UI test runs."""
+    from ..bench import build_summary
+    bench = request.app.state.bench
+    return build_summary(await bench.list(), await bench.runs(), request.app.state.graph)
+
+
+@router.get("/bench/summary/export")
+async def bench_summary_export(request: Request, format: str = "md"):
+    """Download the results summary as markdown or JSON."""
+    from ..bench import build_summary, summary_markdown
+    bench = request.app.state.bench
+    summary = build_summary(await bench.list(), await bench.runs(), request.app.state.graph)
+    stamp = (summary.get("latest_run_at") or "")[:10] or "latest"
+    if format == "json":
+        return Response(
+            content=json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="benchmark-summary-{stamp}.json"'},
+        )
+    return Response(
+        content=summary_markdown(summary),
+        media_type="text/markdown",
+        headers={"Content-Disposition": f'attachment; filename="benchmark-summary-{stamp}.md"'},
+    )
+
+
 @router.get("/bench/export")
 async def bench_export(request: Request):
     """Download the working copy as cases.jsonl, ready to commit to the repo."""

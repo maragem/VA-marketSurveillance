@@ -364,6 +364,126 @@
   }
 }
 
+.summary {
+  &__loading {
+    margin: 1rem 0 0;
+  }
+
+  &__body {
+    margin-top: 1rem;
+    border-top: 1px solid #e3e8ee;
+    padding-top: 1rem;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+
+  &__stat {
+    background: #f4f6f9;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    &--good {
+      background: #f4f9f2;
+      border-color: #b9d6b1;
+    }
+
+    &--bad {
+      background: #fdf7f7;
+      border-color: #f0c6c9;
+    }
+  }
+
+  &__value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #232c36;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    color: #6b7a89;
+  }
+
+  &__meta {
+    font-size: 0.82rem;
+    color: #6b7a89;
+    margin: 0 0 0.6rem;
+  }
+
+  &__warn {
+    color: #d97706;
+    font-weight: 600;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0 0.4rem;
+  }
+
+  &__freq {
+    font-size: 0.78rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: #fdf0f0;
+    border: 1px solid #f0c6c9;
+    color: #9c1a24;
+
+    &--miss {
+      background: #fef7ec;
+      border-color: #f3d9ab;
+      color: #92600a;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-top: 0.8rem;
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid #e9edf2;
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7a89;
+    }
+  }
+
+  &__case {
+    font-family: monospace;
+    white-space: nowrap;
+  }
+
+  &__row--fail td:nth-child(3) {
+    color: #9c1a24;
+    font-weight: 600;
+  }
+
+  &__row--pass td:nth-child(3) {
+    color: #2d5a23;
+    font-weight: 600;
+  }
+}
+
 .calib {
   &__body {
     margin-top: 1rem;

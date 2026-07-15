@@ -29,6 +29,45 @@ export interface BenchCase {
   gold: BenchGold;
 }
 
+export interface BenchSummaryRow {
+  id: string;
+  tier: number;
+  compliant_control: boolean;
+  run: boolean;
+  pass?: boolean;
+  engine?: string;
+  overall_risk?: string;
+  min_risk?: string;
+  risk_ok?: boolean;
+  matched?: string[];
+  missed?: string[];
+  unexpected?: string[];
+  false_positive?: boolean;
+  routing_missed?: string[];
+  recorded_at?: string;
+}
+
+export interface BenchSummary {
+  cases_total: number;
+  cases_run: number;
+  cases_not_run: string[];
+  passed: number;
+  failed: number;
+  engines: string[];
+  latest_run_at: string | null;
+  gold_provision_recall: number | null;
+  gold_provisions_total: number;
+  gold_provisions_matched: number;
+  risk_calibration_passed: number;
+  routing_missed_total: number;
+  unexpected_total: number;
+  false_positives_on_controls: number;
+  controls_run: number;
+  top_unexpected: { provision_id: string; ref: string; count: number }[];
+  top_missed: { provision_id: string; ref: string; count: number }[];
+  cases: BenchSummaryRow[];
+}
+
 export interface CalibrationRule {
   id: string;
   rule: string;

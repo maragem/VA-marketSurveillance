@@ -18,6 +18,104 @@
   </eui-alert>
 }
 
+<eui-card class="case summary">
+  <eui-card-content>
+    <div class="case__head" (click)="toggleSummary()">
+      <span class="case__id">📊 Results summary</span>
+      <span class="case__spacer"></span>
+      <span class="case__count">aggregate of the stored test runs</span>
+      <span class="case__caret">{{ summaryOpen() ? '▾' : '▸' }}</span>
+    </div>
+
+    @if (summaryOpen()) {
+      @if (summaryLoading()) {
+        <p class="muted summary__loading">Computing…</p>
+      } @else if (summary(); as s) {
+        <div class="summary__body">
+          <div class="summary__stats">
+            <div class="summary__stat">
+              <span class="summary__value">{{ s.cases_run }}/{{ s.cases_total }}</span>
+              <span class="summary__label">cases run</span>
+            </div>
+            <div class="summary__stat" [class.summary__stat--good]="s.failed === 0 && s.cases_run > 0">
+              <span class="summary__value">{{ s.passed }} / {{ s.failed }}</span>
+              <span class="summary__label">passed / deviating</span>
+            </div>
+            <div class="summary__stat">
+              <span class="summary__value">{{ s.gold_provision_recall !== null ? (s.gold_provision_recall * 100 | number: '1.0-0') + '%' : '—' }}</span>
+              <span class="summary__label">gold-provision recall ({{ s.gold_provisions_matched }}/{{ s.gold_provisions_total }})</span>
+            </div>
+            <div class="summary__stat">
+              <span class="summary__value">{{ s.risk_calibration_passed }}/{{ s.cases_run }}</span>
+              <span class="summary__label">risk calibration ok</span>
+            </div>
+            <div class="summary__stat" [class.summary__stat--bad]="s.unexpected_total > 0">
+              <span class="summary__value">{{ s.unexpected_total }}</span>
+              <span class="summary__label">unexpected findings</span>
+            </div>
+            <div class="summary__stat" [class.summary__stat--bad]="s.false_positives_on_controls > 0">
+              <span class="summary__value">{{ s.false_positives_on_controls }}/{{ s.controls_run }}</span>
+              <span class="summary__label">false positives on controls</span>
+            </div>
+            <div class="summary__stat" [class.summary__stat--bad]="s.routing_missed_total > 0">
+              <span class="summary__value">{{ s.routing_missed_total }}</span>
+              <span class="summary__label">missed routings</span>
+            </div>
+          </div>
+          <p class="summary__meta">
+            Engine: {{ s.engines.join(', ') || '—' }}
+            @if (s.latest_run_at) { · latest run {{ s.latest_run_at.slice(0, 16).replace('T', ' ') }} UTC }
+            @if (s.cases_not_run.length > 0) {
+              · <span class="summary__warn">not yet run: {{ s.cases_not_run.join(', ') }}</span>
+            }
+          </p>
+
+          @if (s.top_unexpected.length > 0) {
+            <p class="calib__section">Most frequent unexpected citations</p>
+            <p class="summary__list">
+              @for (u of s.top_unexpected; track u.provision_id) {
+                <span class="summary__freq">{{ u.ref }} · {{ u.count }}×</span>
+              }
+            </p>
+          }
+          @if (s.top_missed.length > 0) {
+            <p class="calib__section">Most frequently missed must-finds</p>
+            <p class="summary__list">
+              @for (m of s.top_missed; track m.provision_id) {
+                <span class="summary__freq summary__freq--miss">{{ m.ref }} · {{ m.count }}×</span>
+              }
+            </p>
+          }
+
+          <table class="summary__table">
+            <thead>
+              <tr><th>case</th><th>tier</th><th>result</th><th>risk (min)</th><th>missed</th><th>unexpected</th><th>recorded</th></tr>
+            </thead>
+            <tbody>
+              @for (r of s.cases; track r.id) {
+                <tr [class.summary__row--fail]="r.run && !r.pass" [class.summary__row--pass]="r.run && r.pass">
+                  <td class="summary__case">{{ r.id }}</td>
+                  <td>{{ r.tier }}</td>
+                  <td>{{ rowResult(r) }}</td>
+                  <td>{{ r.run ? r.overall_risk + ' (' + r.min_risk + ')' : '' }}</td>
+                  <td>{{ r.missed?.join(', ') || (r.run ? '—' : '') }}</td>
+                  <td>{{ r.unexpected?.join(', ') || (r.run ? '—' : '') }}</td>
+                  <td>{{ r.recorded_at ? r.recorded_at.slice(0, 16).replace('T', ' ') : '' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="calib__actions">
+            <a euiButton euiPrimary euiSizeS href="/api/bench/summary/export?format=md" download>Download summary (Markdown)</a>
+            <a euiButton euiSecondary euiSizeS href="/api/bench/summary/export?format=json" download>Download summary (JSON)</a>
+          </div>
+        </div>
+      }
+    }
+  </eui-card-content>
+</eui-card>
+
 <eui-card class="case calib">
   <eui-card-content>
     <div class="case__head" (click)="calibOpen.set(!calibOpen())">
