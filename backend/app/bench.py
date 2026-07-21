@@ -147,6 +147,9 @@ class BenchStore:
         # Last run outcome per case id — kept separate from the cases file so
         # the exported gold set stays pure.
         self._runs_path = data_dir / "bench-runs.json"
+        # Ids the user deleted from the working copy — prevents the seed sync
+        # from resurrecting them on the next deploy.
+        self._deleted_path = data_dir / "bench-deleted.json"
         self._lock = asyncio.Lock()
 
     def _ensure_working(self) -> None:
@@ -154,11 +157,27 @@ class BenchStore:
             self._working.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(self._seed, self._working)
 
+    def _read_deleted(self) -> set[str]:
+        if not self._deleted_path.exists():
+            return set()
+        return set(json.loads(self._deleted_path.read_text()))
+
     def _read(self) -> list[dict]:
         self._ensure_working()
         if not self._working.exists():
             return []
-        return [json.loads(line) for line in self._working.read_text().splitlines() if line.strip()]
+        cases = [json.loads(line) for line in self._working.read_text().splitlines() if line.strip()]
+        # Append-only seed sync: cases added to the repo seed after the working
+        # copy was created are merged in, without touching edited or deleted
+        # cases — label corrections and stored runs survive seed growth.
+        if self._seed.exists():
+            skip = {c["id"] for c in cases} | self._read_deleted()
+            new = [json.loads(line) for line in self._seed.read_text().splitlines()
+                   if line.strip() and json.loads(line)["id"] not in skip]
+            if new:
+                cases.extend(new)
+                self._write(cases)
+        return cases
 
     def _write(self, cases: list[dict]) -> None:
         self._working.parent.mkdir(parents=True, exist_ok=True)
@@ -185,6 +204,10 @@ class BenchStore:
                 else:
                     cases.append(case)
                 self._write(cases)
+                deleted = self._read_deleted()
+                if case["id"] in deleted:
+                    deleted.discard(case["id"])
+                    self._deleted_path.write_text(json.dumps(sorted(deleted)))
             await asyncio.to_thread(_apply)
 
     async def delete(self, case_id: str) -> None:
@@ -195,6 +218,8 @@ class BenchStore:
                 if len(remaining) == len(cases):
                     raise KeyError(f"Unknown case id: {case_id}")
                 self._write(remaining)
+                deleted = self._read_deleted() | {case_id}
+                self._deleted_path.write_text(json.dumps(sorted(deleted)))
                 runs = self._read_runs()
                 if runs.pop(case_id, None) is not None:
                     self._write_runs(runs)

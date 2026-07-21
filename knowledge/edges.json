@@ -1,140 +1,674 @@
 [
-  {"source": "reg-ai-act", "target": "aia-art5-1a", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art5-1b", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art5-1c", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art5-1f", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art50-1", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art50-2", "type": "CONTAINS"},
-  {"source": "reg-ai-act", "target": "aia-art50-4", "type": "CONTAINS"},
-
-  {"source": "reg-gdpr", "target": "gdpr-art4-4", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art4-11", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art5-1a", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art6-1", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art7", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art8", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art9", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art12", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art13", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art21", "type": "CONTAINS"},
-  {"source": "reg-gdpr", "target": "gdpr-art22", "type": "CONTAINS"},
-
-  {"source": "reg-dsa", "target": "dsa-art25", "type": "CONTAINS"},
-  {"source": "reg-dsa", "target": "dsa-art26-1", "type": "CONTAINS"},
-  {"source": "reg-dsa", "target": "dsa-art26-3", "type": "CONTAINS"},
-  {"source": "reg-dsa", "target": "dsa-art27", "type": "CONTAINS"},
-  {"source": "reg-dsa", "target": "dsa-art28", "type": "CONTAINS"},
-  {"source": "reg-dsa", "target": "dsa-art39", "type": "CONTAINS"},
-
-  {"source": "reg-ucpd", "target": "ucpd-art5", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-art6", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-art7", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-art8-9", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-7", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-11", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-17", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-20", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-23b", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-23c", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-28", "type": "CONTAINS"},
-  {"source": "reg-ucpd", "target": "ucpd-annex1-31", "type": "CONTAINS"},
-
-  {"source": "dsa-art26-3", "target": "gdpr-art9", "type": "REFERENCES", "note": "The DSA ban on sensitive-data ad targeting is defined by reference to GDPR Art. 9 categories."},
-  {"source": "dsa-art28", "target": "gdpr-art4-4", "type": "REFERENCES", "note": "The minors advertising ban is defined by reference to the GDPR definition of profiling."},
-  {"source": "dsa-art26-1", "target": "gdpr-art4-4", "type": "REFERENCES", "note": "Targeting parameter disclosure concerns profiling as defined in the GDPR."},
-  {"source": "gdpr-art22", "target": "gdpr-art4-4", "type": "REFERENCES", "note": "Automated decision-making rules build on the profiling definition."},
-  {"source": "gdpr-art21", "target": "gdpr-art4-4", "type": "REFERENCES", "note": "The objection right covers profiling related to direct marketing."},
-  {"source": "gdpr-art8", "target": "gdpr-art4-11", "type": "REFERENCES", "note": "Child consent builds on the general consent definition."},
-  {"source": "gdpr-art7", "target": "gdpr-art4-11", "type": "REFERENCES", "note": "Consent conditions operationalise the consent definition."},
-  {"source": "aia-art50-4", "target": "ucpd-art7", "type": "RELATED_TO", "note": "Undisclosed deep fakes are typically also misleading omissions under the UCPD."},
-  {"source": "aia-art5-1b", "target": "ucpd-art5", "type": "RELATED_TO", "note": "Both protect vulnerable groups: AI Act for AI systems, UCPD Art. 5(3) for commercial practices generally."},
-  {"source": "dsa-art25", "target": "ucpd-art5", "type": "RELATED_TO", "note": "DSA dark pattern rules apply without prejudice to the UCPD, which covers the same conduct for all traders."},
-  {"source": "ucpd-annex1-23c", "target": "aia-art50-2", "type": "RELATED_TO", "note": "AI-generated fake reviews are both blacklisted practices and unmarked synthetic content."},
-
-  {"source": "c-dark-patterns", "target": "dsa-art25", "type": "GOVERNED_BY"},
-  {"source": "c-dark-patterns", "target": "ucpd-art5", "type": "GOVERNED_BY"},
-  {"source": "c-dark-patterns", "target": "ucpd-art8-9", "type": "GOVERNED_BY"},
-  {"source": "c-dark-patterns", "target": "gdpr-art7", "type": "GOVERNED_BY"},
-  {"source": "c-dark-patterns", "target": "aia-art5-1a", "type": "GOVERNED_BY"},
-
-  {"source": "c-profiling-personalisation", "target": "gdpr-art4-4", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "gdpr-art6-1", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "gdpr-art21", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "gdpr-art22", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "dsa-art26-1", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "dsa-art26-3", "type": "GOVERNED_BY"},
-  {"source": "c-profiling-personalisation", "target": "dsa-art28", "type": "GOVERNED_BY"},
-
-  {"source": "c-ai-generated-content", "target": "aia-art50-2", "type": "GOVERNED_BY"},
-  {"source": "c-ai-generated-content", "target": "aia-art50-4", "type": "GOVERNED_BY"},
-  {"source": "c-ai-generated-content", "target": "ucpd-art6", "type": "GOVERNED_BY"},
-  {"source": "c-ai-generated-content", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-
-  {"source": "c-chatbots", "target": "aia-art50-1", "type": "GOVERNED_BY"},
-  {"source": "c-chatbots", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-  {"source": "c-chatbots", "target": "gdpr-art13", "type": "GOVERNED_BY"},
-
-  {"source": "c-influencer-marketing", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-  {"source": "c-influencer-marketing", "target": "ucpd-annex1-11", "type": "GOVERNED_BY"},
-  {"source": "c-influencer-marketing", "target": "dsa-art26-1", "type": "GOVERNED_BY"},
-  {"source": "c-influencer-marketing", "target": "aia-art50-4", "type": "GOVERNED_BY"},
-
-  {"source": "c-minors", "target": "ucpd-annex1-28", "type": "GOVERNED_BY"},
-  {"source": "c-minors", "target": "dsa-art28", "type": "GOVERNED_BY"},
-  {"source": "c-minors", "target": "gdpr-art8", "type": "GOVERNED_BY"},
-  {"source": "c-minors", "target": "aia-art5-1b", "type": "GOVERNED_BY"},
-  {"source": "c-minors", "target": "ucpd-art5", "type": "GOVERNED_BY"},
-
-  {"source": "c-sensitive-data-targeting", "target": "gdpr-art9", "type": "GOVERNED_BY"},
-  {"source": "c-sensitive-data-targeting", "target": "dsa-art26-3", "type": "GOVERNED_BY"},
-
-  {"source": "c-urgency-scarcity", "target": "ucpd-annex1-7", "type": "GOVERNED_BY"},
-  {"source": "c-urgency-scarcity", "target": "ucpd-art8-9", "type": "GOVERNED_BY"},
-  {"source": "c-urgency-scarcity", "target": "dsa-art25", "type": "GOVERNED_BY"},
-
-  {"source": "c-free-claims", "target": "ucpd-annex1-20", "type": "GOVERNED_BY"},
-  {"source": "c-free-claims", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-  {"source": "c-free-claims", "target": "dsa-art25", "type": "GOVERNED_BY"},
-
-  {"source": "c-health-claims", "target": "ucpd-annex1-17", "type": "GOVERNED_BY"},
-  {"source": "c-health-claims", "target": "ucpd-art6", "type": "GOVERNED_BY"},
-  {"source": "c-health-claims", "target": "gdpr-art9", "type": "GOVERNED_BY"},
-  {"source": "c-health-claims", "target": "dsa-art26-3", "type": "GOVERNED_BY"},
-
-  {"source": "c-fake-reviews", "target": "ucpd-annex1-23b", "type": "GOVERNED_BY"},
-  {"source": "c-fake-reviews", "target": "ucpd-annex1-23c", "type": "GOVERNED_BY"},
-  {"source": "c-fake-reviews", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-
-  {"source": "c-deepfakes", "target": "aia-art50-4", "type": "GOVERNED_BY"},
-  {"source": "c-deepfakes", "target": "ucpd-art6", "type": "GOVERNED_BY"},
-  {"source": "c-deepfakes", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-
-  {"source": "c-greenwashing", "target": "ucpd-art6", "type": "GOVERNED_BY"},
-  {"source": "c-greenwashing", "target": "ucpd-art7", "type": "GOVERNED_BY"},
-
-  {"source": "c-pricing-practices", "target": "ucpd-art6", "type": "GOVERNED_BY"},
-  {"source": "c-pricing-practices", "target": "gdpr-art22", "type": "GOVERNED_BY"},
-  {"source": "c-pricing-practices", "target": "ucpd-annex1-7", "type": "GOVERNED_BY"},
-
-  {"source": "c-consent-flows", "target": "gdpr-art4-11", "type": "GOVERNED_BY"},
-  {"source": "c-consent-flows", "target": "gdpr-art7", "type": "GOVERNED_BY"},
-  {"source": "c-consent-flows", "target": "gdpr-art13", "type": "GOVERNED_BY"},
-  {"source": "c-consent-flows", "target": "dsa-art25", "type": "GOVERNED_BY"},
-
-  {"source": "c-emotion-targeting", "target": "aia-art5-1a", "type": "GOVERNED_BY"},
-  {"source": "c-emotion-targeting", "target": "aia-art5-1b", "type": "GOVERNED_BY"},
-  {"source": "c-emotion-targeting", "target": "aia-art5-1f", "type": "GOVERNED_BY"},
-  {"source": "c-emotion-targeting", "target": "gdpr-art9", "type": "GOVERNED_BY"},
-  {"source": "c-emotion-targeting", "target": "ucpd-art8-9", "type": "GOVERNED_BY"},
-
-  {"source": "c-dark-patterns", "target": "c-urgency-scarcity", "type": "RELATED_TO"},
-  {"source": "c-dark-patterns", "target": "c-consent-flows", "type": "RELATED_TO"},
-  {"source": "c-ai-generated-content", "target": "c-deepfakes", "type": "RELATED_TO"},
-  {"source": "c-ai-generated-content", "target": "c-fake-reviews", "type": "RELATED_TO"},
-  {"source": "c-profiling-personalisation", "target": "c-sensitive-data-targeting", "type": "RELATED_TO"},
-  {"source": "c-profiling-personalisation", "target": "c-emotion-targeting", "type": "RELATED_TO"},
-  {"source": "c-minors", "target": "c-profiling-personalisation", "type": "RELATED_TO"},
-  {"source": "c-influencer-marketing", "target": "c-fake-reviews", "type": "RELATED_TO"},
-  {"source": "c-health-claims", "target": "c-sensitive-data-targeting", "type": "RELATED_TO"},
-  {"source": "c-pricing-practices", "target": "c-urgency-scarcity", "type": "RELATED_TO"}
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art5-1a",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art5-1b",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art5-1c",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art5-1f",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art50-1",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art50-2",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ai-act",
+    "target": "aia-art50-4",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art4-4",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art4-11",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art5-1a",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art6-1",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art7",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art8",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art9",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art12",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art13",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art21",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-gdpr",
+    "target": "gdpr-art22",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art25",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art26-1",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art26-3",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art27",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art28",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-dsa",
+    "target": "dsa-art39",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-art5",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-art6",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-art7",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-art8-9",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-7",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-11",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-17",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-20",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-23b",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-23c",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-28",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-31",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "dsa-art26-3",
+    "target": "gdpr-art9",
+    "type": "REFERENCES",
+    "note": "The DSA ban on sensitive-data ad targeting is defined by reference to GDPR Art. 9 categories."
+  },
+  {
+    "source": "dsa-art28",
+    "target": "gdpr-art4-4",
+    "type": "REFERENCES",
+    "note": "The minors advertising ban is defined by reference to the GDPR definition of profiling."
+  },
+  {
+    "source": "dsa-art26-1",
+    "target": "gdpr-art4-4",
+    "type": "REFERENCES",
+    "note": "Targeting parameter disclosure concerns profiling as defined in the GDPR."
+  },
+  {
+    "source": "gdpr-art22",
+    "target": "gdpr-art4-4",
+    "type": "REFERENCES",
+    "note": "Automated decision-making rules build on the profiling definition."
+  },
+  {
+    "source": "gdpr-art21",
+    "target": "gdpr-art4-4",
+    "type": "REFERENCES",
+    "note": "The objection right covers profiling related to direct marketing."
+  },
+  {
+    "source": "gdpr-art8",
+    "target": "gdpr-art4-11",
+    "type": "REFERENCES",
+    "note": "Child consent builds on the general consent definition."
+  },
+  {
+    "source": "gdpr-art7",
+    "target": "gdpr-art4-11",
+    "type": "REFERENCES",
+    "note": "Consent conditions operationalise the consent definition."
+  },
+  {
+    "source": "aia-art50-4",
+    "target": "ucpd-art7",
+    "type": "RELATED_TO",
+    "note": "Undisclosed deep fakes are typically also misleading omissions under the UCPD."
+  },
+  {
+    "source": "aia-art5-1b",
+    "target": "ucpd-art5",
+    "type": "RELATED_TO",
+    "note": "Both protect vulnerable groups: AI Act for AI systems, UCPD Art. 5(3) for commercial practices generally."
+  },
+  {
+    "source": "dsa-art25",
+    "target": "ucpd-art5",
+    "type": "RELATED_TO",
+    "note": "DSA dark pattern rules apply without prejudice to the UCPD, which covers the same conduct for all traders."
+  },
+  {
+    "source": "ucpd-annex1-23c",
+    "target": "aia-art50-2",
+    "type": "RELATED_TO",
+    "note": "AI-generated fake reviews are both blacklisted practices and unmarked synthetic content."
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "dsa-art25",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "ucpd-art5",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "ucpd-art8-9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "gdpr-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "aia-art5-1a",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "gdpr-art4-4",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "gdpr-art6-1",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "gdpr-art21",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "gdpr-art22",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "dsa-art26-1",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "dsa-art26-3",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "dsa-art28",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "aia-art50-2",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "aia-art50-4",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "ucpd-art6",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-chatbots",
+    "target": "aia-art50-1",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-chatbots",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-chatbots",
+    "target": "gdpr-art13",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-influencer-marketing",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-influencer-marketing",
+    "target": "ucpd-annex1-11",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-influencer-marketing",
+    "target": "dsa-art26-1",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-influencer-marketing",
+    "target": "aia-art50-4",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-minors",
+    "target": "ucpd-annex1-28",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-minors",
+    "target": "dsa-art28",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-minors",
+    "target": "gdpr-art8",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-minors",
+    "target": "aia-art5-1b",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-minors",
+    "target": "ucpd-art5",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-sensitive-data-targeting",
+    "target": "gdpr-art9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-sensitive-data-targeting",
+    "target": "dsa-art26-3",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-urgency-scarcity",
+    "target": "ucpd-annex1-7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-urgency-scarcity",
+    "target": "ucpd-art8-9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-urgency-scarcity",
+    "target": "dsa-art25",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-free-claims",
+    "target": "ucpd-annex1-20",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-free-claims",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-free-claims",
+    "target": "dsa-art25",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-health-claims",
+    "target": "ucpd-annex1-17",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-health-claims",
+    "target": "ucpd-art6",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-health-claims",
+    "target": "gdpr-art9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-health-claims",
+    "target": "dsa-art26-3",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-fake-reviews",
+    "target": "ucpd-annex1-23b",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-fake-reviews",
+    "target": "ucpd-annex1-23c",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-fake-reviews",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-deepfakes",
+    "target": "aia-art50-4",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-deepfakes",
+    "target": "ucpd-art6",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-deepfakes",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-greenwashing",
+    "target": "ucpd-art6",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-greenwashing",
+    "target": "ucpd-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-pricing-practices",
+    "target": "ucpd-art6",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-pricing-practices",
+    "target": "gdpr-art22",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-pricing-practices",
+    "target": "ucpd-annex1-7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-consent-flows",
+    "target": "gdpr-art4-11",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-consent-flows",
+    "target": "gdpr-art7",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-consent-flows",
+    "target": "gdpr-art13",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-consent-flows",
+    "target": "dsa-art25",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-emotion-targeting",
+    "target": "aia-art5-1a",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-emotion-targeting",
+    "target": "aia-art5-1b",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-emotion-targeting",
+    "target": "aia-art5-1f",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-emotion-targeting",
+    "target": "gdpr-art9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-emotion-targeting",
+    "target": "ucpd-art8-9",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "c-urgency-scarcity",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-dark-patterns",
+    "target": "c-consent-flows",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "c-deepfakes",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-ai-generated-content",
+    "target": "c-fake-reviews",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "c-sensitive-data-targeting",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-profiling-personalisation",
+    "target": "c-emotion-targeting",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-minors",
+    "target": "c-profiling-personalisation",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-influencer-marketing",
+    "target": "c-fake-reviews",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-health-claims",
+    "target": "c-sensitive-data-targeting",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "c-pricing-practices",
+    "target": "c-urgency-scarcity",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-2",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-4",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-15",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "reg-ucpd",
+    "target": "ucpd-annex1-26",
+    "type": "CONTAINS"
+  },
+  {
+    "source": "c-fake-reviews",
+    "target": "ucpd-annex1-2",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-fake-reviews",
+    "target": "ucpd-annex1-4",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-urgency-scarcity",
+    "target": "ucpd-annex1-15",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-pricing-practices",
+    "target": "ucpd-annex1-15",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "c-consent-flows",
+    "target": "ucpd-annex1-26",
+    "type": "GOVERNED_BY"
+  },
+  {
+    "source": "ucpd-annex1-2",
+    "target": "ucpd-art6",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "ucpd-annex1-4",
+    "target": "ucpd-art6",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "ucpd-annex1-4",
+    "target": "ucpd-annex1-2",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "ucpd-annex1-15",
+    "target": "ucpd-art6",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "ucpd-annex1-26",
+    "target": "ucpd-art8-9",
+    "type": "RELATED_TO"
+  },
+  {
+    "source": "ucpd-annex1-26",
+    "target": "gdpr-art21",
+    "type": "REFERENCES",
+    "note": "Persistent solicitation after an objection typically also violates the GDPR right to object to direct marketing."
+  }
 ]
