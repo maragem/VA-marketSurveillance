@@ -19,7 +19,34 @@ python bench/run.py --only t1-detox-tea-influencer
 ```
 
 Requires only `httpx` (already in backend/requirements.txt). Scorecards are
-printed and saved to `bench/results/<timestamp>.{md,json}`.
+printed and saved to `bench/results/<timestamp>.{md,json}`, together with a
+`-reports.jsonl` file of the raw engine outputs.
+
+## Evaluation configurations and the held-out split
+
+The paper's Table 1 grid maps to harness invocations:
+
+| Config | How to run |
+|---|---|
+| A retrieval-only | run against a deployment with no LLM credentials |
+| B no validation | deployment with `EXPERIMENT_SKIP_CITATION_VALIDATION=1` (never production) |
+| C deployed default | normal deployment, `--runs 3` |
+| D C + calibration | after approving rules, `--holdout` (see below) |
+
+The scorecard's **invalid citations** metric counts findings that citation
+validation would remove (unknown ids, cross-regulation citations) — 0 by
+construction for A/C/D, measured for B. **Latency** is captured per case.
+
+`bench/holdout.json` designates 15 held-out cases that never feed
+calibration-rule distillation (the lesson proposer excludes them
+automatically). Report configuration D on `--holdout`; use
+`--exclude-holdout` for calibration-visible runs. Do not move cases out of
+the held-out set once rules have been distilled.
+
+**Relabelling without re-running:** after correcting gold labels, score the
+stored raw outputs against the new labels with
+`python bench/run.py --rescore bench/results/<stamp>-reports.jsonl` —
+no inference cost, results marked `-rescored`.
 
 Note: benchmark runs are persisted by the target instance like any analysis —
 prefer a scratch deployment or a local instance with a throwaway `DATA_DIR` so

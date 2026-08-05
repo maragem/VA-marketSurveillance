@@ -51,6 +51,23 @@ def load_cases(path: Path, only: list[str] | None) -> list[dict]:
     return cases
 
 
+def load_holdout() -> set[str]:
+    path = BENCH_DIR / "holdout.json"
+    if not path.exists():
+        return set()
+    return set(json.loads(path.read_text()).get("holdout", []))
+
+
+def load_provisions() -> dict[str, str] | None:
+    """provision id -> regulation, from the knowledge graph (for detecting
+    citations that validation would normally remove — configuration B)."""
+    path = BENCH_DIR.parent / "knowledge" / "nodes.json"
+    if not path.exists():
+        return None
+    return {n["id"]: n["regulation"] for n in json.loads(path.read_text())
+            if n.get("type") == "provision"}
+
+
 async def run_case(client: httpx.AsyncClient, base_url: str, campaign: dict) -> dict:
     """POST the campaign and read the SSE stream until the final report event."""
     report, engine = None, None
@@ -72,14 +89,21 @@ async def run_case(client: httpx.AsyncClient, base_url: str, campaign: dict) -> 
     return report
 
 
-def extract_predictions(report: dict) -> dict:
+def extract_predictions(report: dict, provisions: dict[str, str] | None) -> dict:
     triage = report.get("triage") or {}
     all_findings = [f for v in report.get("verdicts", []) for f in v.get("findings", [])]
+    invalid = None
+    if provisions is not None:
+        # Citations validation would remove: unknown ids, non-provisions, or a
+        # provision belonging to another regulation than the citing agent's.
+        invalid = sum(1 for f in all_findings
+                      if provisions.get(f["provision_id"]) != f.get("regulation"))
     return {
         "routed": set(triage.get("regulations_to_check") or []),
         "found_any": {f["provision_id"] for f in all_findings},
         "found_actionable": {f["provision_id"] for f in all_findings if f.get("severity") in ACTIONABLE},
         "overall_risk": report.get("overall_risk", "unknown"),
+        "invalid_citations": invalid,
     }
 
 
@@ -118,6 +142,7 @@ def score_case(case: dict, pred: dict) -> dict:
         "min_risk": gold.get("min_risk"),
         "risk_ok": risk_ok,
         "false_positive": false_positive,
+        "invalid_citations": pred.get("invalid_citations"),
     }
 
 
@@ -129,6 +154,7 @@ def aggregate(rows: list[dict]) -> dict:
     matched_total = sum(len(r["provisions_matched"]) for r in violating)
     unexpected_total = sum(len(r["provisions_unexpected"]) for r in rows)
 
+    invalid_counts = [r["invalid_citations"] for r in rows if r["invalid_citations"] is not None]
     return {
         "cases": len(rows),
         "engine": None,  # filled by caller
@@ -138,6 +164,8 @@ def aggregate(rows: list[dict]) -> dict:
         "controls": len(controls),
         "risk_calibration_pass": sum(1 for r in rows if r["risk_ok"]),
         "routing_missed_total": sum(len(r["routing_missed"]) for r in violating),
+        "invalid_citations_total": sum(invalid_counts) if invalid_counts else None,
+        "mean_latency_s": None,  # filled by caller
     }
 
 
@@ -151,9 +179,16 @@ def markdown_scorecard(summary: dict, rows: list[dict], stability: dict[str, flo
         f"- Unexpected actionable findings (review these): **{summary['unexpected_findings']}**",
         f"- False positives on compliant controls: **{summary['false_positives_on_controls']}/{summary['controls']}**",
         f"- Risk calibration passed: **{summary['risk_calibration_pass']}/{summary['cases']}**",
+    ]
+    if summary.get("invalid_citations_total") is not None:
+        lines.append(f"- Invalid citations surviving to reports (would be removed by validation): "
+                     f"**{summary['invalid_citations_total']}**")
+    if summary.get("mean_latency_s") is not None:
+        lines.append(f"- Mean latency per case: **{summary['mean_latency_s']}s**")
+    lines += [
         "",
-        "| case | tier | risk (min) | ok | matched | missed | unexpected | routing missed |",
-        "|---|---|---|---|---|---|---|---|",
+        "| case | tier | risk (min) | ok | matched | missed | unexpected | routing missed | invalid | s |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         ok = "✅" if (r["risk_ok"] and not r["provisions_missed"] and not r["false_positive"]) else "❌"
@@ -162,7 +197,9 @@ def markdown_scorecard(summary: dict, rows: list[dict], stability: dict[str, flo
             f"| {', '.join(r['provisions_matched']) or '—'} "
             f"| {', '.join(r['provisions_missed']) or '—'} "
             f"| {', '.join(r['provisions_unexpected']) or '—'} "
-            f"| {', '.join(r['routing_missed']) or '—'} |"
+            f"| {', '.join(r['routing_missed']) or '—'} "
+            f"| {r['invalid_citations'] if r['invalid_citations'] is not None else '—'} "
+            f"| {r.get('latency_s', '—')} |"
         )
     if stability:
         lines += ["", "## Stability (mean pairwise Jaccard of finding sets across runs)", ""]
@@ -178,12 +215,49 @@ async def main() -> int:
     parser.add_argument("--runs", type=int, default=1, help="repeat each case N times (stability)")
     parser.add_argument("--concurrency", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=600.0, help="per-case timeout in seconds")
+    holdout_group = parser.add_mutually_exclusive_group()
+    holdout_group.add_argument("--holdout", action="store_true",
+                               help="run only the held-out subset (bench/holdout.json) — use for configuration D")
+    holdout_group.add_argument("--exclude-holdout", action="store_true",
+                               help="run only calibration-visible cases (complement of bench/holdout.json)")
+    parser.add_argument("--rescore", metavar="REPORTS_JSONL",
+                        help="score a stored -reports.jsonl against the CURRENT gold labels "
+                             "instead of running the engine (use after relabelling)")
     args = parser.parse_args()
 
     cases = load_cases(Path(args.cases), args.only)
+    if args.holdout or args.exclude_holdout:
+        holdout = load_holdout()
+        assert holdout, "bench/holdout.json missing or empty"
+        cases = [c for c in cases if (c["id"] in holdout) == args.holdout]
+        print(f"{'Held-out' if args.holdout else 'Calibration-visible'} subset: {len(cases)} case(s)")
+    provisions = load_provisions()
+    if provisions is None:
+        print("knowledge/nodes.json not found — invalid-citation detection disabled", file=sys.stderr)
     semaphore = asyncio.Semaphore(args.concurrency)
     engines: set[str] = set()
     reports: dict[str, list[dict | None]] = {c["id"]: [None] * args.runs for c in cases}
+    latencies: dict[str, list[float]] = {c["id"]: [] for c in cases}
+
+    if args.rescore:
+        stored: dict[str, list[dict]] = {}
+        for line in Path(args.rescore).read_text().splitlines():
+            if not line.strip():
+                continue
+            entry = json.loads(line)
+            stored.setdefault(entry["case_id"], []).append(entry["report"])
+        case_ids = {c["id"] for c in cases}
+        reports = {cid: runs for cid, runs in stored.items() if cid in case_ids}
+        for runs in reports.values():
+            for report in runs:
+                engines.add(report.get("_engine") or report.get("engine") or "unknown")
+        missing = case_ids - set(reports)
+        print(f"Re-scoring {sum(len(r) for r in reports.values())} stored report(s) "
+              f"for {len(reports)} case(s) against the current gold labels"
+              + (f" — no stored output for: {', '.join(sorted(missing))}" if missing else ""))
+        cases = [c for c in cases if c["id"] in reports]
+        latencies = {c["id"]: [] for c in cases}
+        return score_and_save(args, cases, reports, latencies, engines, provisions)
 
     async with httpx.AsyncClient(timeout=httpx.Timeout(args.timeout, connect=15.0)) as client:
         async def one(case: dict, run_idx: int) -> None:
@@ -194,10 +268,12 @@ async def main() -> int:
                 except Exception as exc:
                     print(f"  ✗ {case['id']} run {run_idx + 1}: {exc}", file=sys.stderr)
                     return
+                elapsed = time.monotonic() - started
                 engines.add(report["_engine"])
                 reports[case["id"]][run_idx] = report
+                latencies[case["id"]].append(elapsed)
                 print(f"  ✓ {case['id']} run {run_idx + 1} "
-                      f"({report.get('overall_risk')}, {time.monotonic() - started:.0f}s)")
+                      f"({report.get('overall_risk')}, {elapsed:.0f}s)")
 
         print(f"Running {len(cases)} case(s) × {args.runs} against {args.base_url} …")
         await asyncio.gather(*(one(c, i) for c in cases for i in range(args.runs)))
@@ -206,15 +282,22 @@ async def main() -> int:
     if failed:
         print(f"\n{len(failed)} case(s) produced no report: {failed}", file=sys.stderr)
 
+    return score_and_save(args, cases, reports, latencies, engines, provisions)
+
+
+def score_and_save(args, cases, reports, latencies, engines, provisions) -> int:
     rows = []
     stability: dict[str, float] = {}
     for case in cases:
         runs = [r for r in reports[case["id"]] if r is not None]
         if not runs:
             continue
-        rows.append(score_case(case, extract_predictions(runs[0])))
+        row = score_case(case, extract_predictions(runs[0], provisions))
+        if latencies.get(case["id"]):
+            row["latency_s"] = round(sum(latencies[case["id"]]) / len(latencies[case["id"]]), 1)
+        rows.append(row)
         if len(runs) > 1:
-            sets = [extract_predictions(r)["found_any"] for r in runs]
+            sets = [extract_predictions(r, provisions)["found_any"] for r in runs]
             pairs = list(itertools.combinations(sets, 2))
             jaccard = [len(a & b) / len(a | b) if (a | b) else 1.0 for a, b in pairs]
             stability[case["id"]] = round(sum(jaccard) / len(jaccard), 3)
@@ -225,16 +308,30 @@ async def main() -> int:
 
     summary = aggregate(rows)
     summary["engine"] = ", ".join(sorted(engines)) or "unknown"
+    all_latencies = [s for values in latencies.values() for s in values]
+    if all_latencies:
+        summary["mean_latency_s"] = round(sum(all_latencies) / len(all_latencies), 1)
     scorecard = markdown_scorecard(summary, rows, stability or None)
     print("\n" + scorecard)
 
     results_dir = BENCH_DIR / "results"
     results_dir.mkdir(exist_ok=True)
-    stamp = time.strftime("%Y%m%d-%H%M%S")
+    stamp = time.strftime("%Y%m%d-%H%M%S") + ("-rescored" if args.rescore else "")
     (results_dir / f"{stamp}.md").write_text(scorecard + "\n")
     (results_dir / f"{stamp}.json").write_text(json.dumps(
         {"summary": summary, "cases": rows, "stability": stability}, indent=2) + "\n")
-    print(f"\nSaved bench/results/{stamp}.md and .json")
+    saved = f"bench/results/{stamp}.md and .json"
+    if not args.rescore:
+        # Raw reports: relabelling the gold set later means re-scoring these
+        # stored outputs (--rescore) instead of re-paying for inference.
+        with open(results_dir / f"{stamp}-reports.jsonl", "w") as f:
+            for case_id, case_runs in reports.items():
+                for run_idx, report in enumerate(case_runs):
+                    if report is not None:
+                        f.write(json.dumps({"case_id": case_id, "run": run_idx + 1,
+                                            "report": report}, ensure_ascii=False) + "\n")
+        saved += f" and {stamp}-reports.jsonl (raw outputs for --rescore)"
+    print(f"\nSaved {saved}")
     return 0
 
 

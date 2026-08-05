@@ -229,6 +229,14 @@ class BenchStore:
         cases = await self.list()
         return "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cases)
 
+    def holdout_ids(self) -> set[str]:
+        """Held-out evaluation cases (bench/holdout.json) — excluded from
+        calibration-rule distillation so they measure transfer."""
+        path = self._seed.parent / "holdout.json"
+        if not path.exists():
+            return set()
+        return set(json.loads(path.read_text()).get("holdout", []))
+
     # -- stored run outcomes -------------------------------------------------
 
     def _read_runs(self) -> dict:

@@ -241,13 +241,20 @@ async def bench_propose_lessons(request: Request):
         raise HTTPException(status_code=400,
                             detail="No stored test runs yet — run some cases first, so there are "
                                    "deviations to learn from.")
+    # Contamination discipline: held-out evaluation cases never feed rule
+    # distillation, so configuration-D results on them measure transfer.
+    holdout = bench.holdout_ids()
+    distillable_runs = {cid: run for cid, run in runs.items() if cid not in holdout}
+    if not distillable_runs:
+        raise HTTPException(status_code=400,
+                            detail="All stored runs belong to held-out cases — nothing to learn from.")
     existing = await request.app.state.calibration.all()
     try:
-        proposals = await propose_lessons(request.app.state.graph, cases, runs, existing)
+        proposals = await propose_lessons(request.app.state.graph, cases, distillable_runs, existing)
     except Exception as exc:
         logger.exception("lesson proposal failed")
         raise HTTPException(status_code=502, detail=f"Lesson proposal failed: {exc}")
-    return {"proposals": proposals}
+    return {"proposals": proposals, "excluded_holdout": sorted(holdout & set(runs))}
 
 
 class AdjudicateRequest(BaseModel):
@@ -444,8 +451,10 @@ async def analyze_stream(campaign: CampaignSubmission, request: Request,
 
     async def stream():
         task = asyncio.create_task(run())
-        yield _sse({"type": "accepted", "report_id": report.id,
-                    "engine": "agentic" if config.llm_available() else "heuristic"})
+        engine = "agentic" if config.llm_available() else "heuristic"
+        if config.llm_available() and config.EXPERIMENT_SKIP_CITATION_VALIDATION:
+            engine = "agentic-unvalidated"  # ablation configuration B
+        yield _sse({"type": "accepted", "report_id": report.id, "engine": engine})
         try:
             while True:
                 event = await queue.get()

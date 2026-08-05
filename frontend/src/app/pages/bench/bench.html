@@ -131,7 +131,9 @@
         <p class="calib__intro">
           Approved rules are added to the specialist agents' prompts on every analysis, correcting
           error patterns found through benchmark review. Rules must be general legal principles —
-          never case-specific facts, or the benchmark stops being an honest measurement.
+          never case-specific facts, or the benchmark stops being an honest measurement. Cases in
+          the held-out evaluation set (<code>bench/holdout.json</code>) are automatically excluded
+          from lesson proposals so they keep measuring transfer.
           Export and commit <code>knowledge/calibration.json</code> to version them.
         </p>
 

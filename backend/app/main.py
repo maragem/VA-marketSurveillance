@@ -35,6 +35,10 @@ async def lifespan(app: FastAPI):
     logger.info("Knowledge graph loaded: %s", graph.summary())
     if config.llm_available():
         logger.info("LLM provider: %s, model: %s", config.CLAUDE_PROVIDER, config.CLAUDE_MODEL)
+    if config.EXPERIMENT_SKIP_CITATION_VALIDATION:
+        logger.warning(
+            "EXPERIMENT_SKIP_CITATION_VALIDATION is ON — citation validation disabled "
+            "(benchmark ablation configuration B). Never use this deployment for real screening.")
     else:
         logger.warning(
             "No LLM credentials found (ANTHROPIC_API_KEY or AWS_BEARER_TOKEN_BEDROCK) — "

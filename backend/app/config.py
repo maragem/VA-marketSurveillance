@@ -48,6 +48,12 @@ AGENT_MAX_TOKENS = int(os.environ.get("AGENT_MAX_TOKENS", "8000"))
 # Max tool-use round trips per regulation agent before it is forced to conclude.
 AGENT_MAX_TURNS = int(os.environ.get("AGENT_MAX_TURNS", "8"))
 
+# EXPERIMENT ONLY (benchmark ablation "configuration B"): disable the post-hoc
+# graph validation of citations, letting hallucinated or cross-regulation
+# provision ids reach reports. Never enable on a production deployment.
+EXPERIMENT_SKIP_CITATION_VALIDATION = (
+    os.environ.get("EXPERIMENT_SKIP_CITATION_VALIDATION", "") == "1")
+
 REGULATIONS = ["AI_ACT", "GDPR", "DSA", "UCPD"]
 
 REGULATION_LABELS = {

@@ -146,6 +146,20 @@ def _to_verdict(regulation: str, submitted: dict, executor: GraphToolExecutor) -
         node = executor.graph.get(raw.get("provision_id", ""))
         # Drop hallucinated citations and findings pinned to another regulation's provision.
         if not node or node.get("type") != "provision" or node.get("regulation") != regulation:
+            if not config.EXPERIMENT_SKIP_CITATION_VALIDATION:
+                continue
+            # Ablation configuration B: keep the invalid citation so the
+            # benchmark can measure what validation normally removes.
+            findings.append(Finding(
+                regulation=regulation,
+                provision_id=raw.get("provision_id", ""),
+                provision_ref=(node or {}).get("ref", raw.get("provision_id", "")),
+                title=(node or {}).get("title", "(unvalidated citation)"),
+                severity=raw.get("severity", "medium"),
+                rationale=raw.get("rationale", ""),
+                evidence_quote=raw.get("evidence_quote"),
+                recommendation=raw.get("recommendation", ""),
+            ))
             continue
         source = node.get("source") or {}
         findings.append(Finding(

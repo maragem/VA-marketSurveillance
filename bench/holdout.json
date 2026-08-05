@@ -1,0 +1,20 @@
+{
+  "_comment": "Held-out evaluation subset (15 of 52, stratified across tiers, regulations, compliant controls and near-miss cases). These cases NEVER feed calibration-rule distillation — the lesson proposer excludes them automatically — so configuration D (calibration) results reported on this subset measure transfer, not memorisation. Change this list only by adding newly created cases; moving an existing case out of the held-out set after rules have been distilled invalidates the split.",
+  "holdout": [
+    "t1-countdown-timer",
+    "t1-purchased-list-lookalike",
+    "t1-voice-clone-radio",
+    "t1-official-lookalike",
+    "t1-guaranteed-loan-pressure",
+    "t2-preselected-addons",
+    "t2-drip-pricing-fees",
+    "t2-retargeting-pressure",
+    "t2-gifted-influencer-vague",
+    "t2-personalised-price-hidden",
+    "t3-compliant-green-certified",
+    "t3-compliant-urgency-deadline",
+    "t3-minors-adjacent-audience",
+    "t3-was-price-anchor",
+    "t3-emotion-optimized-ads"
+  ]
+}
