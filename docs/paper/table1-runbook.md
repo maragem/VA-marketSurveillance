@@ -6,6 +6,12 @@ the manuscript. Follow it in order; each step states what it produces and
 where the numbers land. Estimated total effort: one focused day, plus review
 time.
 
+> **Running from Google Colab?** `bench/table1_colab.ipynb` packages §§2–7
+> of this runbook into one notebook — per-configuration server switching,
+> harness invocation, and automatic archiving of results to Google Drive.
+> Read this document first anyway; the notebook automates the *how*, not the
+> *why*.
+
 ## 0. Ground rules (read first)
 
 1. **The gold labels are frozen.** `bench/cases.jsonl` at commit `5ad62f0`
