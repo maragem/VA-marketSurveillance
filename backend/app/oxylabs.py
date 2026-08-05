@@ -293,14 +293,22 @@ async def video_bundle(video_id: str, language: str | None = None) -> dict:
         for lang in (language, None, "en"):
             if lang not in attempts:
                 attempts.append(lang)
+        last_error: OxylabsError | None = None
+        succeeded = False
         for lang in attempts:
             try:
                 transcript = await _transcript_attempt(lang)
             except OxylabsError as exc:
                 logger.info("transcript attempt (lang=%s) failed for %s: %s", lang, video_id, exc)
+                last_error = exc
                 continue
+            succeeded = True
             if transcript:
                 return transcript
+        # Only if every attempt errored is the failure reason worth
+        # propagating; an empty-but-successful scrape just means no captions.
+        if not succeeded and last_error is not None:
+            raise last_error
         return ""
 
     meta_result, transcript_result = await asyncio.gather(
@@ -314,7 +322,21 @@ async def video_bundle(video_id: str, language: str | None = None) -> dict:
         logger.warning("youtube_transcript failed for %s: %s", video_id, transcript_result)
 
     if not (meta["title"] or meta["description"] or transcript):
-        raise OxylabsError("Could not retrieve any content for this video.")
+        # Explain *why* nothing came back — a credentials/quota failure needs a
+        # very different fix than an unavailable video, and burying the cause
+        # in server logs leaves the user guessing.
+        causes = []
+        if isinstance(meta_result, Exception):
+            causes.append(f"metadata: {meta_result}")
+        if isinstance(transcript_result, Exception):
+            causes.append(f"transcript: {transcript_result}")
+        if causes:
+            raise OxylabsError(
+                "Could not retrieve any content for this video — " + "; ".join(causes))
+        raise OxylabsError(
+            "Could not retrieve any content for this video. The scraper responded "
+            "but returned no title, description or captions — the video may be "
+            "private, removed, age-restricted, or unavailable in the scraper's region.")
 
     return {
         "video_id": video_id,
