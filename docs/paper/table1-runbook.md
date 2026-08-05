@@ -226,6 +226,34 @@ state, flags, result stamp). Table 1 is then a transcription exercise:
 one row per configuration from the corresponding scorecard, with D (and its
 C baseline) taken from the holdout runs.
 
+### 7.1 If you don't push to the repository yourself (Drive handoff)
+
+Results can be handed over instead of pushed. When running from Google
+Colab, mount Drive once per session and copy the outputs **immediately
+after each run** (the Colab VM is ephemeral — waiting until the end of the
+day risks losing paid runs):
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+
+```bash
+cp -r bench/results /content/drive/MyDrive/mcc-table1/config-C-full/
+```
+
+Use one Drive subfolder per configuration — `config-A/`, `config-B/`,
+`config-C-full/`, `config-C-holdout/`, `config-D/` — and keep a
+`runlog.txt` in the top folder mapping each result stamp to: date,
+configuration, model id reported by `/api/health`, flags used, and the
+calibration state check. The result files are named only by timestamp, so
+this mapping is what keeps them unambiguous.
+
+When all configurations are done, share the folder with the supervisor,
+who will have the files verified (engine labels, holdout case counts,
+run counts, rescore reproduction from the raw reports) and committed to
+`bench/results/`.
+
 ## 8. Recommended order and time budget
 
 | Step | What | Wall time | LLM cost |
