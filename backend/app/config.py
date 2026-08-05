@@ -29,15 +29,15 @@ else:
 
 # Model id. ANTHROPIC_MODEL is accepted as an alias for CLAUDE_MODEL.
 # Bedrock model ids carry a provider/inference-profile prefix,
-# e.g. "eu.anthropic.claude-opus-4-8"; first-party ids are bare, e.g. "claude-opus-4-8".
+# e.g. "eu.anthropic.claude-opus-5"; first-party ids are bare, e.g. "claude-opus-5".
 _DEFAULT_MODELS = {
-    "anthropic": "claude-opus-4-8",
-    "bedrock": "eu.anthropic.claude-opus-4-8",
+    "anthropic": "claude-opus-5",
+    "bedrock": "eu.anthropic.claude-opus-5",
 }
 CLAUDE_MODEL = (
     os.environ.get("CLAUDE_MODEL")
     or os.environ.get("ANTHROPIC_MODEL")
-    or _DEFAULT_MODELS.get(CLAUDE_PROVIDER, "claude-opus-4-8")
+    or _DEFAULT_MODELS.get(CLAUDE_PROVIDER, "claude-opus-5")
 )
 
 # Bedrock API surface: "runtime" (classic InvokeModel, default) or "mantle".

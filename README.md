@@ -48,7 +48,7 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
 |------------|------------|
 | Frontend   | Angular 21 + **eUI 21** (`@eui/components`, `@eui/styles`) — EC look & feel |
 | Backend    | Python 3.12, FastAPI, SSE streaming |
-| Agents     | Anthropic Python SDK, Claude (default `claude-opus-4-8`), parallel tool-use loops |
+| Agents     | Anthropic Python SDK, Claude (default `claude-opus-5`), parallel tool-use loops |
 | GraphRAG   | Curated legal knowledge graph (JSON) + BM25 + 1-hop graph expansion |
 | Storage    | SQLite (reports); attach a Railway volume for persistence |
 | Deployment | Docker multi-stage build, single Railway service |
@@ -64,7 +64,7 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
    | Variable | Description |
    |---|---|
    | `ANTHROPIC_API_KEY` | Anthropic API key. |
-   | `CLAUDE_MODEL` | Optional; default `claude-opus-4-8`. |
+   | `CLAUDE_MODEL` | Optional; default `claude-opus-5`. |
 
    **Option B — Claude on Amazon Bedrock (bearer token / Bedrock API key):**
 
@@ -72,7 +72,7 @@ using deterministic GraphRAG retrieval (clearly labelled in the UI) — useful f
    |---|---|
    | `AWS_BEARER_TOKEN_BEDROCK` | Your Bedrock API key (bearer token). |
    | `AWS_REGION` | e.g. `eu-west-1`. |
-   | `ANTHROPIC_MODEL` (or `CLAUDE_MODEL`) | Bedrock model / inference-profile id, e.g. `eu.anthropic.claude-opus-4-8` (the default in Bedrock mode). |
+   | `ANTHROPIC_MODEL` (or `CLAUDE_MODEL`) | Bedrock model / inference-profile id, e.g. `eu.anthropic.claude-opus-5` (the default in Bedrock mode). |
    | `BEDROCK_ENDPOINT` | Optional: `runtime` (default — classic InvokeModel endpoint, works with plain Bedrock API keys) or `mantle` (newer Messages endpoint; the key additionally needs the `bedrock-mantle:CreateInference` IAM action). |
 
    The provider is auto-detected from which credentials are present
