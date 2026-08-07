@@ -1,20 +1,88 @@
 {
-  "_comment": "Human-approved calibration rules injected into the specialist agents' prompts. They encode lessons from benchmark review — general legal principles only, never case-specific facts. GLOBAL rules reach every specialist; regulation keys reach that specialist only. Managed from the Benchmark page (working copy on the data volume); export and commit here to version.",
+  "_comment": "Human-approved calibration rules injected into the specialist agents' prompts. They encode lessons from benchmark review — general legal principles only, never case-specific facts. GLOBAL rules reach every specialist; regulation keys reach that specialist only. Curated from the 2026-08 benchmark-review export: near-duplicate proposals merged, and rules distilled from the corrupted t1-miracle-cure-arthritis label removed.",
   "GLOBAL": [
     {
       "id": "global-specificity",
       "rule": "Cite the most specific provision that covers the conduct. When a specific prohibition squarely applies (e.g. a UCPD Annex I blacklist item), do not add separate findings for general clauses that merely restate the same conduct — reference them in the rationale instead.",
       "origin": "seed — benchmark review 2026-07-12"
+    },
+    {
+      "id": "b0867ba0",
+      "rule": "Do not append data-protection provisions to a campaign whose violations are purely deceptive or aggressive commercial practices unless the record shows actual processing of personal data, direct-marketing to identified individuals, or a specific consent defect. The mere presence of a web form, email channel or prize mechanic is not sufficient to trigger GDPR findings.",
+      "origin": "benchmark lessons — evidence: t1-countdown-timer, t1-kids-toy-exhortation, t1-prize-notification"
+    },
+    {
+      "id": "3f51ba41",
+      "rule": "Where the true harm is a consent, opt-out or direct-marketing defect (e.g. a buried or mislabelled unsubscribe mechanism), treat it under the data-protection/ePrivacy instrument governing that duty and do not reclassify it as a UCPD misleading-omission. Conversely, do not append data-protection provisions to campaigns whose violations are purely deceptive or aggressive commercial practices.",
+      "origin": "benchmark lessons — evidence: t3-soft-optin-email, t1-countdown-timer, t1-prize-pay-to-claim, t3-minors-adjacent-audience, t2-marketplace-ad-labels"
     }
   ],
-  "AI_ACT": [],
-  "GDPR": [],
+  "AI_ACT": [
+    {
+      "id": "726a0c65",
+      "rule": "Cite AI Act synthetic-content marking duties (Art. 50(2)) only against providers of the generative AI system, not against advertisers who merely use AI-generated copy; and cite AI prohibitions (Art. 5) only where an AI system is actually deployed. Content fabricated by ordinary means is a UCPD matter, not an AI-transparency or AI-prohibition breach.",
+      "origin": "benchmark lessons — evidence: t1-crypto-guaranteed, t1-voice-clone-radio, t1-miracle-cure-arthritis"
+    },
+    {
+      "id": "eab75aa0",
+      "rule": "Cite AI Act Article 5 prohibitions (subliminal/manipulative techniques, exploitation of vulnerabilities) only where an AI system is actually deployed to influence behaviour. Persuasive, pressuring or emotive advertising executed by ordinary means is an unfair or aggressive commercial practice under the UCPD, not an AI-prohibition breach.",
+      "origin": "benchmark lessons — evidence: t1-miracle-cure-arthritis, t1-subliminal-audio-nudge"
+    }
+  ],
+  "GDPR": [
+    {
+      "id": "c70cbd9b",
+      "rule": "Cite the child-consent provision for information society services only where the record shows an online service actually collecting or processing a child's personal data on a consent basis. Do not append it to campaigns whose child-protection concern is a deceptive or aggressive marketing practice (e.g. direct exhortation to children) rather than any data processing.",
+      "origin": "benchmark lessons — evidence: t1-kids-toy-exhortation"
+    },
+    {
+      "id": "0ff03b64",
+      "rule": "Cite the special-categories provision only when the record contains data falling within its closed list (racial/ethnic origin, political opinions, religious/philosophical beliefs, trade-union membership, genetic, biometric, health, or sex-life/sexual-orientation data). Do not invoke it merely because minors are targeted or profiling occurs; ordinary profiling of non-sensitive attributes stays under the general processing and platform rules.",
+      "origin": "benchmark lessons — evidence: t3-minors-profiling-ads"
+    },
+    {
+      "id": "491f39eb",
+      "rule": "Never cite a purely definitional provision (e.g. the definition of profiling) as a standalone breach or compliance obligation. Definitions impose no duty on anyone; cite the operative provision that actually creates the obligation instead.",
+      "origin": "benchmark lessons — evidence: t1-miracle-cure-arthritis, t1-guaranteed-loan-pressure"
+    },
+    {
+      "id": "7b28436a",
+      "rule": "Cite GDPR operative provisions (lawful basis, transparency notices, right to object, child consent) only where the record shows an actual data-processing or consent defect within that provision's specific scope. Do not append them to campaigns whose violations are deceptive or aggressive commercial practices merely because a form, email channel, prize or targeting is incidentally involved, and match the article to the precise duty (e.g. do not use collection-notice duties for ranking or ad-disclosure gaps).",
+      "origin": "benchmark lessons — evidence: t1-countdown-timer, t1-kids-toy-exhortation, t1-prize-pay-to-claim, t2-marketplace-ad-labels, t3-minors-adjacent-audience"
+    }
+  ],
   "DSA": [
     {
       "id": "dsa-addressee",
       "rule": "The DSA's platform obligations (Articles 25, 26 and 28) are addressed to providers of online platforms, not to advertisers or traders whose campaigns merely run on a platform. Cite them only when the campaign's operator itself provides the online interface in question (e.g. its own marketplace or booking platform); advertiser-side conduct belongs under the UCPD, or the GDPR for data practices.",
       "origin": "seed — benchmark review 2026-07-12"
+    },
+    {
+      "id": "a1e20249",
+      "rule": "Cite DSA platform obligations (dark patterns, advertising and recommender transparency, minor-protection and profiling-ad bans) only where the operator itself provides the online interface and the specific platform mechanism is present in the record. Do not attach recommender-system or ad-transparency duties reflexively when only some platform findings are made out, and never to advertiser-side deceptive conduct running on a third party's interface.",
+      "origin": "benchmark lessons — evidence: t1-crypto-guaranteed, t1-subliminal-audio-nudge, t3-emotion-optimized-ads"
     }
   ],
-  "UCPD": []
+  "UCPD": [
+    {
+      "id": "7fe7d642",
+      "rule": "When a UCPD Annex I blacklist item squarely captures the conduct (e.g. false urgency, false scarcity), treat it as the primary and sufficient finding; do not add the general aggressive-practices clauses (Arts. 8-9) or misleading-actions clauses that merely restate the same deceptive conduct — address them in the rationale instead.",
+      "origin": "benchmark lessons — evidence: t1-countdown-timer"
+    },
+    {
+      "id": "28c609e8",
+      "rule": "Match each blacklist item to the specific per se conduct it prohibits and cite it only where that conduct is actually present in the record. Do not cite the fake-reviews/endorsements blacklist item for conduct that is really false urgency, false scarcity or fabricated activity; those belong under the false-urgency/scarcity item and the general misleading-actions clause.",
+      "origin": "benchmark lessons — evidence: t2-dark-fake-activity"
+    },
+    {
+      "id": "5f706b7a",
+      "rule": "Whenever a fabricated or false statement independently deceives consumers about material facts, record the general misleading-actions clause even where a specific blacklist item also applies; the blacklist item captures the per se prohibition while misleading-actions captures the substantive falsehood. Do not let a blacklist finding absorb an independently established misleading-actions violation.",
+      "origin": "benchmark lessons — evidence: t2-dark-fake-activity, t3-deepfake-endorsement"
+    },
+    {
+      "id": "f45d583f",
+      "rule": "Where a campaign both makes a false or misleading affirmative statement and withholds or obscures material information (hidden commercial intent, undisclosed paid endorsements, hidden material terms), find both the misleading-actions and the misleading-omissions clauses. Do not let the misleading-action finding absorb a distinct omission that independently deprives consumers of material information.",
+      "origin": "benchmark lessons — evidence: t2-scarcity-room-left, t2-paid-actor-testimonials, t3-deepfake-endorsement"
+    }
+  ]
 }
