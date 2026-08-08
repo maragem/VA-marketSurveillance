@@ -25,6 +25,7 @@ export class HelpPage {
     { id: 'dashboard', label: 'Dashboard & analytics' },
     { id: 'graph', label: 'Knowledge graph' },
     { id: 'benchmark', label: 'Benchmark' },
+    { id: 'experiments', label: 'Experiments' },
     { id: 'reference', label: 'Severity & status reference' },
     { id: 'disclaimer', label: 'Data handling & disclaimer' },
   ];

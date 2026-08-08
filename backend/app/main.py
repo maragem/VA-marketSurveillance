@@ -32,6 +32,9 @@ async def lifespan(app: FastAPI):
     app.state.cellar = CellarClient()
     from .bench import BenchStore
     app.state.bench = BenchStore(config.BENCH_DIR / "cases.jsonl", config.DATA_DIR)
+    from .experiments import ExperimentManager
+    app.state.experiments = ExperimentManager(graph, retriever, app.state.bench, config.DATA_DIR)
+    app.state.experiments.resume_pending()
     logger.info("Knowledge graph loaded: %s", graph.summary())
     if config.llm_available():
         logger.info("LLM provider: %s, model: %s", config.CLAUDE_PROVIDER, config.CLAUDE_MODEL)

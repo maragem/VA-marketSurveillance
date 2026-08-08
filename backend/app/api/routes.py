@@ -467,3 +467,89 @@ async def analyze_stream(campaign: CampaignSubmission, request: Request,
 
     return StreamingResponse(stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+# ---------------------------------------------------------------------------
+# Experiments (Table 1 evaluation grid) — server-side benchmark jobs
+# ---------------------------------------------------------------------------
+
+class ExperimentStartRequest(BaseModel):
+    config: str
+
+
+@router.get("/experiments/configs")
+async def experiments_configs(request: Request):
+    """The A-D configuration cards with prerequisite status."""
+    return await request.app.state.experiments.configs_status()
+
+
+@router.get("/experiments/jobs")
+async def experiments_jobs(request: Request):
+    return {"jobs": request.app.state.experiments.list_jobs(),
+            "running_job": request.app.state.experiments.running_job_id()}
+
+
+@router.post("/experiments/jobs", status_code=201)
+async def experiments_start(body: ExperimentStartRequest, request: Request):
+    try:
+        return await request.app.state.experiments.start(body.config)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+
+
+@router.get("/experiments/jobs/{job_id}")
+async def experiments_job(job_id: str, request: Request):
+    job = request.app.state.experiments.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Unknown experiment job")
+    return job
+
+
+@router.post("/experiments/jobs/{job_id}/cancel")
+async def experiments_cancel(job_id: str, request: Request):
+    try:
+        return await request.app.state.experiments.cancel(job_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unknown experiment job")
+
+
+@router.delete("/experiments/jobs/{job_id}", status_code=204)
+async def experiments_delete(job_id: str, request: Request):
+    try:
+        request.app.state.experiments.delete(job_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unknown experiment job")
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+
+
+@router.get("/experiments/jobs/{job_id}/scorecard")
+async def experiments_scorecard(job_id: str, request: Request):
+    path = request.app.state.experiments.job_file(job_id, "scorecard.md")
+    if not path:
+        raise HTTPException(status_code=404, detail="No scorecard yet for this job")
+    return Response(content=path.read_text(), media_type="text/markdown; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{job_id}-scorecard.md"'})
+
+
+@router.get("/experiments/jobs/{job_id}/results")
+async def experiments_results(job_id: str, request: Request):
+    path = request.app.state.experiments.job_file(job_id, "results.json")
+    if not path:
+        raise HTTPException(status_code=404, detail="No results yet for this job")
+    return Response(content=path.read_text(), media_type="application/json",
+                    headers={"Content-Disposition": f'attachment; filename="{job_id}-results.json"'})
+
+
+@router.get("/experiments/jobs/{job_id}/reports")
+async def experiments_reports(job_id: str, request: Request):
+    """Raw engine outputs in the harness -reports.jsonl format (--rescore compatible)."""
+    if not request.app.state.experiments.get_job(job_id):
+        raise HTTPException(status_code=404, detail="Unknown experiment job")
+    content = request.app.state.experiments.reports_jsonl(job_id)
+    if not content:
+        raise HTTPException(status_code=404, detail="No stored outputs yet for this job")
+    return Response(content=content, media_type="application/x-ndjson",
+                    headers={"Content-Disposition": f'attachment; filename="{job_id}-reports.jsonl"'})

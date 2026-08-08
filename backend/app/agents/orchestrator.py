@@ -100,12 +100,18 @@ async def _forced_tool_call(client: AsyncAnthropic, system: str, user: str, tool
 
 
 class Orchestrator:
-    def __init__(self, graph: KnowledgeGraph, retriever: GraphRetriever, calibration=None):
+    def __init__(self, graph: KnowledgeGraph, retriever: GraphRetriever, calibration=None,
+                 *, force_heuristic: bool = False, skip_validation: bool | None = None):
+        """`force_heuristic` and `skip_validation` are per-instance overrides
+        used by the experiment runner (Table 1 configurations A and B); when
+        left at their defaults the instance behaves per the environment."""
         self.graph = graph
         self.retriever = retriever
         self.executor = GraphToolExecutor(graph, retriever)
-        self.client = config.make_async_client()
+        self.client = None if force_heuristic else config.make_async_client()
         self.calibration = calibration  # CalibrationStore | None
+        self.skip_validation = (config.EXPERIMENT_SKIP_CITATION_VALIDATION
+                                if skip_validation is None else skip_validation)
 
     async def run(self, report: AnalysisReport, emit: Callable[[dict], Awaitable[None]]) -> AnalysisReport:
         if self.client is None:
@@ -147,7 +153,8 @@ class Orchestrator:
             try:
                 verdict = await run_regulation_agent(
                     self.client, reg, block, triage_summary, self.executor, emit,
-                    calibration=calibration_rules.get(reg))
+                    calibration=calibration_rules.get(reg),
+                    skip_validation=self.skip_validation)
             except Exception as exc:  # one agent failing must not sink the run
                 verdict = RegulationVerdict(
                     regulation=reg, status="attention", findings=[],
@@ -178,6 +185,6 @@ class Orchestrator:
         report.overall_risk = synthesis_input.get("overall_risk", "medium")
         report.executive_summary = synthesis_input.get("executive_summary", "")
         report.recommendations = synthesis_input.get("recommendations", [])
-        report.engine = "agentic"
+        report.engine = "agentic-unvalidated" if self.skip_validation else "agentic"
         report.status = "completed"
         return report

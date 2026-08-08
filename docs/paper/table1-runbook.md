@@ -6,11 +6,22 @@ the manuscript. Follow it in order; each step states what it produces and
 where the numbers land. Estimated total effort: one focused day, plus review
 time.
 
-> **Running from Google Colab?** `bench/table1_colab.ipynb` packages §§2–7
-> of this runbook into one notebook — per-configuration server switching,
-> harness invocation, and automatic archiving of results to Google Drive.
-> Read this document first anyway; the notebook automates the *how*, not the
-> *why*.
+> **Preferred way to run the grid: the app's Experiments page.** The
+> deployment now has an **Experiments** page with one card per configuration
+> (A, B, C-full, C-holdout, D). Jobs run *server-side*: they survive closing
+> the browser, checkpoint progress to the data volume after every analysis,
+> and resume automatically after a redeploy or restart — nothing can be lost
+> to a dropped session. Configuration switching (credentials off for A, the
+> validation-skip for B, calibration for D) is handled per job; no
+> environment changes, no local setup. When a job completes, download the
+> scorecard, results JSON and raw reports from the card and commit them to
+> `bench/results/` (§7). The scoring code is shared with `bench/run.py`, so
+> the numbers are identical to a CLI run by construction. Read §§0–1 and
+> §6.1 regardless — the ground rules and the calibration-commit step still
+> apply. The CLI/Colab procedure below (§§2–7) remains valid as a fallback
+> or for scratch instances; note that Experiments-page jobs run on the
+> deployment's pinned model, which is the model-consistency guarantee of
+> ground rule 2 for free.
 
 ## 0. Ground rules (read first)
 

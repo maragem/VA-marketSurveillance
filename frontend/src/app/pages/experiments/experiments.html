@@ -1,0 +1,141 @@
+<div class="bar">
+  <h1 class="page-title">Experiments — Table 1 evaluation grid</h1>
+  @if (model()) {
+    <span class="model-chip" title="Model used for LLM configurations">{{ model() }}</span>
+  }
+</div>
+
+<p class="intro">
+  Runs the benchmark configurations for the paper's evaluation grid as <strong>server-side jobs</strong>:
+  they keep running if you close this page, progress is saved to the data volume after
+  <em>every</em> analysis, and interrupted jobs resume automatically after a redeploy or restart.
+  One job runs at a time. Results stay stored here until you delete them — download the scorecard,
+  results JSON and raw reports when a job completes.
+</p>
+
+@if (error()) {
+  <div class="alert alert--error">{{ error() }}</div>
+}
+
+<div class="cards">
+  @for (cfg of configs(); track cfg.id) {
+    <div class="card" [class.card--blocked]="cfg.blocked">
+      <div class="card__head">
+        <span class="card__id">{{ cfg.id }}</span>
+        <span class="card__label">{{ cfg.label }}</span>
+      </div>
+      <p class="card__desc">{{ cfg.description }}</p>
+      <div class="card__meta">
+        <span>{{ cfg.cases }} cases × {{ cfg.runs }} runs = {{ cfg.total_analyses }} analyses</span>
+        @if (cfg.calibration_rules) {
+          <span>· {{ cfg.calibration_rules }} calibration rules</span>
+        }
+      </div>
+
+      @if (cfg.blocked) {
+        <div class="card__blocked">{{ cfg.blocked }}</div>
+      }
+
+      @if (latestJob(cfg.id); as job) {
+        <div class="card__job">
+          <div class="card__jobline">
+            <span class="status status--{{ job.status }}">{{ statusLabel(job.status) }}</span>
+            <span class="muted">{{ job.created_at | date: 'medium' }}</span>
+            @if (job.resumed) {
+              <span class="muted" title="The job survived a restart and resumed from its checkpoint">
+                resumed ×{{ job.resumed }}</span>
+            }
+          </div>
+          @if (job.status === 'running') {
+            <div class="progress">
+              <div class="progress__fill" [style.width.%]="pct(job)"></div>
+            </div>
+            <div class="muted">{{ job.done }}/{{ job.total }} analyses ({{ pct(job) }}%)</div>
+          } @else if (job.summary; as s) {
+            <div class="metrics">
+              <span title="Gold-provision recall"><strong>{{ s.finding_recall ?? '—' }}</strong> recall</span>
+              <span title="Unexpected actionable findings"><strong>{{ s.unexpected_findings }}</strong> unexpected</span>
+              <span title="False positives on compliant controls">
+                <strong>{{ s.false_positives_on_controls }}/{{ s.controls }}</strong> control FP</span>
+              <span title="Risk calibration passed"><strong>{{ s.risk_calibration_pass }}/{{ s.cases }}</strong> risk ok</span>
+              @if (s.stability_mean != null) {
+                <span title="Mean pairwise Jaccard across runs"><strong>{{ s.stability_mean }}</strong> stability</span>
+              }
+              @if (s.invalid_citations_total != null) {
+                <span title="Invalid citations surviving to reports"><strong>{{ s.invalid_citations_total }}</strong> invalid citations</span>
+              }
+              @if (s.mean_latency_s != null) {
+                <span title="Mean latency per analysis"><strong>{{ s.mean_latency_s }}s</strong> latency</span>
+              }
+            </div>
+          }
+          @if (job.failures.length) {
+            <div class="card__failures">{{ job.failures.length }} failed analysis(es) — see results JSON.</div>
+          }
+        </div>
+      }
+
+      <div class="card__actions">
+        @if (latestJob(cfg.id)?.status === 'running') {
+          <button class="btn btn--secondary" (click)="cancel(latestJob(cfg.id)!)">Cancel</button>
+        } @else {
+          <button class="btn" [disabled]="!!cfg.blocked || !!runningJob() || starting() === cfg.id"
+                  (click)="start(cfg)">
+            {{ starting() === cfg.id ? 'Starting…' : (latestJob(cfg.id) ? 'Run again' : 'Start') }}
+          </button>
+        }
+        @if (latestJob(cfg.id); as job) {
+          @if (job.status !== 'running' && job.summary) {
+            <a class="btn btn--link" [href]="downloadUrl(job, 'scorecard')">Scorecard</a>
+            <a class="btn btn--link" [href]="downloadUrl(job, 'results')">Results JSON</a>
+            <a class="btn btn--link" [href]="downloadUrl(job, 'reports')" title="Raw engine outputs — bench/run.py --rescore compatible">Raw reports</a>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>
+
+@if (jobs().length) {
+  <h2 class="section-title">Job history</h2>
+  <p class="muted">
+    Every job's files remain on the server volume until deleted. Commit the downloaded
+    scorecard/results/raw-reports triple to <code>bench/results/</code> to version them.
+  </p>
+  <table class="jobs">
+    <thead>
+      <tr>
+        <th>Job</th><th>Configuration</th><th>Status</th><th>Started</th>
+        <th>Progress</th><th>Model</th><th>Files</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (job of jobs(); track job.id) {
+        <tr>
+          <td class="mono">{{ job.id }}</td>
+          <td>{{ job.label }}</td>
+          <td><span class="status status--{{ job.status }}">{{ statusLabel(job.status) }}</span></td>
+          <td>{{ job.created_at | date: 'short' }}</td>
+          <td>{{ job.done }}/{{ job.total }}</td>
+          <td class="mono">{{ job.model || '—' }}</td>
+          <td class="links">
+            @if (job.summary) {
+              <a [href]="downloadUrl(job, 'scorecard')">scorecard</a>
+              <a [href]="downloadUrl(job, 'results')">json</a>
+              <a [href]="downloadUrl(job, 'reports')">raw</a>
+            } @else {
+              <span class="muted">—</span>
+            }
+          </td>
+          <td>
+            @if (job.status === 'running') {
+              <button class="btn btn--secondary btn--small" (click)="cancel(job)">Cancel</button>
+            } @else {
+              <button class="btn btn--secondary btn--small" (click)="remove(job)">Delete</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

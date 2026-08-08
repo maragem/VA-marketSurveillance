@@ -274,3 +274,49 @@ export const REGULATION_LABELS: Record<Regulation, string> = {
   DSA: 'Digital Services Act',
   UCPD: 'Unfair Commercial Practices',
 };
+
+// ---- Experiments (Table 1 evaluation grid) ---------------------------------
+
+export interface ExperimentConfigStatus {
+  id: string;
+  label: string;
+  description: string;
+  cases: number;
+  runs: number;
+  total_analyses: number;
+  calibration_rules: number;
+  blocked: string | null;
+}
+
+export interface ExperimentSummary {
+  cases: number;
+  engine: string | null;
+  finding_recall: number | null;
+  unexpected_findings: number;
+  false_positives_on_controls: number;
+  controls: number;
+  risk_calibration_pass: number;
+  routing_missed_total: number;
+  invalid_citations_total: number | null;
+  mean_latency_s: number | null;
+  stability_mean?: number | null;
+}
+
+export interface ExperimentJob {
+  id: string;
+  config: string;
+  label: string;
+  status: 'running' | 'completed' | 'completed_with_errors' | 'cancelled' | 'failed';
+  created_at: string;
+  updated_at?: string;
+  model: string | null;
+  runs: number;
+  case_ids: string[];
+  cases_sha256: string;
+  total: number;
+  done: number;
+  failures: { case_id: string; run: number; error: string; at: string }[];
+  resumed: number;
+  summary: ExperimentSummary | null;
+  error: string | null;
+}

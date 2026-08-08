@@ -216,6 +216,35 @@
       </p>
     </section>
 
+    <section id="experiments">
+      <h2>Experiments</h2>
+      <p>
+        The <strong>Experiments</strong> page runs whole evaluation configurations of the
+        benchmark as <strong>server-side jobs</strong> — the systematic counterpart to the
+        Benchmark page's one-case-at-a-time runs, used to produce the evaluation grid for
+        reporting (each configuration isolates one part of the pipeline):
+      </p>
+      <ul>
+        <li><strong>A — Retrieval-only:</strong> the GraphRAG heuristic with no language model.</li>
+        <li><strong>B — No citation validation:</strong> the agentic pipeline with post-hoc
+            citation validation disabled for that job only; measures what validation removes.</li>
+        <li><strong>C — Deployed default:</strong> the pipeline as deployed, without calibration
+            rules (full set, plus a holdout-only baseline run).</li>
+        <li><strong>D — C + calibration:</strong> the versioned calibration rules applied,
+            evaluated only on held-out cases that never informed rule-writing.</li>
+      </ul>
+      <p>
+        Every case is analysed three times (run-to-run stability), progress is saved to the data
+        volume after <em>every</em> analysis, and a job interrupted by a redeploy or restart
+        resumes automatically from its checkpoint — closing the page loses nothing. One job runs
+        at a time; experiment analyses never appear in the dashboard. When a job completes,
+        download the <strong>scorecard</strong> (Markdown), <strong>results JSON</strong>
+        (per-case detail) and <strong>raw reports</strong> (re-scorable offline with
+        <code>bench/run.py --rescore</code> after label changes) and commit them to
+        <code>bench/results/</code>.
+      </p>
+    </section>
+
     <section id="reference">
       <h2>Severity &amp; status reference</h2>
       <h3>Finding severity</h3>

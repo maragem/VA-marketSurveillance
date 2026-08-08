@@ -76,7 +76,10 @@ async def run_regulation_agent(
     executor: GraphToolExecutor,
     emit: Callable[[dict], Awaitable[None]],
     calibration: list[str] | None = None,
+    skip_validation: bool | None = None,
 ) -> RegulationVerdict:
+    if skip_validation is None:
+        skip_validation = config.EXPERIMENT_SKIP_CITATION_VALIDATION
     graph = executor.graph
     system = SYSTEM_PROMPT.format(
         label=config.REGULATION_LABELS[regulation],
@@ -128,7 +131,7 @@ async def run_regulation_agent(
                 })
 
         if submitted is not None:
-            return _to_verdict(regulation, submitted, executor)
+            return _to_verdict(regulation, submitted, executor, skip_validation)
 
         if response.stop_reason != "tool_use":
             break
@@ -140,13 +143,14 @@ async def run_regulation_agent(
     )
 
 
-def _to_verdict(regulation: str, submitted: dict, executor: GraphToolExecutor) -> RegulationVerdict:
+def _to_verdict(regulation: str, submitted: dict, executor: GraphToolExecutor,
+                skip_validation: bool = False) -> RegulationVerdict:
     findings: list[Finding] = []
     for raw in submitted.get("findings", []):
         node = executor.graph.get(raw.get("provision_id", ""))
         # Drop hallucinated citations and findings pinned to another regulation's provision.
         if not node or node.get("type") != "provision" or node.get("regulation") != regulation:
-            if not config.EXPERIMENT_SKIP_CITATION_VALIDATION:
+            if not skip_validation:
                 continue
             # Ablation configuration B: keep the invalid citation so the
             # benchmark can measure what validation normally removes.

@@ -10,6 +10,8 @@ import {
   BenchCase,
   BenchRunOutcome,
   BenchSummary,
+  ExperimentConfigStatus,
+  ExperimentJob,
   Calibration,
   CalibrationRule,
   CampaignSubmission,
@@ -106,6 +108,28 @@ export class ApiService {
       rationale: finding.rationale ?? '',
       evidence_quote: finding.evidence_quote ?? null,
     });
+  }
+
+  experimentsConfigs(): Observable<{ configs: ExperimentConfigStatus[]; model: string | null; running_job: string | null }> {
+    return this.http.get<{ configs: ExperimentConfigStatus[]; model: string | null; running_job: string | null }>(
+      `${this.base}/experiments/configs`,
+    );
+  }
+
+  experimentsJobs(): Observable<{ jobs: ExperimentJob[]; running_job: string | null }> {
+    return this.http.get<{ jobs: ExperimentJob[]; running_job: string | null }>(`${this.base}/experiments/jobs`);
+  }
+
+  startExperiment(config: string): Observable<ExperimentJob> {
+    return this.http.post<ExperimentJob>(`${this.base}/experiments/jobs`, { config });
+  }
+
+  cancelExperiment(id: string): Observable<ExperimentJob> {
+    return this.http.post<ExperimentJob>(`${this.base}/experiments/jobs/${encodeURIComponent(id)}/cancel`, {});
+  }
+
+  deleteExperiment(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/experiments/jobs/${encodeURIComponent(id)}`);
   }
 
   benchRuns(): Observable<Record<string, BenchRunOutcome>> {
