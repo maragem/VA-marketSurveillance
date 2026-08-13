@@ -223,11 +223,14 @@ class ExperimentManager:
         return path if path.exists() else None
 
     def reports_jsonl(self, job_id: str) -> str:
-        """Raw outputs in the CLI harness's -reports.jsonl format (--rescore compatible)."""
-        lines = []
-        for entry in self._read_outcomes(job_id):
-            lines.append(json.dumps({"case_id": entry["case_id"], "run": entry["run"],
-                                     "report": entry["report"]}, ensure_ascii=False))
+        """Raw outputs in the CLI harness's -reports.jsonl format (--rescore compatible).
+
+        Outcomes are stored in completion order (case-runs interleave under
+        concurrency); emit them sorted by (case, run) so downstream consumers
+        that rely on file order pick the same "first run" the scorer did."""
+        entries = sorted(self._read_outcomes(job_id), key=lambda e: (e["case_id"], e["run"]))
+        lines = [json.dumps({"case_id": e["case_id"], "run": e["run"], "report": e["report"]},
+                            ensure_ascii=False) for e in entries]
         return "\n".join(lines) + ("\n" if lines else "")
 
     async def start(self, config_id: str) -> dict:

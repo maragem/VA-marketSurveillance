@@ -241,10 +241,13 @@ async def main() -> int:
 
     if args.rescore:
         stored: dict[str, list[dict]] = {}
-        for line in Path(args.rescore).read_text().splitlines():
-            if not line.strip():
-                continue
-            entry = json.loads(line)
+        entries = [json.loads(line) for line in Path(args.rescore).read_text().splitlines()
+                   if line.strip()]
+        # Stored files may be in completion order (concurrent runners interleave
+        # case-runs); sort by the recorded run number so "the first run" is
+        # deterministic and matches the original scoring.
+        entries.sort(key=lambda e: e.get("run", 0))
+        for entry in entries:
             stored.setdefault(entry["case_id"], []).append(entry["report"])
         case_ids = {c["id"] for c in cases}
         reports = {cid: runs for cid, runs in stored.items() if cid in case_ids}
