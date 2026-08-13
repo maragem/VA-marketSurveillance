@@ -21,7 +21,7 @@ RESULTS = BENCH_DIR / "results"
 
 # (row label, results file, evaluated subset) in reporting order.
 ROWS = [
-    ("A — retrieval only (no LLM)", "A-20260813-153304-results.json", "full"),
+    ("A — retrieval only (no LLM)", "A-20260808-114736-results.json", "full"),
     ("B — agentic, no citation validation", "B-20260808-114752-results.json", "full"),
     ("C — agentic, deployed default", "C-full-20260813-071439-results.json", "full"),
     ("C — deployed default (holdout)", "C-holdout-20260813-083740-results.json", "holdout"),

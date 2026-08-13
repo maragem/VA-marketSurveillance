@@ -53,6 +53,14 @@ actually engaged — and by this addressee, on these facts — is what the agent
 layer contributes. Adding it (configuration C) roughly doubles recall, halves
 the over-flagging rate, and takes control false positives from 7/7 to 1/7.
 
+Because this configuration is deterministic, it also serves as a cross-check on
+the measurement apparatus: an independent replication executed five days later
+on a separate instance, scored through the command-line harness rather than the
+in-application runner, reproduced the deployment run exactly — identical
+matched, missed and unexpected provision sets, risk verdicts and control
+outcomes on all 52 campaigns (`bench/results/A-20260813-153304-*`). The two
+scoring paths and the two label copies are therefore in exact agreement.
+
 ## 3.2.2 The deployed configuration
 
 Configuration C recovers 95 of 97 must-find provisions (0.979) with complete

@@ -10,7 +10,7 @@
 
 Provenance:
 
-- **A — retrieval only (no LLM)** — job `A-20260813-153304-results`, engine `heuristic`, model `n/a (no LLM)`, case set `repo cases.jsonl`
+- **A — retrieval only (no LLM)** — job `A-20260808-114736`, engine `heuristic`, model `n/a (no LLM)`, case set `bb48530e65e048b9`
 - **B — agentic, no citation validation** — job `B-20260808-114752`, engine `agentic-unvalidated`, model `eu.anthropic.claude-opus-4-8`, case set `bb48530e65e048b9`
 - **C — agentic, deployed default** — job `C-full-20260813-071439`, engine `agentic`, model `eu.anthropic.claude-opus-4-8`, case set `bb48530e65e048b9`
 - **C — deployed default (holdout)** — job `C-holdout-20260813-083740`, engine `agentic`, model `eu.anthropic.claude-opus-4-8`, case set `54ff841181b4621b`
