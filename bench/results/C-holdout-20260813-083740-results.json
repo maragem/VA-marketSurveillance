@@ -1,0 +1,416 @@
+{
+  "job": {
+    "id": "C-holdout-20260813-083740",
+    "config": "C-holdout",
+    "label": "C \u2014 Default on holdout (D baseline)",
+    "model": "eu.anthropic.claude-opus-4-8",
+    "runs": 3,
+    "cases_sha256": "54ff841181b4621b"
+  },
+  "summary": {
+    "cases": 15,
+    "engine": "agentic",
+    "finding_recall": 1.0,
+    "unexpected_findings": 44,
+    "false_positives_on_controls": 0,
+    "controls": 2,
+    "risk_calibration_pass": 15,
+    "routing_missed_total": 0,
+    "invalid_citations_total": 0,
+    "mean_latency_s": 58.6,
+    "stability_mean": 0.745
+  },
+  "cases": [
+    {
+      "id": "t1-countdown-timer",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-annex1-7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "ucpd-art8-9"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 46.5
+    },
+    {
+      "id": "t1-purchased-list-lookalike",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "UCPD"
+      ],
+      "provisions_matched": [
+        "gdpr-art21",
+        "gdpr-art6-1"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-3",
+        "ucpd-art8-9"
+      ],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 73.3
+    },
+    {
+      "id": "t1-voice-clone-radio",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "aia-art50-4",
+        "ucpd-annex1-23c",
+        "ucpd-art6"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "aia-art5-1a",
+        "aia-art50-2",
+        "gdpr-art9"
+      ],
+      "gold_provision_count": 3,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 54.6
+    },
+    {
+      "id": "t1-guaranteed-loan-pressure",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6",
+        "ucpd-art8-9"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art25",
+        "dsa-art26-1",
+        "dsa-art26-3",
+        "gdpr-art13",
+        "gdpr-art9",
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 64.3
+    },
+    {
+      "id": "t1-official-lookalike",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6",
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "aia-art5-1a",
+        "aia-art5-1b",
+        "aia-art50-2",
+        "aia-art50-4",
+        "dsa-art25",
+        "dsa-art26-1",
+        "gdpr-art12",
+        "gdpr-art6-1",
+        "ucpd-annex1-2",
+        "ucpd-annex1-7",
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 72.3
+    },
+    {
+      "id": "t2-preselected-addons",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 57.9
+    },
+    {
+      "id": "t2-gifted-influencer-vague",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1"
+      ],
+      "gold_provision_count": 0,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 60.8
+    },
+    {
+      "id": "t2-drip-pricing-fees",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [
+        "ucpd-art6",
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 2,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 49.5
+    },
+    {
+      "id": "t2-retargeting-pressure",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA"
+      ],
+      "provisions_matched": [
+        "gdpr-art21"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art25",
+        "dsa-art26-1",
+        "gdpr-art4-11",
+        "gdpr-art5-1a",
+        "gdpr-art7",
+        "ucpd-annex1-26",
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "critical",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 62.7
+    },
+    {
+      "id": "t2-personalised-price-hidden",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [
+        "gdpr-art13",
+        "gdpr-art5-1a",
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "gdpr-art4-11",
+        "gdpr-art4-4",
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 3,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 64.6
+    },
+    {
+      "id": "t3-compliant-green-certified",
+      "tier": 3,
+      "compliant_control": true,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 0,
+      "overall_risk": "low",
+      "min_risk": "low",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 47.3
+    },
+    {
+      "id": "t3-compliant-urgency-deadline",
+      "tier": 3,
+      "compliant_control": true,
+      "routing_missed": [],
+      "routing_extra": [
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 0,
+      "overall_risk": "low",
+      "min_risk": "low",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 45.3
+    },
+    {
+      "id": "t3-minors-adjacent-audience",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art5"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1",
+        "gdpr-art5-1a",
+        "gdpr-art6-1",
+        "gdpr-art8",
+        "ucpd-annex1-11"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "high",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 65.9
+    },
+    {
+      "id": "t3-was-price-anchor",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [
+        "ucpd-art6"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 1,
+      "overall_risk": "high",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 41.3
+    },
+    {
+      "id": "t3-emotion-optimized-ads",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [
+        "aia-art5-1a",
+        "aia-art5-1b",
+        "dsa-art25",
+        "dsa-art26-3",
+        "gdpr-art5-1a",
+        "gdpr-art6-1",
+        "ucpd-art8-9"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art27",
+        "dsa-art39",
+        "gdpr-art7",
+        "ucpd-art5"
+      ],
+      "gold_provision_count": 7,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0,
+      "latency_s": 72.0
+    }
+  ],
+  "stability": {
+    "t1-countdown-timer": 0.738,
+    "t1-purchased-list-lookalike": 0.694,
+    "t1-voice-clone-radio": 0.933,
+    "t1-guaranteed-loan-pressure": 0.826,
+    "t1-official-lookalike": 0.889,
+    "t2-preselected-addons": 0.7,
+    "t2-gifted-influencer-vague": 0.581,
+    "t2-drip-pricing-fees": 0.56,
+    "t2-retargeting-pressure": 0.842,
+    "t2-personalised-price-hidden": 0.879,
+    "t3-compliant-green-certified": 0.556,
+    "t3-compliant-urgency-deadline": 0.778,
+    "t3-minors-adjacent-audience": 0.944,
+    "t3-was-price-anchor": 0.444,
+    "t3-emotion-optimized-ads": 0.806
+  }
+}
