@@ -118,3 +118,35 @@ cases rather than repurposing old ids.
 | false positives on controls | compliant campaigns flagged ≥ medium | credibility-killing over-enforcement |
 | risk calibration | overall_risk ≥ gold min_risk | correct findings, understated severity |
 | stability (`--runs N`) | pairwise Jaccard of finding sets | non-deterministic verdicts |
+
+## Manual evaluation through a chat UI (configuration E)
+
+Where an external model is reachable only through a web interface (e.g. GPT@EC),
+`make_gptec_workbook.py` produces an Excel workbook that lets assistants run the
+benchmark by hand, and `score_gptec_workbook.py` scores the pasted answers with
+the same code as the automated runs.
+
+```bash
+python bench/make_gptec_workbook.py                     # -> bench/gptec-evaluation.xlsx
+# ... assistants paste prompts into the chat UI and paste the replies back ...
+python bench/score_gptec_workbook.py bench/gptec-evaluation.xlsx
+python bench/score_gptec_workbook.py bench/gptec-evaluation.xlsx --holdout
+```
+
+The workbook has one row per campaign carrying a ready-to-paste prompt that
+reproduces the deployed specialists' task definition: the same closed provision
+vocabulary (all 40 ids, so an id outside the list is measurable as an invalid
+citation), the same severity guide and risk scale, and a strict single-JSON-object
+output contract. Gold labels sit on a separate tab that assistants are told not
+to consult while running. The scorer writes the usual
+`scorecard.md` / `results.json` / `reports.jsonl` triple into `results/`, so the
+row can be added to Table 1 via `make_table1.py` and re-scored later with
+`run.py --rescore`.
+
+**What this configuration is, and is not.** A chat UI cannot run the agentic
+loop, so configuration E is a *single-call, closed-vocabulary baseline* on a
+different model — not a model swap of configuration C. It varies model family
+and architecture at the same time, and is reported as an external baseline
+rather than as evidence that the architecture is model-agnostic. Isolating the
+model variable requires API access and a per-job model override in the
+Experiments runner.
