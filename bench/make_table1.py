@@ -26,10 +26,12 @@ ROWS = [
     ("C — agentic, deployed default", "C-full-20260813-071439-results.json", "full"),
     ("E1 — single call, GPT-5.4", "E1-gpt54-2*-results.json", "full"),
     ("E2 — single call, GPT-5.6", "E2-gpt56-2*-results.json", "full"),
+    ("E3 — single call, gpt-oss-120b (open weights)", "E3-gptoss120b-2*-results.json", "full"),
     ("C — deployed default (holdout)", "C-holdout-20260813-083740-results.json", "holdout"),
     ("D — deployed default + calibration (holdout)", "D-20260813-091230-results.json", "holdout"),
     ("E1 — single call, GPT-5.4 (holdout)", "E1-gpt54-holdout-*-results.json", "holdout"),
     ("E2 — single call, GPT-5.6 (holdout)", "E2-gpt56-holdout-*-results.json", "holdout"),
+    ("E3 — single call, gpt-oss-120b (holdout)", "E3-gptoss120b-holdout-*-results.json", "holdout"),
 ]
 
 COLUMNS = [

@@ -1,0 +1,417 @@
+{
+  "job": {
+    "id": "E3-gptoss120b-holdout-20261003-163330",
+    "config": "E",
+    "label": "E \u2014 single-call chat UI (gpt-oss-120b)",
+    "model": "gpt-oss-120b",
+    "runs": 2,
+    "cases_sha256": "manual (see workbook)"
+  },
+  "summary": {
+    "cases": 15,
+    "engine": "chat-ui (gpt-oss-120b)",
+    "finding_recall": 0.538,
+    "unexpected_findings": 31,
+    "false_positives_on_controls": 2,
+    "controls": 2,
+    "risk_calibration_pass": 13,
+    "routing_missed_total": 0,
+    "invalid_citations_total": 0,
+    "mean_latency_s": null,
+    "stability_mean": 0.639
+  },
+  "cases": [
+    {
+      "id": "t1-countdown-timer",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-annex1-7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art25",
+        "dsa-art26-1"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t1-purchased-list-lookalike",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "UCPD"
+      ],
+      "provisions_matched": [
+        "gdpr-art21",
+        "gdpr-art6-1"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t1-voice-clone-radio",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6"
+      ],
+      "provisions_missed": [
+        "aia-art50-4",
+        "ucpd-annex1-23c"
+      ],
+      "provisions_unexpected": [
+        "aia-art5-1a",
+        "aia-art50-1",
+        "dsa-art26-1",
+        "gdpr-art4-11",
+        "ucpd-annex1-4"
+      ],
+      "gold_provision_count": 3,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t1-guaranteed-loan-pressure",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6"
+      ],
+      "provisions_missed": [
+        "ucpd-art8-9"
+      ],
+      "provisions_unexpected": [
+        "aia-art5-1b",
+        "dsa-art25",
+        "dsa-art26-1",
+        "dsa-art27",
+        "gdpr-art13"
+      ],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t1-official-lookalike",
+      "tier": 1,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6",
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "aia-art5-1a",
+        "dsa-art26-1",
+        "ucpd-annex1-11",
+        "ucpd-annex1-20"
+      ],
+      "gold_provision_count": 2,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t2-preselected-addons",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [
+        "ucpd-art7"
+      ],
+      "provisions_unexpected": [
+        "dsa-art25"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t2-gifted-influencer-vague",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1"
+      ],
+      "gold_provision_count": 0,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t2-drip-pricing-fees",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [
+        "ucpd-art6",
+        "ucpd-art7"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [],
+      "gold_provision_count": 2,
+      "overall_risk": "high",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t2-retargeting-pressure",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA"
+      ],
+      "provisions_matched": [
+        "gdpr-art21"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art25",
+        "dsa-art26-1",
+        "ucpd-annex1-26"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "critical",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t2-personalised-price-hidden",
+      "tier": 2,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA"
+      ],
+      "provisions_matched": [
+        "gdpr-art13"
+      ],
+      "provisions_missed": [
+        "gdpr-art5-1a",
+        "ucpd-art7"
+      ],
+      "provisions_unexpected": [
+        "aia-art5-1a",
+        "dsa-art25"
+      ],
+      "gold_provision_count": 3,
+      "overall_risk": "critical",
+      "min_risk": "high",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t3-compliant-green-certified",
+      "tier": 3,
+      "compliant_control": true,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1"
+      ],
+      "gold_provision_count": 0,
+      "overall_risk": "high",
+      "min_risk": "low",
+      "risk_ok": false,
+      "false_positive": true,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t3-compliant-urgency-deadline",
+      "tier": 3,
+      "compliant_control": true,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1",
+        "gdpr-art13"
+      ],
+      "gold_provision_count": 0,
+      "overall_risk": "high",
+      "min_risk": "low",
+      "risk_ok": false,
+      "false_positive": true,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t3-minors-adjacent-audience",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "AI_ACT",
+        "DSA",
+        "GDPR"
+      ],
+      "provisions_matched": [],
+      "provisions_missed": [
+        "ucpd-art5"
+      ],
+      "provisions_unexpected": [
+        "dsa-art26-1",
+        "ucpd-annex1-11"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "critical",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t3-was-price-anchor",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [
+        "DSA"
+      ],
+      "provisions_matched": [
+        "ucpd-art6"
+      ],
+      "provisions_missed": [],
+      "provisions_unexpected": [
+        "dsa-art26-1"
+      ],
+      "gold_provision_count": 1,
+      "overall_risk": "high",
+      "min_risk": "medium",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    },
+    {
+      "id": "t3-emotion-optimized-ads",
+      "tier": 3,
+      "compliant_control": false,
+      "routing_missed": [],
+      "routing_extra": [],
+      "provisions_matched": [
+        "aia-art5-1a",
+        "dsa-art25"
+      ],
+      "provisions_missed": [
+        "aia-art5-1b",
+        "dsa-art26-3",
+        "gdpr-art5-1a",
+        "gdpr-art6-1",
+        "ucpd-art8-9"
+      ],
+      "provisions_unexpected": [
+        "dsa-art27",
+        "gdpr-art12"
+      ],
+      "gold_provision_count": 7,
+      "overall_risk": "critical",
+      "min_risk": "critical",
+      "risk_ok": true,
+      "false_positive": false,
+      "invalid_citations": 0
+    }
+  ],
+  "stability": {
+    "t1-countdown-timer": 1.0,
+    "t1-purchased-list-lookalike": 0.667,
+    "t1-voice-clone-radio": 0.4,
+    "t1-guaranteed-loan-pressure": 0.545,
+    "t1-official-lookalike": 0.556,
+    "t2-preselected-addons": 0.333,
+    "t2-gifted-influencer-vague": 1.0,
+    "t2-drip-pricing-fees": 0.667,
+    "t2-retargeting-pressure": 0.375,
+    "t2-personalised-price-hidden": 0.667,
+    "t3-compliant-green-certified": 1.0,
+    "t3-compliant-urgency-deadline": 0.5,
+    "t3-minors-adjacent-audience": 0.6,
+    "t3-was-price-anchor": 0.5,
+    "t3-emotion-optimized-ads": 0.778
+  }
+}

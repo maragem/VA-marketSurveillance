@@ -35,11 +35,12 @@ Configurations A–D used a single model, Claude Opus 4.8, served through the
 Amazon Bedrock European cross-region inference profile; configuration A uses no
 language model at all.
 
-Configuration E adds an **external, cross-family comparison**. Two OpenAI
-models (GPT-5.4 and GPT-5.6) were evaluated through the European Commission's
-GPT@EC interface, which exposes no programmatic API, so each campaign was
-submitted manually in a fresh conversation by trained assistants: 52 campaigns
-× 2 runs × 2 models = 208 conversations. The prompt reproduces the deployed
+Configuration E adds an **external, cross-family comparison**. Three models
+were evaluated through the European Commission's GPT@EC interface — the
+proprietary GPT-5.4 and GPT-5.6, and the open-weights gpt-oss-120b. The
+interface exposes no programmatic API, so each campaign was submitted manually
+in a fresh conversation by trained assistants: 52 campaigns × 2 runs × 3
+models = 312 conversations. The prompt reproduces the deployed
 specialist agents' task definition — the identical closed vocabulary of 40
 provision identifiers with their references and obligations, the identical
 five-level severity guide and risk scale, and a strict single-JSON-object
@@ -138,17 +139,18 @@ categorical rather than statistical: one fabricated legal citation in a
 regulator-facing report is a disproportionate failure, and the guarantee
 validation provides is absolute rather than probabilistic.
 
-Configuration E sharpens the interpretation considerably. Across **205 scored
-external-model runs on two different model families, not one invalid citation
-was produced** — no invented identifier, no provision attributed to the wrong
-instrument. The constraint that does the work is therefore the *closed
-vocabulary supplied in the prompt*, not the agentic loop and not the post-hoc
-validator: given an explicit, enumerated set of citable provisions, three
-models from two families stayed inside it. This is the strongest available
-evidence for the architectural claim of Section 1 — that hallucination
-resistance is a property of the closed-world citation design rather than of any
-particular model — and it is evidence the single-model experiments could not
-have provided. The post-hoc validator remains justified as a cheap backstop for
+Configuration E sharpens the interpretation considerably. Across **309 scored
+external-model runs spanning three models — two proprietary and one
+open-weights — not one invalid citation was produced**: no invented identifier,
+no provision attributed to the wrong instrument. The constraint that does the
+work is therefore the *closed vocabulary supplied in the prompt*, not the
+agentic loop and not the post-hoc validator. Given an explicit, enumerated set
+of citable provisions, four models across three families stayed inside it, and
+the one open-weights model did so despite being the weakest performer on every
+other metric in Table 1. This is the strongest available evidence for the
+architectural claim of Section 1 — that hallucination resistance is a property
+of the closed-world citation design rather than of any particular model — and
+it is evidence the single-model experiments could not have provided. The post-hoc validator remains justified as a cheap backstop for
 the rare lapse and for the concept-node confusion configuration B exposed, but
 it should be presented as defence in depth, not as the mechanism.
 
@@ -195,18 +197,23 @@ annotator rather than made by the authors.
 
 ## 3.2.5 External models: what is architecture and what is model
 
-Configurations E1 and E2 place two frontier models from a different vendor
-against the same gold set, under the same closed vocabulary and the same
-scoring rules, but in a single call rather than the agentic pipeline.
+Configurations E1–E3 place three further models against the same gold set,
+under the same closed vocabulary and the same scoring rules, but in a single
+call rather than the agentic pipeline: two proprietary frontier models from a
+different vendor (GPT-5.4, GPT-5.6) and one open-weights model
+(gpt-oss-120b).
 
 **The agentic pipeline's advantage is recall, and it is large and significant.**
 Configuration C found 95 of 97 must-find provisions; GPT-5.4 found 80 (0.825,
-CI [0.737, 0.888]) and GPT-5.6 found 74 (0.763, CI [0.669, 0.836]). The
-comparison is near-dominant rather than merely favourable: paired over
-must-find outcomes, 15 provisions were found only by configuration C and none
-only by GPT-5.4 (exact McNemar p = 6.1 × 10⁻⁵); against GPT-5.6, 22 only by
-configuration C and 1 only by the external model (p = 6 × 10⁻⁶). On the harder
-held-out split the gap widens, to 0.615 and 0.692 against 1.000.
+CI [0.737, 0.888]), GPT-5.6 found 74 (0.763, CI [0.669, 0.836]) and
+gpt-oss-120b found 59 (0.608, CI [0.509, 0.699]). The comparison is
+near-dominant rather than merely favourable: paired over must-find outcomes, 15
+provisions were found only by configuration C and none only by GPT-5.4 (exact
+McNemar p = 6.1 × 10⁻⁵); against GPT-5.6, 22 only by configuration C and 1 only
+by the external model (p = 5.7 × 10⁻⁶); against gpt-oss-120b, 37 only by
+configuration C and 1 only by the external model (p = 2.8 × 10⁻¹⁰). On the
+harder held-out split the gap widens, to 0.615, 0.692 and 0.538 against
+1.000.
 
 **The single-call baselines are, however, markedly more conservative.** GPT-5.4
 produced 1.65 unexpected actionable findings per campaign and GPT-5.6 only 0.23
@@ -220,22 +227,37 @@ provisions. The calibration loop therefore delivers the precision of the
 conservative baseline without its recall cost, which is the central practical
 argument for the regulator-in-the-loop design.
 
+**The open-weights model separates two claims that the proprietary models left
+entangled.** gpt-oss-120b honoured the closed vocabulary perfectly (zero
+invalid citations in 104 runs) yet failed at screening in every other respect:
+recall 0.608, 2.40 unexpected findings per campaign, the lowest stability in
+the study (0.550), and — most damaging for an enforcement instrument — false
+positives on **six of seven** compliant controls, a control-discipline failure
+close to the retrieval-only baseline's 7/7. The distinction this licenses is
+worth stating precisely, because it is the honest answer to the
+model-agnosticism question: the *citation-integrity* property of the
+architecture is model-agnostic, holding even on a weak open-weights model,
+whereas *screening quality* is not. A deployment can inherit the guarantee that
+no fabricated legal anchor reaches a report without inheriting usable recall or
+usable precision; capability still has to be bought.
+
 Severity judgement also separates the configurations: risk calibration passes
-51/52 for configuration C against 47/52 and 43/52 for the external models, and
-15/15 against 12/15 and 10/15 on the held-out split — the single-call models
-under-rate severity on campaigns they do flag.
+51/52 for configuration C against 47/52, 43/52 and 45/52 for the external
+models, and 15/15 against 12/15, 10/15 and 13/15 on the held-out split — the
+single-call models under-rate severity on campaigns they do flag.
 
 **The blind spots are systematic and relevant to this venue.** Twelve must-find
-provisions were missed by *both* external models yet found by configuration C.
+provisions were missed by *both* proprietary external models yet found by
+configuration C.
 Five of those twelve are synthetic-media provisions — UCPD Annex I point 23c
 (fake endorsement) and AI Act Article 50(2) (synthetic-content marking) — and
 they account for every AI-media campaign in the set: the cloned-voice radio
 spot, the AI-retouched cosmetics campaign, the deepfake physician endorsement
 and the virtual influencer. Three more cluster on
 `t3-emotion-optimized-ads`, the four-instrument platform case. Per instrument,
-external recall falls furthest on the two newest instruments: DSA (3/6 and 4/6
-against 6/6) and the AI Act (4/8 and 5/8 against 6/8), while UCPD recall holds
-up better (51/59 and 46/59 against 59/59). The reading we offer is that
+external recall falls furthest on the two newest instruments: DSA (3/6, 4/6 and
+3/6 against 6/6) and the AI Act (4/8, 5/8 and 5/8 against 6/8), while UCPD
+recall holds up better (51/59, 46/59 and 39/59 against 59/59). The reading we offer is that
 single-pass assessment handles well-established consumer-protection doctrine
 reasonably but under-detects the AI- and platform-specific obligations that
 require connecting a campaign's technical description to a recent provision —
@@ -247,8 +269,8 @@ architecture and model family together, so the recall gap cannot be attributed
 to the model alone; isolating that factor requires running the full pipeline on
 a different model, which needs programmatic access the GPT@EC interface does
 not offer. Second, configuration E ran two repetitions per campaign against
-three for configurations A–D, so its stability figures (0.653 and 0.775) rest
-on a single pair per campaign.
+three for configurations A–D, so its stability figures (0.653, 0.775 and 0.550)
+rest on a single pair per campaign.
 
 ## 3.2.6 Throughput, cost and reviewer workload at scale
 
@@ -304,11 +326,16 @@ citations in configuration D are deliberately left unreclassified until that
 pass, so that the authors do not adjudicate their own system's residual errors.
 
 **Model and provider coverage.** Configurations A–D use one model from one
-provider; configuration E adds two models from a second provider, but only in
-the single-call architecture. No open-weights model has been evaluated, so the
-claim that the architecture is model-agnostic is supported for the closed-world
-citation property — which held across three models and two families — but not
-yet for the agentic pipeline's recall advantage.
+provider; configuration E adds three further models, including one with open
+weights, but only in the single-call architecture. The claim that the
+architecture is model-agnostic is therefore established for the closed-world
+citation property — which held across four models and three families, 309
+external runs, without a single invalid citation — and explicitly *not* claimed
+for screening quality, which varied by a factor of 1.6 in recall and by 6/7
+against 0/7 in control false positives across those same models. What remains
+untested is the agentic pipeline itself on a non-Claude model; that requires
+programmatic access and a per-job model override in the evaluation runner, and
+is the natural next experiment.
 
 **Benchmark scale and provenance.** The frozen benchmark contains 52 campaigns
 with 15 held out. Tier-1 campaigns are inspired by real enforcement actions,

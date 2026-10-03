@@ -51,6 +51,16 @@
       ]
     },
     {
+      "config": "E3 \u2014 gpt-oss-120b, single call",
+      "hits": 59,
+      "total": 97,
+      "recall": 0.608,
+      "ci95": [
+        0.509,
+        0.699
+      ]
+    },
+    {
       "config": "C \u2014 deployed default (holdout)",
       "hits": 26,
       "total": 26,
@@ -89,6 +99,16 @@
         0.5,
         0.835
       ]
+    },
+    {
+      "config": "E3 \u2014 gpt-oss-120b (holdout)",
+      "hits": 14,
+      "total": 26,
+      "recall": 0.538,
+      "ci95": [
+        0.355,
+        0.712
+      ]
     }
   ],
   "calibration_effect": {
@@ -124,7 +144,15 @@
       "external_found": 74,
       "found_only_by_C": 22,
       "found_only_by_external": 1,
-      "mcnemar_exact_p": 6e-06
+      "mcnemar_exact_p": 5.72e-06
+    },
+    "E3 \u2014 gpt-oss-120b, single call": {
+      "must_finds": 97,
+      "claude_C_found": 95,
+      "external_found": 59,
+      "found_only_by_C": 37,
+      "found_only_by_external": 1,
+      "mcnemar_exact_p": 2.84e-10
     }
   }
 }

@@ -25,12 +25,14 @@ CONFIGS = [
     ("C — deployed default", "C-full-20260813-071439-results.json"),
     ("E1 — gpt-5.4, single call", "E1-gpt54-2*-results.json"),
     ("E2 — gpt-5.6, single call", "E2-gpt56-2*-results.json"),
+    ("E3 — gpt-oss-120b, single call", "E3-gptoss120b-2*-results.json"),
 ]
 HOLDOUT_CONFIGS = [
     ("C — deployed default (holdout)", "C-holdout-20260813-083740-results.json"),
     ("D — + calibration (holdout)", "D-20260813-091230-results.json"),
     ("E1 — gpt-5.4 (holdout)", "E1-gpt54-holdout-*-results.json"),
     ("E2 — gpt-5.6 (holdout)", "E2-gpt56-holdout-*-results.json"),
+    ("E3 — gpt-oss-120b (holdout)", "E3-gptoss120b-holdout-*-results.json"),
 ]
 
 
@@ -147,7 +149,7 @@ def main() -> int:
 
     # C vs the external single-call models on must-find recall (same campaigns).
     c_full = resolve(CONFIGS[2][1])
-    for label, pattern in (CONFIGS[3], CONFIGS[4]):
+    for label, pattern in (CONFIGS[3], CONFIGS[4], CONFIGS[5]):
         rows_c = {r["id"]: r for r in json.load(open(c_full))["cases"]}
         rows_e = {r["id"]: r for r in json.load(open(resolve(pattern)))["cases"]}
         shared = sorted(set(rows_c) & set(rows_e))
@@ -178,7 +180,7 @@ def main() -> int:
         out["model_comparison"][label] = {
             "must_finds": tot, "claude_C_found": c_hits, "external_found": e_hits,
             "found_only_by_C": b, "found_only_by_external": c,
-            "mcnemar_exact_p": round(p_val, 6),
+            "mcnemar_exact_p": float(f"{p_val:.3g}"),
         }
 
     if args.json:
@@ -205,7 +207,7 @@ def main() -> int:
         print(f"    must-finds {m['must_finds']} · found by C {m['claude_C_found']} · "
               f"found by external {m['external_found']}")
         print(f"    found only by C: {m['found_only_by_C']} · only by external: "
-              f"{m['found_only_by_external']} · McNemar exact p={m['mcnemar_exact_p']}")
+              f"{m['found_only_by_external']} · McNemar exact p={m['mcnemar_exact_p']:.3g}")
     return 0
 
 
