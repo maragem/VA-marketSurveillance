@@ -1,0 +1,130 @@
+{
+  "recall": [
+    {
+      "config": "A \u2014 retrieval only",
+      "hits": 50,
+      "total": 97,
+      "recall": 0.515,
+      "ci95": [
+        0.417,
+        0.612
+      ]
+    },
+    {
+      "config": "B \u2014 no citation validation",
+      "hits": 97,
+      "total": 97,
+      "recall": 1.0,
+      "ci95": [
+        0.962,
+        1.0
+      ]
+    },
+    {
+      "config": "C \u2014 deployed default",
+      "hits": 95,
+      "total": 97,
+      "recall": 0.979,
+      "ci95": [
+        0.928,
+        0.994
+      ]
+    },
+    {
+      "config": "E1 \u2014 gpt-5.4, single call",
+      "hits": 80,
+      "total": 97,
+      "recall": 0.825,
+      "ci95": [
+        0.737,
+        0.888
+      ]
+    },
+    {
+      "config": "E2 \u2014 gpt-5.6, single call",
+      "hits": 74,
+      "total": 97,
+      "recall": 0.763,
+      "ci95": [
+        0.669,
+        0.836
+      ]
+    },
+    {
+      "config": "C \u2014 deployed default (holdout)",
+      "hits": 26,
+      "total": 26,
+      "recall": 1.0,
+      "ci95": [
+        0.871,
+        1.0
+      ]
+    },
+    {
+      "config": "D \u2014 + calibration (holdout)",
+      "hits": 26,
+      "total": 26,
+      "recall": 1.0,
+      "ci95": [
+        0.871,
+        1.0
+      ]
+    },
+    {
+      "config": "E1 \u2014 gpt-5.4 (holdout)",
+      "hits": 16,
+      "total": 26,
+      "recall": 0.615,
+      "ci95": [
+        0.425,
+        0.776
+      ]
+    },
+    {
+      "config": "E2 \u2014 gpt-5.6 (holdout)",
+      "hits": 18,
+      "total": 26,
+      "recall": 0.692,
+      "ci95": [
+        0.5,
+        0.835
+      ]
+    }
+  ],
+  "calibration_effect": {
+    "campaigns": 15,
+    "unexpected_before": 44,
+    "unexpected_after": 5,
+    "reduction_pct": 88.6,
+    "mean_per_campaign_before": 2.93,
+    "mean_per_campaign_after": 0.33,
+    "mean_reduction_per_campaign": 2.6,
+    "bootstrap_ci95": [
+      1.33,
+      4.07
+    ],
+    "wilcoxon_W": 0,
+    "wilcoxon_p_exact": 0.00098,
+    "campaigns_improved": 11,
+    "campaigns_worsened": 0,
+    "campaigns_unchanged": 4
+  },
+  "model_comparison": {
+    "E1 \u2014 gpt-5.4, single call": {
+      "must_finds": 97,
+      "claude_C_found": 95,
+      "external_found": 80,
+      "found_only_by_C": 15,
+      "found_only_by_external": 0,
+      "mcnemar_exact_p": 6.1e-05
+    },
+    "E2 \u2014 gpt-5.6, single call": {
+      "must_finds": 97,
+      "claude_C_found": 95,
+      "external_found": 74,
+      "found_only_by_C": 22,
+      "found_only_by_external": 1,
+      "mcnemar_exact_p": 6e-06
+    }
+  }
+}

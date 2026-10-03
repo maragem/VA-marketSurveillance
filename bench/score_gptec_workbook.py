@@ -34,14 +34,24 @@ def load_scoring():
 
 
 _FENCE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$", re.I)
+# Boilerplate the host platform appends to every reply (GPT@EC stamps a
+# sensitivity/AI-generated notice). It is injected by the interface, not
+# produced by the model, so stripping it is not a tolerated protocol
+# violation — it is removing a transport artifact.
+_PLATFORM_FOOTER = re.compile(
+    r"\(?\s*sensitivity level\s*:?[^)\n]*\)?"      # "(Sensitivity level: CU)"
+    r"|GPT@EC"                                     # platform name
+    r"|AI[-\s]generated content"                   # "AI generated content"
+    r"|please use with caution\.?",                # closing admonition
+    re.I)
 
 
 def parse_answer(raw: str):
     """Extract the JSON object from a pasted chat reply.
 
-    Tolerates code fences and surrounding prose (both are protocol violations
-    the instructions warn against, but they do not invalidate the legal
-    content of the answer). Returns (payload, problem_description).
+    Returns (payload, problem_description). A problem is reported only for
+    things the model did wrong: platform boilerplate and code fences are
+    removed silently.
     """
     if raw is None:
         return None, "empty"
@@ -53,7 +63,23 @@ def parse_answer(raw: str):
         return json.loads(candidate), None
     except ValueError:
         pass
-    # Fall back to the outermost {...} span.
+    # One JSON value followed by trailing text: take the value. If everything
+    # after it is platform boilerplate, the answer itself was well formed.
+    try:
+        payload, end = json.JSONDecoder().raw_decode(candidate)
+        tail = _PLATFORM_FOOTER.sub("", candidate[end:]).strip(" \t\r\n-–—.")
+        if not tail:
+            return payload, None
+        # More than one answer pasted into the cell. Which one belongs to this
+        # campaign cannot be established from the cell alone (observed cause:
+        # replies for several campaigns pasted together), so refuse rather
+        # than score a possibly mis-attributed answer.
+        if "{" in tail and '"findings"' in tail:
+            return None, "several answers pasted in one cell — cannot attribute, excluded"
+        return payload, "trailing text after the JSON object"
+    except ValueError:
+        pass
+    # Fall back to the outermost {...} span (prose before the object).
     start, end = candidate.find("{"), candidate.rfind("}")
     if start != -1 and end > start:
         try:
@@ -93,6 +119,11 @@ def main() -> int:
     parser.add_argument("--holdout", action="store_true",
                         help="score only the held-out campaigns (comparable with the C/D holdout rows)")
     parser.add_argument("--cases", default=str(BENCH / "cases.jsonl"))
+    parser.add_argument("--sheet", default="Run sheet",
+                        help="worksheet to read (workbooks may hold one sheet per model)")
+    parser.add_argument("--model-label",
+                        help="override the MODEL_NAME column (use when the column was not "
+                             "updated for a copied sheet)")
     args = parser.parse_args()
 
     scoring = load_scoring()
@@ -100,7 +131,11 @@ def main() -> int:
     cases = {c["id"]: c for c in scoring.load_cases(Path(args.cases), None)}
     holdout = scoring.load_holdout()
 
-    ws = load_workbook(args.workbook, data_only=True)["Run sheet"]
+    book = load_workbook(args.workbook, data_only=True)
+    if args.sheet not in book.sheetnames:
+        print(f"No sheet named {args.sheet!r}. Available: {', '.join(book.sheetnames)}")
+        return 1
+    ws = book[args.sheet]
     header = [c.value for c in ws[1]]
     col = {name: i for i, name in enumerate(header)}
 
@@ -111,10 +146,10 @@ def main() -> int:
         return None
 
     answers = {}          # case_id -> {run_no: report}
-    problems, models, skipped = [], set(), 0
+    problems, models, skipped, excluded = [], set(), 0, 0
     for row in ws.iter_rows(min_row=2, values_only=True):
         case_id = row[col["CASE_ID"]]
-        if not case_id or str(case_id).startswith("EXAMPLE"):
+        if not case_id or str(case_id).startswith(("EXAMPLE", "Repeat", "Remaining")):
             continue
         raw = get(row, "RESPONSE_JSON")
         if raw is None or not str(raw).strip():
@@ -137,11 +172,13 @@ def main() -> int:
         else:
             problems.append((case_id, run_no, "MODEL_NAME missing"))
         payload, problem = parse_answer(raw)
+        if problem:
+            problems.append((case_id, run_no, problem))
         if payload is None:
-            problems.append((case_id, run_no, problem))
-            payload = {}
-        elif problem:
-            problems.append((case_id, run_no, problem))
+            if problem and "excluded" in problem:
+                excluded += 1
+                continue          # ambiguous cell: not scored at all
+            payload = {}          # unusable reply: scored as producing no findings
         answers.setdefault(case_id, {})[run_no] = to_report(payload)
 
     if not answers:
@@ -169,7 +206,7 @@ def main() -> int:
             stability[cid] = round(sum(jaccard) / len(jaccard), 3)
 
     summary = scoring.aggregate(rows)
-    model_label = ", ".join(sorted(models)) or "unknown"
+    model_label = args.model_label or ", ".join(sorted(models)) or "unknown"
     summary["engine"] = f"chat-ui ({model_label})"
     summary["mean_latency_s"] = None
     if stability:
@@ -181,7 +218,7 @@ def main() -> int:
     RESULTS.mkdir(exist_ok=True)
     header_line = (f"Configuration: E — single-call chat UI (GPT@EC) · model: {model_label} · "
                    f"campaigns scored: {len(rows)} · runs/campaign: up to {max_runs} · "
-                   f"manual evaluation\n\n")
+                   f"manual evaluation · worksheet: {args.sheet}\n\n")
     (RESULTS / f"{stamp}-scorecard.md").write_text(header_line + scorecard + "\n")
     (RESULTS / f"{stamp}-results.json").write_text(json.dumps({
         "job": {"id": stamp, "config": "E", "label": f"E — single-call chat UI ({model_label})",
@@ -199,8 +236,11 @@ def main() -> int:
     print(scorecard)
     print(f"\nModel(s): {model_label}")
     print(f"Campaigns scored: {len(rows)}"
-          + (f" (held-out subset)" if args.holdout else "")
-          + f" · rows without an answer: {skipped}")
+          + (" (held-out subset)" if args.holdout else "")
+          + f" · rows without an answer: {skipped}"
+          + (f" · runs excluded as ambiguous: {excluded}" if excluded else ""))
+    runs_scored = sum(len(v) for v in answers.values())
+    print(f"Runs scored: {runs_scored}")
     missing = [cid for cid in (holdout if args.holdout else cases) if cid not in answers]
     if missing:
         print(f"No answer yet for {len(missing)} campaign(s): {', '.join(sorted(missing)[:8])}"

@@ -21,11 +21,15 @@ RESULTS = BENCH_DIR / "results"
 
 # (row label, results file, evaluated subset) in reporting order.
 ROWS = [
-    ("A — retrieval only (no LLM)", "A-20260808-114736-results.json", "full"),
+    ("A — retrieval only, no LLM", "A-20260808-114736-results.json", "full"),
     ("B — agentic, no citation validation", "B-20260808-114752-results.json", "full"),
     ("C — agentic, deployed default", "C-full-20260813-071439-results.json", "full"),
+    ("E1 — single call, GPT-5.4", "E1-gpt54-2*-results.json", "full"),
+    ("E2 — single call, GPT-5.6", "E2-gpt56-2*-results.json", "full"),
     ("C — deployed default (holdout)", "C-holdout-20260813-083740-results.json", "holdout"),
     ("D — deployed default + calibration (holdout)", "D-20260813-091230-results.json", "holdout"),
+    ("E1 — single call, GPT-5.4 (holdout)", "E1-gpt54-holdout-*-results.json", "holdout"),
+    ("E2 — single call, GPT-5.6 (holdout)", "E2-gpt56-holdout-*-results.json", "holdout"),
 ]
 
 COLUMNS = [
@@ -59,7 +63,8 @@ def load(path: Path) -> dict:
         "risk": summary["risk_calibration_pass"],
         "stability": f"{mean_stability:.3f}" if mean_stability is not None else "—",
         "invalid": summary["invalid_citations_total"] if summary.get("invalid_citations_total") is not None else 0,
-        "latency": f"{summary['mean_latency_s']:.1f}" if summary.get("mean_latency_s") else "<1",
+        "latency": (f"{summary['mean_latency_s']:.1f}" if summary.get("mean_latency_s")
+                    else ("n/a" if "chat-ui" in (summary.get("engine") or "") else "<1")),
         "engine": summary.get("engine") or "—",
         "model": (data.get("job") or {}).get("model") or "n/a (no LLM)",
         "cases_sha256": (data.get("job") or {}).get("cases_sha256") or "repo cases.jsonl",
@@ -73,13 +78,14 @@ def main() -> int:
     parser.add_argument("--out", help="write to this file instead of stdout")
     args = parser.parse_args()
 
+    import glob
     rows = []
     for label, filename, subset in ROWS:
-        path = RESULTS / filename
-        if not path.exists():
-            print(f"missing results file: {path}")
+        matches = sorted(glob.glob(str(RESULTS / filename)))
+        if not matches:
+            print(f"missing results file for pattern: {filename}")
             return 1
-        rows.append({"label": label, "subset": subset, **load(path)})
+        rows.append({"label": label, "subset": subset, **load(Path(matches[-1]))})
 
     headers = [name for name, _ in COLUMNS]
     body = [[template.format(**row) for _, template in COLUMNS] for row in rows]
