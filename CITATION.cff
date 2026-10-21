@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+title: Marketing Compliance Checker
+message: >-
+  If you use this software or its benchmark, please cite both the software and
+  the accompanying article.
+type: software
+authors:
+  - family-names: Kaponis
+    given-names: Alexios
+    affiliation: Department of Informatics, Ionian University, Corfu, Greece
+    email: alexios.kaponis@ionio.gr
+  - family-names: Maragoudakis
+    given-names: Manolis
+    affiliation: Department of Informatics, Ionian University, Corfu, Greece
+    email: mmarag@ionio.gr
+repository-code: 'https://github.com/maragem/VA-marketSurveillance'
+abstract: >-
+  A decision-support system that screens digital marketing campaigns against
+  four EU legal instruments (AI Act, GDPR, DSA, UCPD) using GraphRAG over a
+  curated legal knowledge graph and an agentic pipeline of regulation
+  specialists. Agents may cite only provisions retrieved from the graph, which
+  makes hallucination resistance a property of the architecture rather than of
+  the model. Ships with a 52-campaign gold benchmark, a held-out split, a
+  regulator-in-the-loop calibration loop, and archived result artifacts for
+  every reported configuration.
+keywords:
+  - multimedia content governance
+  - AI-generated media
+  - synthetic media
+  - digital advertising
+  - legal natural language processing
+  - large language model agent
+  - GraphRAG
+  - EU marketing law
+references:
+  - type: article
+    title: >-
+      Regulator-in-the-Loop Compliance Screening: Graph-Grounded LLM Agents
+      with a Continuously Calibrated Benchmark for EU Marketing Law
+    authors:
+      - family-names: Kaponis
+        given-names: Alexios
+      - family-names: Maragoudakis
+        given-names: Manolis
+    journal: Multimedia
+    publisher:
+      name: MDPI
+    year: 2026
+    volume: 2
+    # TODO on publication: set the article number (`number:`), page range and
+    # `doi:`. Accepted 20 October 2026; the DOI is assigned at publication.
+    notes: Accepted 20 October 2026; in production.
