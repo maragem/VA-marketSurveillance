@@ -14,6 +14,7 @@ authors:
     affiliation: Department of Informatics, Ionian University, Corfu, Greece
     email: mmarag@ionio.gr
 repository-code: 'https://github.com/maragem/VA-marketSurveillance'
+license: EUPL-1.2
 abstract: >-
   A decision-support system that screens digital marketing campaigns against
   four EU legal instruments (AI Act, GDPR, DSA, UCPD) using GraphRAG over a

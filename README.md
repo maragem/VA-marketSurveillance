@@ -391,9 +391,22 @@ calibration rule that encodes a case-specific answer.
 
 ## Licence
 
-Not yet set. Until a licence file is added, default copyright applies and the code carries no
-grant of reuse — add one before relying on this repository. The accompanying article is
-published open access under CC BY.
+Copyright © 2026 Alexios Kaponis and Manolis Maragoudakis.
+
+Licensed under the **European Union Public Licence v. 1.2** (EUPL-1.2). You may not use this
+work except in compliance with the Licence; the full text is in [`LICENSE`](LICENSE) and the
+official multilingual versions are published by the European Commission on
+[Joinup](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12).
+
+The EUPL is a copyleft licence: if you distribute the work or a derivative, or make it
+available to the public as a network service, you must do so under the EUPL (or one of the
+compatible licences listed in its Appendix) and make the source code available. It is
+compatible with the GPL, AGPL, MPL, LGPL, EPL, CeCILL and the other licences named there, so
+EUPL-licensed code can be combined with projects under those terms.
+
+Note that the knowledge graph in `knowledge/` reproduces short summaries of EU legislation;
+the underlying legal texts are published by the Publications Office of the European Union and
+are not covered by this licence. The accompanying article is published open access under CC BY.
 
 ## Disclaimer
 
