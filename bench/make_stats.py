@@ -178,7 +178,7 @@ def main() -> int:
         else:
             p_val = 1.0
         out["model_comparison"][label] = {
-            "must_finds": tot, "claude_C_found": c_hits, "external_found": e_hits,
+            "must_finds": tot, "config_C_found": c_hits, "external_found": e_hits,
             "found_only_by_C": b, "found_only_by_external": c,
             "mcnemar_exact_p": float(f"{p_val:.3g}"),
         }
@@ -204,7 +204,7 @@ def main() -> int:
     print("\nCONFIGURATION C vs EXTERNAL SINGLE-CALL MODELS (paired on must-find provisions)")
     for label, m in out["model_comparison"].items():
         print(f"  {label}")
-        print(f"    must-finds {m['must_finds']} · found by C {m['claude_C_found']} · "
+        print(f"    must-finds {m['must_finds']} · found by C {m['config_C_found']} · "
               f"found by external {m['external_found']}")
         print(f"    found only by C: {m['found_only_by_C']} · only by external: "
               f"{m['found_only_by_external']} · McNemar exact p={m['mcnemar_exact_p']:.3g}")

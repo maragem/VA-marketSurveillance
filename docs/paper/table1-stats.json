@@ -132,7 +132,7 @@
   "model_comparison": {
     "E1 \u2014 gpt-5.4, single call": {
       "must_finds": 97,
-      "claude_C_found": 95,
+      "config_C_found": 95,
       "external_found": 80,
       "found_only_by_C": 15,
       "found_only_by_external": 0,
@@ -140,7 +140,7 @@
     },
     "E2 \u2014 gpt-5.6, single call": {
       "must_finds": 97,
-      "claude_C_found": 95,
+      "config_C_found": 95,
       "external_found": 74,
       "found_only_by_C": 22,
       "found_only_by_external": 1,
@@ -148,7 +148,7 @@
     },
     "E3 \u2014 gpt-oss-120b, single call": {
       "must_finds": 97,
-      "claude_C_found": 95,
+      "config_C_found": 95,
       "external_found": 59,
       "found_only_by_C": 37,
       "found_only_by_external": 1,

@@ -31,7 +31,7 @@ def register_document_namespaces(path):
             pass
 
 unpacked = sys.argv[1]
-AUTHOR = sys.argv[2] if len(sys.argv) > 2 else "Claude (editorial fixes)"
+AUTHOR = sys.argv[2] if len(sys.argv) > 2 else "Manolis Maragoudakis"
 STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 _next_id = [9000]

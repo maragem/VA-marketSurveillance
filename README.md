@@ -11,6 +11,12 @@ the Claude API. Deployable on **Railway** as a single service.
 > reports as raising no concern is *not* thereby compliant — see
 > [Scope and limitations](#scope-and-limitations).
 
+## Author
+
+**Manolis Maragoudakis** — author, owner and maintainer of this repository
+(Department of Informatics, Ionian University, Corfu, Greece · mmarag@ionio.gr), and co-author
+of the accompanying article.
+
 ## Research paper
 
 This repository is the artifact accompanying:
@@ -391,7 +397,7 @@ calibration rule that encodes a case-specific answer.
 
 ## Licence
 
-Copyright © 2026 Alexios Kaponis and Manolis Maragoudakis.
+Copyright © 2026 Manolis Maragoudakis.
 
 Licensed under the **European Union Public Licence v. 1.2** (EUPL-1.2). You may not use this
 work except in compliance with the Licence; the full text is in [`LICENSE`](LICENSE) and the

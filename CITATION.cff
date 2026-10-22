@@ -5,10 +5,6 @@ message: >-
   the accompanying article.
 type: software
 authors:
-  - family-names: Kaponis
-    given-names: Alexios
-    affiliation: Department of Informatics, Ionian University, Corfu, Greece
-    email: alexios.kaponis@ionio.gr
   - family-names: Maragoudakis
     given-names: Manolis
     affiliation: Department of Informatics, Ionian University, Corfu, Greece
@@ -38,6 +34,7 @@ references:
     title: >-
       Regulator-in-the-Loop Compliance Screening: Graph-Grounded LLM Agents
       with a Continuously Calibrated Benchmark for EU Marketing Law
+    # Author order as published in the article.
     authors:
       - family-names: Kaponis
         given-names: Alexios
